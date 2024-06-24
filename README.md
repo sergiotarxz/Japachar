@@ -2,6 +2,7 @@
 
 ## Demostration
 
+<video controls src="https://git.owlcode.tech/sergiotarxz/JapaChar/raw/branch/main/demo-2.mp4"></video>
 <video controls src="https://git.owlcode.tech/sergiotarxz/JapaChar/raw/branch/main/demo.mp4"></video>
 
 These instructions are safe to follow even if you have JapaChar installed,
