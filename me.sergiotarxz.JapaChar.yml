@@ -7,7 +7,7 @@ finish-args:
   - --share=ipc
   - --socket=fallback-x11
   - --socket=wayland
-  - --filesystem=xdg-config/.japachar
+  - --preserve=~/.japachar
 command: '/app/JapaChar/run.sh'
 modules: 
   - name: "perle"
