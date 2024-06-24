@@ -3,7 +3,7 @@
   <id>me.sergiotarxz.JapaChar</id>
   
   <name>Japachar</name>
-  <summary>Learn Japanese characters.</summary>
+  <summary>Learn Japanese characters</summary>
   
   <metadata_license>MIT</metadata_license>
   <project_license>AGPL-3.0-only</project_license>
@@ -13,6 +13,24 @@
     <control>keyboard</control>
     <control>touch</control>
   </supports>
+
+  <url type="homepage">https://git.owlcode.tech/sergiotarxz/JapaChar</url>
+
+<content_rating type="oars-1.1">
+    <content_attribute id="language-humor">mild</content_attribute>
+    <content_attribute id="money-advertising">mild</content_attribute>
+</content_rating>
+
+
+  <developer_name>sergiotarxz</developer_name>
+<releases>
+  <release version="v0.05" date="2024-06-24">
+    <description>
+      <p>Initial version</p>
+    </description>
+  </release>
+</releases>
+
   <developer id="me.sergiotarxz">
     <name>Sergiotarxz</name>
   </developer>
@@ -30,12 +48,15 @@
   <screenshots>
     <screenshot type="default">
       <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/branch/main/Screenshot%20from%202024-06-24%2023-13-52.png</image>
+      <caption>There is a featured character 'a' and 5 toggle buttons which read え　お　う　い　and あ being the last one marked, there is a green text saying You are doing great because the exercise have succeded, there is a button which reads 'Continue'</caption>
     </screenshot>
     <screenshot>
       <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/branch/main/Screenshot%20from%202024-06-24%2023-13-28.png</image>
+      <caption>There is a button called 'Basic Characters' on top and on the bottom there is two buttons 'Hiragana' and 'Katakana'</caption>
     </screenshot>
     <screenshot>
       <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/branch/main/Screenshot%20from%202024-06-24%2023-13-42.png</image>
+      <caption>There is a featured character 'i' and 5 toggle buttons which read あ　い　う(marked)　え　and お, there is a red text saying 'Meck!! The correct answer is い', because the exercise has failed, there is a button which reads 'Continue'</caption>
     </screenshot>
   </screenshots>
 </component>
