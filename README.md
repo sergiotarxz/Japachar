@@ -1,6 +1,10 @@
 # JapaChar
 
-## Installing in Linux
+These instructions are safe to follow even if you have JapaChar installed,
+it will preserve your progress so you can continue learning from
+where you were.
+
+## Installing in Linux (Flatpak)
 
 Run these commands with flatpak correctly configured for your desktop
 environment with flathub support:
