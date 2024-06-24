@@ -2,7 +2,7 @@
 
 ## Demostration
 
-[!watch](https://git.owlcode.tech/sergiotarxz/JapaChar/raw/branch/main/demo.mp4);
+[video](https://git.owlcode.tech/sergiotarxz/JapaChar/raw/branch/main/demo.mp4);
 
 These instructions are safe to follow even if you have JapaChar installed,
 it will preserve your progress so you can continue learning from
