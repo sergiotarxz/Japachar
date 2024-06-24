@@ -222,7 +222,7 @@ sub _application_start($self, $app) {
 }
 
 sub start($self) {
-    my $app = Gtk::Application->new('me.sergiotarxz.japchar', 'default-flags'); 
+    my $app = Gtk::Application->new('me.sergiotarxz.JapaChar', 'default-flags'); 
     $app->signal_connect('activate' => sub {
         $self->_application_start($app);
     });

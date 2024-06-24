@@ -38,8 +38,15 @@ sub connect {
 
 sub _db_path($class) {
     my $home = $ENV{HOME};
+    my $flatpak_config_dir = $ENV{XDG_CONFIG_HOME};
     my $db_path = '';
-    $db_path = $home . '/' if $home; 
+    {
+	if ($flatpak_config_dir) {
+		$db_path = $flatpak_config_dir . '/';	
+		next;
+	}
+	$db_path = $home . '/' if $home; 
+    }
     $db_path .= '.japachar/db.sqlite';
     path($db_path)->parent->mkpath;
     return $db_path;
