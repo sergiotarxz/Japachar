@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>me.sergiotarxz.JapaChar</id>
+  
+  <name>Japachar</name>
+  <summary>Learn Japanese characters on your own pace.</summary>
+  
+  <metadata_license>MIT</metadata_license>
+  <project_license>AGPL-3.0-only</project_license>
+  
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+  
+  <description>
+    <p>
+      This application helps you to learn Japanese characters using a gradual learning algorithm which makes you test-like questions.
+    </p>
+    <p>
+      It keeps a inner score of how much you know a character to give priority to ask you again about it if needed and introduces a new characters when you are ready.
+    </p>
+  </description>
+  
+  <launchable type="desktop-id">me.sergiotarxz.JapaChar.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/branch/main/Screenshot%20from%202024-06-24%2023-13-52.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/branch/main/Screenshot%20from%202024-06-24%2023-13-28.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/branch/main/Screenshot%20from%202024-06-24%2023-13-42.png</image>
+    </screenshot>
+  </screenshots>
+</component>
