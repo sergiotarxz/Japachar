@@ -9,6 +9,8 @@ environment:
 git clone https://git.owlcode.tech/sergiotarxz/JapaChar
 cd JapaChar
 flatpak-builder --repo=repo --user  build me.sergiotarxz.JapaChar.yml  --force-clean
+# Ignore possible errors in the next command 
+# if you do not have JapaChar installed.
 flatpak --user remove me.sergiotarxz.JapaChar
 flatpak --user install me.sergiotarxz.JapaChar
 ```
