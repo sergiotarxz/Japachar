@@ -13,6 +13,9 @@
     <control>keyboard</control>
     <control>touch</control>
   </supports>
+  <developer id="me.sergiotarxz">
+    <name>Sergiotarxz</name>
+  </developer>
   
   <description>
     <p>
