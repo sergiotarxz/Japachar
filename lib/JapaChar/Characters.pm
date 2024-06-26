@@ -95,6 +95,9 @@ sub next_char( $self, $type = undef ) {
     if ( !defined $next_review ) {
         return $next_learning;
     }
+    if ( !defined $next_learning) {
+        return $next_review;
+    }
     my $rng = int( rand(100) ) + 1;
     if ( $rng > 20 ) {
         return $next_learning;
