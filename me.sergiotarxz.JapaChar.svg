@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     inkscape:zoom="1.5722656"
-     inkscape:cx="260.13416"
-     inkscape:cy="264.26832"
+     inkscape:zoom="1.2293232"
+     inkscape:cx="264.77984"
+     inkscape:cy="205.39757"
      inkscape:window-width="1920"
      inkscape:window-height="1011"
      inkscape:window-x="0"
@@ -48,20 +48,21 @@
     <text
        xml:space="preserve"
        id="text1"
-       style="white-space:pre;shape-inside:url(#rect1);fill:#000000"><tspan
+       style="white-space:pre;shape-inside:url(#rect1);display:inline;fill:#000000"><tspan
          x="58.386719"
          y="109.67383"
-         id="tspan3">　</tspan></text>
+         id="tspan1">　</tspan></text>
     <text
        xml:space="preserve"
-       style="fill:#000000"
-       x="-10.168951"
-       y="453.92053"
-       id="text2"><tspan
+       style="font-size:11.7079px;fill:#ffccaa;stroke:#2b0000;stroke-width:11.3176;stroke-dasharray:none"
+       x="-16.431278"
+       y="447.94705"
+       id="text2"
+       transform="scale(1.0001214,0.99987857)"><tspan
          sodipodi:role="line"
          id="tspan2"
-         x="-10.168951"
-         y="453.92053"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:533.333px;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">あ</tspan></text>
+         x="-16.431278"
+         y="447.94705"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:520.353px;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffccaa;stroke:#2b0000;stroke-width:11.3176;stroke-dasharray:none">あ</tspan></text>
   </g>
 </svg>
