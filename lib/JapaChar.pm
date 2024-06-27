@@ -14,7 +14,7 @@ use YAML::PP;
 use JapaChar::DB;
 use JapaChar::Characters;
 use Pango;
-use Crypt::URandom qw( urandom );
+use JapaChar::Random;
 
 use Glib::IO;
 
@@ -58,9 +58,7 @@ sub _new_challenge($self, $window, $type = undef) {
         $self->_create_main_menu($window);
         return;
     }
-    my $rng = urandom(4);
-    $rng = unpack 'L', $rng;
-    $rng = ($rng % 100) + 1;
+    my $rng = JapaChar::Random->new->get(1, 100);
     if ($rng > 50) {
         $self->_new_challenge_romanji($window, $type);
         return;

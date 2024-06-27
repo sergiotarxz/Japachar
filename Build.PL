@@ -22,5 +22,10 @@ my $build = Module::Build->new(
         'Pango'                       => 0,
         'Crypt::URandom'              => 0,
     },
+    test_requires => {
+        'Test::MockModule' => 0,
+        'Test::Most'       => 0,
+        'Test::MockObject' => 0,
+    }
 );
 $build->create_build_script;

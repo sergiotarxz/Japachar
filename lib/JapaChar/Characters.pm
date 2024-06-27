@@ -10,6 +10,8 @@ use Path::Tiny;
 use JSON;
 use Data::Dumper;
 
+use JapaChar::Random;
+
 my $option_populated = 'populated_basic_characters';
 require JapaChar::DB;
 require JapaChar::Schema;
@@ -68,7 +70,7 @@ sub get_4_incorrect_answers( $self, $char ) {
     return \@bad_answers;
 }
 
-sub next_review_char( $self, $type = undef ) {
+sub _next_review_char( $self, $type = undef ) {
     my $basic_character_resultset =
       JapaChar::Schema->Schema->resultset('BasicCharacter');
     my @chars = $basic_character_resultset->search(
@@ -90,22 +92,23 @@ sub next_review_char( $self, $type = undef ) {
 }
 
 sub next_char( $self, $type = undef ) {
-    my $next_review   = $self->next_review_char($type);
-    my $next_learning = $self->next_learning_char($type);
+    my $next_review   = $self->_next_review_char($type);
+    my $next_learning = $self->_next_learning_char($type);
     if ( !defined $next_review ) {
         return $next_learning;
     }
     if ( !defined $next_learning) {
         return $next_review;
     }
-    my $rng = int( rand(100) ) + 1;
+    my $rng = JapaChar::Random->new->get(1, 100);
     if ( $rng > 20 ) {
         return $next_learning;
     }
     return $next_review;
 }
 
-sub next_learning_char( $self, $type = undef ) {
+
+sub _next_learning_char( $self, $type = undef ) {
     $self->populate_basic_characters;
     my $basic_character_resultset =
       JapaChar::Schema->Schema->resultset('BasicCharacter');
