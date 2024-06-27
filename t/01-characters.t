@@ -30,11 +30,12 @@ BEGIN {
         return 100;
     });
     my $mock_characters = Test::MockModule->new('JapaChar::Characters');
-    my $called_next_review_char = 0;
+    my $next_review_char = undef;
     $mock_characters->mock(_next_review_char => sub {
-        $called_next_review_char = 1;
-        return $mock_characters->original('_next_review_char')->(@_);
+        $next_review_char = $mock_characters->original('_next_review_char')->(@_);
+        return $next_review_char;
     });
-    ok defined(JapaChar::Characters->new->next_char), 'The next char is defined.';
-    ok $called_next_review_char, 'The next char is a review.';
+    my $next_char = JapaChar::Characters->new->next_char;
+    ok defined($next_char), 'The next char is defined.';
+    is_deeply $next_review_char, $next_char, 'The next char is a review one.';
 }
