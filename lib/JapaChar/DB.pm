@@ -16,6 +16,10 @@ use Data::Dumper;
 
 my $dbh;
 
+sub reset_dbh {
+    undef $dbh;
+}
+
 sub connect {
     if ( defined $dbh ) {
         return $dbh;

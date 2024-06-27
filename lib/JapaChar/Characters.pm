@@ -35,13 +35,16 @@ WHERE name = ?', {}, $option_populated
 sub _populate_type( $self, $type ) {
     my $basic_character_resultset =
       JapaChar::Schema->Schema->resultset('BasicCharacter');
+    my @array_for_insertion;
     for my $char ( @{ $self->_get_characters_of_type($type) } ) {
         my $kana    = $char->{kana};
         my $romanji = $char->{roumaji};
         next if $romanji =~ /pause/i;
-        $basic_character_resultset->new(
-            { value => $kana, romanji => $romanji, type => $type, } )->insert;
+        push @array_for_insertion, { value => $kana, romanji => $romanji, type => $type };
     }
+    $basic_character_resultset->populate([
+        @array_for_insertion
+    ]);
 }
 
 sub _get_characters_of_type( $self, $type ) {

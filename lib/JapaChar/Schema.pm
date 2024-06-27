@@ -29,4 +29,8 @@ sub Schema ($class) {
     }
     return $schema;
 }
+
+sub reset_schema {
+    undef $schema;
+}
 1;
