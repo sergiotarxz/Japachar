@@ -9,7 +9,7 @@ use Moo;
 
 use Crypt::URandom qw( urandom );
 
-sub get($min = 1, $max = 100) {
+sub get($class, $min = 1, $max = 100) {
     my $rng = urandom(4);
     $rng = unpack 'L', $rng;
     $rng = ($rng % $max) + $min;
