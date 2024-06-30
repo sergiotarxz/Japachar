@@ -38,6 +38,13 @@ Glib::Object::Introspection->setup(
     package => 'Gtk::Gsk',
 );
 
+Glib::Object::Introspection->setup(
+    basename => 'Adw',
+    version => '1',
+    package => 'Adw',
+);
+
+
 has _counter => (
     is => 'rw',
 );
@@ -220,7 +227,7 @@ sub _application_start($self, $app) {
 }
 
 sub start($self) {
-    my $app = Gtk::Application->new('me.sergiotarxz.JapaChar', 'default-flags'); 
+    my $app = Adw::Application->new('me.sergiotarxz.JapaChar', 'default-flags'); 
     $app->signal_connect('activate' => sub {
         $self->_application_start($app);
     });
