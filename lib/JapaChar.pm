@@ -93,6 +93,7 @@ sub _new_challenge_generic_code($self, $window, $type, $show, $guess) {
     $continue_button->set_valign('center');
     $continue_button->set_halign('end');
     $continue_button->set_sensitive(0);
+    $continue_button->add_css_class('accent');
     my $on_answer = sub {
         $continue_button->set_sensitive(1);
     };
