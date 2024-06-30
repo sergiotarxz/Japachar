@@ -86,7 +86,7 @@ sub _new_challenge_generic_code($self, $window, $type, $show, $guess) {
     $kana_label->set_halign('center');
     $kana_label->set_valign('center');
     $grid->attach($kana_label, 0, 0, 12, 1);
-    $window->set_child($grid);
+    $self->_window_set_child($window, $grid);
     my $incorrect_chars = JapaChar::Characters->new->get_4_incorrect_answers($char);
     my @buttons;
     my $continue_button = Gtk::Button->new_with_label('Continue');
@@ -212,12 +212,21 @@ sub _create_main_menu($self, $window) {
     $box->set_valign('start');
     $box->set_halign('center');
     $grid->attach($box, 0, 1, 5, 1);
-    $window->set_child($grid);
+    $self->_window_set_child($window, $grid);
+}
+
+sub _window_set_child($self, $window, $child) {
+    my $box = Gtk::Box->new('vertical', 0);
+    my $headerbar = Adw::HeaderBar->new;
+    $headerbar->set_title_widget(Gtk::Label->new('Japachar'));
+    $box->append($headerbar);
+    $box->append($child);
+    $child->set_vexpand(1);
+    $window->set_content($box);
 }
 
 sub _application_start($self, $app) {
-    my $main_window = Gtk::ApplicationWindow->new($app);
-    $main_window->set_title('JapaChar');
+    my $main_window = Adw::ApplicationWindow->new($app);
     $main_window->set_default_size(600, 600);
     my $display = $main_window->get_property('display');
     my $css_provider = Gtk::CssProvider->new;
