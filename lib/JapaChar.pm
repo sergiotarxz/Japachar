@@ -49,6 +49,10 @@ has _counter => (
     is => 'rw',
 );
 
+has _headerbar => (
+    is => 'rw',
+);
+
 sub config($class) {
     my $ypp = YAML::PP->new;
     $ypp->load_file(''.path(__FILE__)->parent->parent->child('config.yml'));
@@ -87,6 +91,49 @@ sub _new_challenge_generic_code($self, $window, $type, $show, $guess) {
     $kana_label->set_valign('center');
     $grid->attach($kana_label, 0, 0, 12, 1);
     $self->_window_set_child($window, $grid);
+    my $back_button = Gtk::Button->new_from_icon_name('go-previous-symbolic');
+    $back_button->signal_connect('clicked', sub {
+        my $dialog = Adw::Dialog->new;
+        $dialog->set_content_width(460);
+        $dialog->set_content_height(400);
+        my $main_box = Gtk::Box->new('vertical', 0);
+        $main_box->set_vexpand(1);
+        my $grid = Gtk::Grid->new;
+        my $headerbar = Adw::HeaderBar->new;
+        $main_box->append($headerbar);
+        my $label = Gtk::Label->new('You are about to exit the lesson');
+        $main_box->append($label);
+        $label->set_property('height_request', 250);
+        $label->set_valign('center');
+        $label->set_halign('center');
+        my $attr_list = Pango::AttrList->new;
+        my $size = Pango::AttrSize->new(18 * PANGO_SCALE);
+        $attr_list->insert($size);
+        $label->set_attributes($attr_list);
+        my $button_box = Gtk::Box->new('horizontal', 15);
+        $button_box->set_halign('center');
+        $button_box->set_property('height_request', 50);
+        $button_box->set_valign('end');
+        my $button_accept = Gtk::Button->new_with_label('Lose all progress');
+        my $button_reject = Gtk::Button->new_with_label('Continue the lesson');
+        $button_accept->signal_connect('clicked', sub {
+            $dialog->close;
+            $self->_create_main_menu($window);
+        });
+        $button_reject->signal_connect('clicked', sub {
+            $dialog->close;
+        });
+        $button_accept->set_valign('end');
+        $button_reject->set_valign('end');
+        $button_accept->add_css_class('destructive-action');
+        $button_reject->add_css_class('suggested-action');
+        $main_box->append($button_box);
+        $button_box->append($button_accept);
+        $button_box->append($button_reject);
+        $dialog->set_child($main_box);
+        $dialog->present($window);
+    });
+    $self->_headerbar->pack_start($back_button);
     my $incorrect_chars = JapaChar::Characters->new->get_4_incorrect_answers($char);
     my @buttons;
     my $continue_button = Gtk::Button->new_with_label('Continue');
@@ -223,6 +270,7 @@ sub _window_set_child($self, $window, $child) {
     $box->append($child);
     $child->set_vexpand(1);
     $window->set_content($box);
+    $self->_headerbar($headerbar);
 }
 
 sub _application_start($self, $app) {
