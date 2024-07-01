@@ -22,6 +22,11 @@
     <content_attribute id="money-advertising">mild</content_attribute>
 </content_rating>
 
+<branding>
+  <color type="primary" scheme_preference="light">#d5459b</color>
+  <color type="primary" scheme_preference="dark">#7e1d70</color>
+</branding>
+
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
