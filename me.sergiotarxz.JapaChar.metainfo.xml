@@ -24,6 +24,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v0.11" date="2024-06-24">
+    <description>
+      <p>Providing dark theme and using libadwaita to have better integration with GNOME.</p>
+    </description>
+  </release>
   <release version="v0.10" date="2024-06-24">
     <description>
       <p>Initial version</p>
