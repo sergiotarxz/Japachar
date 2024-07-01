@@ -15,6 +15,7 @@
   </supports>
 
   <url type="homepage">https://git.owlcode.tech/sergiotarxz/JapaChar</url>
+  <url type="donation">https://ko-fi.com/sergiotarxz</url>
 
 <content_rating type="oars-1.1">
     <content_attribute id="language-humor">mild</content_attribute>
@@ -24,7 +25,12 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
-  <release version="v0.11" date="2024-06-24">
+  <release version="v0.12" date="2024-07-01">
+    <description>
+      <p>Adding a donation button, please use it.</p>
+    </description>
+  </release>
+  <release version="v0.11" date="2024-07-01">
     <description>
       <p>Providing dark theme and using libadwaita to have better integration with GNOME.</p>
     </description>
