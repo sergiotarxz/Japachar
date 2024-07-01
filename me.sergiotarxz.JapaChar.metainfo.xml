@@ -25,14 +25,19 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v0.13" date="2024-07-01">
+    <description>
+      <p>Improving screenshots, adding the option to exit the lesson without exiting the program</p>
+    </description>
+  </release>
   <release version="v0.12" date="2024-07-01">
     <description>
-      <p>Adding a donation button, please use it.</p>
+      <p>Adding a donation button, please use it</p>
     </description>
   </release>
   <release version="v0.11" date="2024-07-01">
     <description>
-      <p>Providing dark theme and using libadwaita to have better integration with GNOME.</p>
+      <p>Providing dark theme and using libadwaita to have better integration with GNOME</p>
     </description>
   </release>
   <release version="v0.10" date="2024-06-24">
