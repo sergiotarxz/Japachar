@@ -30,6 +30,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v0.14" date="2024-07-01">
+    <description>
+      <p>Adding branding colours</p>
+    </description>
+  </release>
   <release version="v0.13" date="2024-07-01">
     <description>
       <p>Improving screenshots, adding the option to exit the lesson without exiting the program</p>
