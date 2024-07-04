@@ -30,6 +30,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v0.16" date="2024-07-04">
+    <description>
+       <p>Adding updated screenshots.</p>
+    </description>
+  </release>
   <release version="v0.15" date="2024-07-04">
     <description>
        <p>Exit lesson popup is now an adwaita alert, custom styles for light and dark themes.</p>
