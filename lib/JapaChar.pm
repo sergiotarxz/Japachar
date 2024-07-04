@@ -47,6 +47,7 @@ Glib::Object::Introspection->setup(
 has _counter => ( is => 'rw', );
 
 has _headerbar => ( is => 'rw', );
+has _on_resize_lesson => ( is => 'rw', );
 
 has _gresources_path => ( is => 'lazy', );
 
@@ -124,46 +125,6 @@ sub _new_challenge_generic_code( $self, $window, $type, $show, $guess ) {
                     }
                 }
             );
-
-#        my $dialog = Adw::Dialog->new;
-#        $dialog->set_content_width(460);
-#        $dialog->set_content_height(400);
-#        my $main_box = Gtk::Box->new('vertical', 0);
-#        $main_box->set_vexpand(1);
-#        my $grid = Gtk::Grid->new;
-#        my $headerbar = Adw::HeaderBar->new;
-#        $main_box->append($headerbar);
-#        my $label = Gtk::Label->new('You are about to exit the lesson');
-#        $main_box->append($label);
-#        $label->set_property('height_request', 250);
-#        $label->set_valign('center');
-#        $label->set_halign('center');
-#        my $attr_list = Pango::AttrList->new;
-#        my $size = Pango::AttrSize->new(18 * PANGO_SCALE);
-#        $attr_list->insert($size);
-#        $label->set_attributes($attr_list);
-#        my $button_box = Gtk::Box->new('horizontal', 15);
-#        $button_box->set_halign('center');
-#        $button_box->set_property('height_request', 50);
-#        $button_box->set_valign('end');
-#        my $button_accept = Gtk::Button->new_with_label('Lose all progress');
-#        my $button_reject = Gtk::Button->new_with_label('Continue the lesson');
-#        $button_accept->signal_connect('clicked', sub {
-#            $dialog->close;
-#            $self->_create_main_menu($window);
-#        });
-#        $button_reject->signal_connect('clicked', sub {
-#            $dialog->close;
-#        });
-#        $button_accept->set_valign('end');
-#        $button_reject->set_valign('end');
-#        $button_accept->add_css_class('destructive-action');
-#        $button_reject->add_css_class('suggested-action');
-#        $main_box->append($button_box);
-#        $button_box->append($button_accept);
-#        $button_box->append($button_reject);
-#        $dialog->set_child($main_box);
-#        $dialog->present($window);
         }
     );
     $self->_headerbar->pack_start($back_button);
@@ -206,13 +167,26 @@ sub _new_challenge_generic_code( $self, $window, $type, $show, $guess ) {
     my $box = Gtk::Box->new( 'horizontal', 10 );
     $box->set_valign('center');
     $box->set_halign('center');
+    my $resize_buttons = sub {
+        my $window_size = $window->get_property('default-width');
+#        $box->set_spacing(20 * $window_size / 420);
+        for my $button (@buttons) {
+            my $attr_list = Pango::AttrList->new;
+            my $size_number = 60 * $window_size;
+            my $size_pango_number = PANGO_SCALE * 60;
+            my $size      = Pango::AttrSize->new( $size_number  );
+            if ($size_pango_number < $size_number) {
+                $size      = Pango::AttrSize->new( $size_pango_number );
+            }
+            $attr_list->insert($size);
+            $button->get_child->set_attributes($attr_list);
+        }
+    };
+    $resize_buttons->();
     for my $button (@buttons) {
-        my $attr_list = Pango::AttrList->new;
-        my $size      = Pango::AttrSize->new( 42 * PANGO_SCALE );
-        $attr_list->insert($size);
-        $button->get_child->set_attributes($attr_list);
         $box->append($button);
     }
+    $self->_on_resize_lesson($resize_buttons);
     my $first_press_continue = 1;
     $continue_button->signal_connect(
         'clicked',
@@ -237,8 +211,9 @@ sub _new_challenge_generic_code( $self, $window, $type, $show, $guess ) {
                 $char->fail;
             }
             my $attr_list = Pango::AttrList->new;
-            my $size      = Pango::AttrSize->new( 18 * PANGO_SCALE );
+            my $size      = Pango::AttrSize->new( 23 * $window->get_property('default-width') );
             $attr_list->insert($size);
+            $label_feedback->set_halign('center');
             $label_feedback->set_attributes($attr_list);
             $grid->attach( $label_feedback, 0, 2, 7, 1 );
         }
@@ -278,6 +253,7 @@ sub _create_main_menu( $self, $window ) {
     my $grid = Gtk::Grid->new;
     my $button_start_basic_lesson =
       Gtk::Button->new_with_label('Basic Characters');
+    $self->_on_resize_lesson(undef);
     $button_start_basic_lesson->signal_connect(
         'clicked',
         sub {
@@ -335,6 +311,13 @@ sub _window_set_child( $self, $window, $child ) {
 sub _application_start( $self, $app ) {
     my $main_window = Adw::ApplicationWindow->new($app);
     $main_window->set_default_size( 600, 600 );
+    $main_window->signal_connect(notify => sub($object, $param) {
+        if ($param->{name} eq 'default-width') {
+            if (defined $self->_on_resize_lesson) {
+                $self->_on_resize_lesson->();
+            }
+        }
+    });
     my $display      = $main_window->get_property('display');
     $self->_create_main_menu($main_window);
     $main_window->present;
