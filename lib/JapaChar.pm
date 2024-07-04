@@ -50,6 +50,8 @@ has _headerbar => ( is => 'rw', );
 has _on_resize_lesson => ( is => 'rw', );
 
 has _gresources_path => ( is => 'lazy', );
+has _first_press_continue => ( is => 'rw');
+has _final_answer => (is => 'rw');
 
 sub _build__gresources_path($self) {
     my $root       = path(__FILE__)->parent->parent;
@@ -96,14 +98,51 @@ sub _new_challenge_romanji( $self, $window, $type = undef ) {
     $self->_new_challenge_generic_code( $window, $type, $show, $guess );
 }
 
-sub _new_challenge_generic_code( $self, $window, $type, $show, $guess ) {
+sub _new_typing_romanji_challenge($self, $window, $char, $type) {
     my $grid       = $self->_create_grid_challenge;
-    my $char       = JapaChar::Characters->new->next_char($type);
-    my $kana_label = $self->_get_label_featured_character( $char->get($show) );
+    my $kana_label = $self->_get_label_featured_character( $char->get('kana') );
     $kana_label->set_halign('center');
     $kana_label->set_valign('center');
     $grid->attach( $kana_label, 0, 0, 12, 1 );
-    $self->_window_set_child( $window, $grid );
+    $self->_window_set_child($window, $grid);
+    my $back_button = $self->_create_exit_lesson_back_button($window);
+    $self->_headerbar->pack_start($back_button);
+    my $romanji_entry = Gtk::Entry->new;
+    my $attr_list = Pango::AttrList->new;
+    my $size_number = 60 * $window->get_property('default-width');
+    my $size_pango_number = PANGO_SCALE * 60;
+    my $size      = Pango::AttrSize->new( $size_number  );
+    if ($size_pango_number < $size_number) {
+        $size      = Pango::AttrSize->new( $size_pango_number );
+    }
+    $attr_list->insert($size);
+    $romanji_entry->set_attributes($attr_list);
+    my $buffer = $romanji_entry->get_buffer;
+    $self->_first_press_continue(1);
+    my $continue_button = $self->_create_continue_lesson_button($window, $grid, $char, $type, 'romanji');
+    my $on_change_buffer = sub {
+        my $text = $buffer->get_text;
+        if (!$text) {
+            $continue_button->set_sensitive(0);
+            return;
+        }
+        $self->_final_answer(lc($text));
+        $continue_button->set_sensitive(1);
+    };
+    $buffer->signal_connect('inserted-text', sub {
+        $on_change_buffer->();
+    });
+    $buffer->signal_connect('deleted-text', sub {
+        $on_change_buffer->();
+    });
+
+    $romanji_entry->set_valign('center');
+    $romanji_entry->set_halign('center');
+    $grid->attach($romanji_entry, 2, 1, 8, 1);
+    $grid->attach( $continue_button, 6, 2, 5, 1 );
+}
+
+sub _create_exit_lesson_back_button($self, $window) {
     my $back_button = Gtk::Button->new_from_icon_name('go-previous-symbolic');
     $back_button->signal_connect(
         'clicked',
@@ -127,25 +166,37 @@ sub _new_challenge_generic_code( $self, $window, $type, $show, $guess ) {
             );
         }
     );
+    return $back_button;
+}
+
+sub _new_challenge_generic_code( $self, $window, $type, $show, $guess, $can_be_typed = 0 ) {
+    my $grid       = $self->_create_grid_challenge;
+    my $char       = JapaChar::Characters->new->next_char($type);
+    my $kana_label = $self->_get_label_featured_character( $char->get($show) );
+    my $rng = JapaChar::Random->new->get( 1, 100 );
+    if ($char->score > 60 && $can_be_typed && $rng > 30 ) {
+        $self->_new_typing_romanji_challenge($window, $char, $type);
+        return;
+    }
+    $kana_label->set_halign('center');
+    $kana_label->set_valign('center');
+    $grid->attach( $kana_label, 0, 0, 12, 1 );
+    $self->_window_set_child( $window, $grid );
+    my $back_button = $self->_create_exit_lesson_back_button($window);
     $self->_headerbar->pack_start($back_button);
     my $incorrect_chars =
       JapaChar::Characters->new->get_4_incorrect_answers($char);
     my @buttons;
-    my $continue_button = Gtk::Button->new_with_label('Continue');
-    $continue_button->set_valign('center');
-    $continue_button->set_halign('end');
-    $continue_button->set_sensitive(0);
-    $continue_button->add_css_class('accent');
+    my $continue_button = $self->_create_continue_lesson_button($window, $grid, $char, $type, $guess);
     my $on_answer = sub {
         $continue_button->set_sensitive(1);
     };
     my $correct_answer_button =
       Gtk::ToggleButton->new_with_label( $char->get($guess) );
-    my $final_answer;
     $correct_answer_button->signal_connect(
         'clicked',
         sub {
-            $final_answer = $char->get($guess);
+            $self->_final_answer($char->get($guess));
             $on_answer->();
         }
     );
@@ -157,7 +208,7 @@ sub _new_challenge_generic_code( $self, $window, $type, $show, $guess ) {
         $incorrect_button->signal_connect(
             'clicked',
             sub {
-                $final_answer = $char->get($guess);
+                $self->_final_answer($char->get($guess));
                 $on_answer->();
             }
         );
@@ -187,18 +238,32 @@ sub _new_challenge_generic_code( $self, $window, $type, $show, $guess ) {
         $box->append($button);
     }
     $self->_on_resize_lesson($resize_buttons);
-    my $first_press_continue = 1;
+    $self->_first_press_continue(1);
+    $grid->attach( $box, 0, 1, 12, 1 );
+    $grid->attach( $continue_button, 6, 2, 5, 1 );
+}
+
+sub _create_continue_lesson_button($self, $window, $grid, $char, $type, $guess) {
+    my $continue_button = Gtk::Button->new_with_label('Continue');
+    $continue_button->set_valign('center');
+    $continue_button->set_halign('end');
+    $continue_button->set_sensitive(0);
+    $continue_button->add_css_class('accent');
+    my $attr_list = Pango::AttrList->new;
+    my $size      = Pango::AttrSize->new( 25 * PANGO_SCALE );
+    $attr_list->insert($size);
+    $continue_button->get_child->set_attributes($attr_list);
     $continue_button->signal_connect(
         'clicked',
         sub {
-            if ( !$first_press_continue ) {
+            if ( !$self->_first_press_continue ) {
                 $self->_new_challenge( $window, $type );
                 return;
             }
-            $first_press_continue = 0;
+            $self->_first_press_continue(0);
             my $label_feedback;
             {
-                if ( $final_answer eq $char->get($guess) ) {
+                if ( $self->_final_answer eq $char->get($guess) ) {
                     $label_feedback =
                       Gtk::Label->new('You are doing it great.');
                     $label_feedback->add_css_class('success');
@@ -218,18 +283,13 @@ sub _new_challenge_generic_code( $self, $window, $type, $show, $guess ) {
             $grid->attach( $label_feedback, 0, 2, 7, 1 );
         }
     );
-    $grid->attach( $box, 0, 1, 12, 1 );
-    my $attr_list = Pango::AttrList->new;
-    my $size      = Pango::AttrSize->new( 25 * PANGO_SCALE );
-    $attr_list->insert($size);
-    $continue_button->get_child->set_attributes($attr_list);
-    $grid->attach( $continue_button, 6, 2, 5, 1 );
+    return $continue_button;
 }
 
 sub _new_challenge_kana( $self, $window, $type = undef ) {
     my $show  = 'kana';
     my $guess = 'romanji';
-    $self->_new_challenge_generic_code( $window, $type, $show, $guess );
+    $self->_new_challenge_generic_code( $window, $type, $show, $guess, 1 );
 }
 
 sub _create_grid_challenge($self) {
