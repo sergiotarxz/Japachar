@@ -30,6 +30,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v0.17" date="2024-07-05">
+    <description>
+       <p>Increasing adaptativity in small display devices.</p>
+    </description>
+  </release>
   <release version="v0.16" date="2024-07-04">
     <description>
        <p>Adding updated screenshots.</p>
@@ -76,7 +81,10 @@
       This application helps you to learn Japanese characters using a gradual learning algorithm which makes you test-like questions.
     </p>
     <p>
-      It keeps a inner score of how much you know a character to give priority to ask you again about it if needed and introduces a new characters when you are ready.
+      It keeps a inner score of how much you know a character to give priority to ask you again about it if needed and introduces new characters when you are ready.
+    </p>
+    <p>
+        You are going to need to have installed japanese fonts on your linux system in order of this app to correctly work, I recommend noto-cjk.
     </p>
   </description>
   
