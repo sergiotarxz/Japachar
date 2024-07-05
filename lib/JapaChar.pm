@@ -46,20 +46,20 @@ Glib::Object::Introspection->setup(
 
 has _counter => ( is => 'rw', );
 
-has _headerbar => ( is => 'rw', );
+has _headerbar        => ( is => 'rw', );
 has _on_resize_lesson => ( is => 'rw', );
 
-has _gresources_path => ( is => 'lazy', );
-has _first_press_continue => ( is => 'rw');
-has _final_answer => (is => 'rw');
+has _gresources_path           => ( is => 'lazy', );
+has _first_press_continue      => ( is => 'rw' );
+has _final_answer              => ( is => 'rw' );
+has _continue_button           => ( is => 'rw' );
+has _on_resize_continue_button => ( is => 'rw' );
 
 sub _build__gresources_path($self) {
     my $root       = path(__FILE__)->parent->parent;
     my $gresources = $root->child('resources.gresource');
-    0 == system( 'which', 'glib-compile-resources' )
-    && system(
-        'glib-compile-resources', $root->child('resources.xml')
-    );
+    0 == system( 'which',                  'glib-compile-resources' )
+      && system( 'glib-compile-resources', $root->child('resources.xml') );
     if ( !-e $gresources ) {
         {
             die 'No gresources';
@@ -98,51 +98,61 @@ sub _new_challenge_romanji( $self, $window, $type = undef ) {
     $self->_new_challenge_generic_code( $window, $type, $show, $guess );
 }
 
-sub _new_typing_romanji_challenge($self, $window, $char, $type) {
+sub _new_typing_romanji_challenge( $self, $window, $char, $type ) {
     my $grid       = $self->_create_grid_challenge;
     my $kana_label = $self->_get_label_featured_character( $char->get('kana') );
     $kana_label->set_halign('center');
     $kana_label->set_valign('center');
     $grid->attach( $kana_label, 0, 0, 12, 1 );
-    $self->_window_set_child($window, $grid);
+    $self->_window_set_child( $window, $grid );
     my $back_button = $self->_create_exit_lesson_back_button($window);
     $self->_headerbar->pack_start($back_button);
-    my $romanji_entry = Gtk::Entry->new;
-    my $attr_list = Pango::AttrList->new;
-    my $size_number = 60 * $window->get_property('default-width');
+    my $romanji_entry     = Gtk::Entry->new;
+    my $attr_list         = Pango::AttrList->new;
+    my $size_number       = 60 * $window->get_property('default-width');
     my $size_pango_number = PANGO_SCALE * 60;
-    my $size      = Pango::AttrSize->new( $size_number  );
-    if ($size_pango_number < $size_number) {
-        $size      = Pango::AttrSize->new( $size_pango_number );
+    my $size              = Pango::AttrSize->new($size_number);
+
+    if ( $size_pango_number < $size_number ) {
+        $size = Pango::AttrSize->new($size_pango_number);
     }
     $attr_list->insert($size);
     $romanji_entry->set_attributes($attr_list);
     my $buffer = $romanji_entry->get_buffer;
     $self->_first_press_continue(1);
-    my $continue_button = $self->_create_continue_lesson_button($window, $grid, $char, $type, 'romanji');
+    my $continue_button =
+      $self->_create_continue_lesson_button( $window, $grid, $char, $type,
+        'romanji' );
     my $on_change_buffer = sub {
         my $text = $buffer->get_text;
-        if (!$text) {
+        if ( !$text ) {
             $continue_button->set_sensitive(0);
             return;
         }
-        $self->_final_answer(lc($text));
+        $self->_final_answer( lc($text) );
         $continue_button->set_sensitive(1);
     };
-    $buffer->signal_connect('inserted-text', sub {
-        $on_change_buffer->();
-    });
-    $buffer->signal_connect('deleted-text', sub {
-        $on_change_buffer->();
-    });
+    $buffer->signal_connect(
+        'inserted-text',
+        sub {
+            $on_change_buffer->();
+        }
+    );
+    $buffer->signal_connect(
+        'deleted-text',
+        sub {
+            $on_change_buffer->();
+        }
+    );
 
     $romanji_entry->set_valign('center');
     $romanji_entry->set_halign('center');
-    $grid->attach($romanji_entry, 2, 1, 8, 1);
+    $grid->attach( $romanji_entry, 2, 1, 8, 1 );
+
     $grid->attach( $continue_button, 6, 2, 5, 1 );
 }
 
-sub _create_exit_lesson_back_button($self, $window) {
+sub _create_exit_lesson_back_button( $self, $window ) {
     my $back_button = Gtk::Button->new_from_icon_name('go-previous-symbolic');
     $back_button->signal_connect(
         'clicked',
@@ -169,13 +179,15 @@ sub _create_exit_lesson_back_button($self, $window) {
     return $back_button;
 }
 
-sub _new_challenge_generic_code( $self, $window, $type, $show, $guess, $can_be_typed = 0 ) {
+sub _new_challenge_generic_code( $self, $window, $type, $show, $guess,
+    $can_be_typed = 0 )
+{
     my $grid       = $self->_create_grid_challenge;
     my $char       = JapaChar::Characters->new->next_char($type);
     my $kana_label = $self->_get_label_featured_character( $char->get($show) );
-    my $rng = JapaChar::Random->new->get( 1, 100 );
-    if ($char->score > 60 && $can_be_typed && $rng > 30 ) {
-        $self->_new_typing_romanji_challenge($window, $char, $type);
+    my $rng        = JapaChar::Random->new->get( 1, 100 );
+    if ( $char->score > 60 && $can_be_typed && $rng > 30 ) {
+        $self->_new_typing_romanji_challenge( $window, $char, $type );
         return;
     }
     $kana_label->set_halign('center');
@@ -187,7 +199,9 @@ sub _new_challenge_generic_code( $self, $window, $type, $show, $guess, $can_be_t
     my $incorrect_chars =
       JapaChar::Characters->new->get_4_incorrect_answers($char);
     my @buttons;
-    my $continue_button = $self->_create_continue_lesson_button($window, $grid, $char, $type, $guess);
+    my $continue_button =
+      $self->_create_continue_lesson_button( $window, $grid, $char, $type,
+        $guess );
     my $on_answer = sub {
         $continue_button->set_sensitive(1);
     };
@@ -196,7 +210,7 @@ sub _new_challenge_generic_code( $self, $window, $type, $show, $guess, $can_be_t
     $correct_answer_button->signal_connect(
         'clicked',
         sub {
-            $self->_final_answer($char->get($guess));
+            $self->_final_answer( $char->get($guess) );
             $on_answer->();
         }
     );
@@ -208,7 +222,7 @@ sub _new_challenge_generic_code( $self, $window, $type, $show, $guess, $can_be_t
         $incorrect_button->signal_connect(
             'clicked',
             sub {
-                $self->_final_answer($char->get($guess));
+                $self->_final_answer( $char->get($guess) );
                 $on_answer->();
             }
         );
@@ -220,14 +234,14 @@ sub _new_challenge_generic_code( $self, $window, $type, $show, $guess, $can_be_t
     $box->set_halign('center');
     my $resize_buttons = sub {
         my $window_size = $window->get_property('default-width');
-#        $box->set_spacing(20 * $window_size / 420);
+        $box->set_spacing( 5 * $window_size / 420 );
         for my $button (@buttons) {
-            my $attr_list = Pango::AttrList->new;
-            my $size_number = 60 * $window_size;
+            my $attr_list         = Pango::AttrList->new;
+            my $size_number       = 45 * $window_size;
             my $size_pango_number = PANGO_SCALE * 60;
-            my $size      = Pango::AttrSize->new( $size_number  );
-            if ($size_pango_number < $size_number) {
-                $size      = Pango::AttrSize->new( $size_pango_number );
+            my $size              = Pango::AttrSize->new($size_number);
+            if ( $size_pango_number < $size_number ) {
+                $size = Pango::AttrSize->new($size_pango_number);
             }
             $attr_list->insert($size);
             $button->get_child->set_attributes($attr_list);
@@ -239,20 +253,29 @@ sub _new_challenge_generic_code( $self, $window, $type, $show, $guess, $can_be_t
     }
     $self->_on_resize_lesson($resize_buttons);
     $self->_first_press_continue(1);
-    $grid->attach( $box, 0, 1, 12, 1 );
-    $grid->attach( $continue_button, 6, 2, 5, 1 );
+    $grid->attach( $box,             0, 1, 12, 1 );
+    $grid->attach( $continue_button, 6, 2, 5,  1 );
 }
 
-sub _create_continue_lesson_button($self, $window, $grid, $char, $type, $guess) {
+sub _create_continue_lesson_button( $self, $window, $grid, $char, $type,
+    $guess )
+{
     my $continue_button = Gtk::Button->new_with_label('Continue');
     $continue_button->set_valign('center');
     $continue_button->set_halign('end');
     $continue_button->set_sensitive(0);
     $continue_button->add_css_class('accent');
-    my $attr_list = Pango::AttrList->new;
-    my $size      = Pango::AttrSize->new( 25 * PANGO_SCALE );
-    $attr_list->insert($size);
-    $continue_button->get_child->set_attributes($attr_list);
+    $self->_on_resize_continue_button(
+        sub {
+            my $attr_list = Pango::AttrList->new;
+            my $size = Pango::AttrSize->new(
+                40 * $window->get_property('default-width') );
+
+            $attr_list->insert($size);
+            $continue_button->get_child->set_attributes($attr_list);
+        }
+    );
+    $self->_on_resize_continue_button->();
     $continue_button->signal_connect(
         'clicked',
         sub {
@@ -276,7 +299,8 @@ sub _create_continue_lesson_button($self, $window, $grid, $char, $type, $guess) 
                 $char->fail;
             }
             my $attr_list = Pango::AttrList->new;
-            my $size      = Pango::AttrSize->new( 23 * $window->get_property('default-width') );
+            my $size      = Pango::AttrSize->new(
+                23 * $window->get_property('default-width') );
             $attr_list->insert($size);
             $label_feedback->set_halign('center');
             $label_feedback->set_attributes($attr_list);
@@ -314,6 +338,7 @@ sub _create_main_menu( $self, $window ) {
     my $button_start_basic_lesson =
       Gtk::Button->new_with_label('Basic Characters');
     $self->_on_resize_lesson(undef);
+    $self->_on_resize_continue_button(undef);
     $button_start_basic_lesson->signal_connect(
         'clicked',
         sub {
@@ -370,21 +395,27 @@ sub _window_set_child( $self, $window, $child ) {
 
 sub _application_start( $self, $app ) {
     my $main_window = Adw::ApplicationWindow->new($app);
-    $main_window->set_default_size( 600, 600 );
-    $main_window->signal_connect(notify => sub($object, $param) {
-        if ($param->{name} eq 'default-width') {
-            if (defined $self->_on_resize_lesson) {
-                $self->_on_resize_lesson->();
+    $main_window->set_default_size( 1200, 600 );
+    $main_window->signal_connect(
+        notify => sub( $object, $param ) {
+            if ( $param->{name} eq 'default-width' ) {
+                if ( defined $self->_on_resize_lesson ) {
+                    $self->_on_resize_lesson->();
+                }
+                if ( defined $self->_on_resize_continue_button ) {
+                    $self->_on_resize_continue_button->();
+                }
             }
         }
-    });
-    my $display      = $main_window->get_property('display');
+    );
+    my $display = $main_window->get_property('display');
     $self->_create_main_menu($main_window);
     $main_window->present;
 }
 
 sub start($self) {
-    Glib::IO::resources_register(Glib::IO::Resource::load($self->_gresources_path));
+    Glib::IO::resources_register(
+        Glib::IO::Resource::load( $self->_gresources_path ) );
     my $app =
       Adw::Application->new( 'me.sergiotarxz.JapaChar', 'default-flags' );
     $app->signal_connect(

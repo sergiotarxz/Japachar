@@ -1,3 +1,7 @@
 headerbar box {
     background: #e1d98a;
 }
+
+button {
+    min-width: 5px;
+}
