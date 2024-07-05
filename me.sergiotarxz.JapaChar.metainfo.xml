@@ -30,6 +30,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v0.19" date="2024-07-05">
+    <description>
+       <p>The last small display fixes went badly this version tries to smooth that fixes.</p>
+    </description>
+  </release>
   <release version="v0.18" date="2024-07-05">
     <description>
        <p>On high score characters now the program can ask you to type the character in romanji, that's because it is very important that you can identify characters without clues.</p>
