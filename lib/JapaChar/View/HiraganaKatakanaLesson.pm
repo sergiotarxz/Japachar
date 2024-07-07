@@ -20,6 +20,7 @@ use JapaChar::Score;
 use Glib::IO;
 
 use constant PANGO_SCALE => 1024;
+my $exit_the_lesson_id = 'exit-the-lesson';
 
 Glib::Object::Introspection->setup(
     basename => 'Gtk',
@@ -135,28 +136,34 @@ sub create_exit_lesson_back_button( $self, $on_exit ) {
         'clicked',
         sub {
             $back_button->set_sensitive(0);
-            my $dialog = Adw::AlertDialog->new( 'Exit the lessson',
-                'On exit you will lose your progress' );
-            $dialog->add_response( 'close', 'Continue' );
-            my $exit_the_lesson_id = 'exit-the-lesson';
-            $dialog->add_response( $exit_the_lesson_id, 'Exit' );
-            $dialog->set_response_appearance( $exit_the_lesson_id,
-                'destructive' );
-            $self->app->present_dialog($dialog);
-            $dialog->signal_connect(
-                'response',
-                sub( $obj, $response ) {
-                    if ( $response eq $exit_the_lesson_id ) {
-                        $on_exit->();
-                        require JapaChar::View::MainMenu;
-                        JapaChar::View::MainMenu->new( app => $self->app )->run;
-                        return;
-                    }
-                }
-            );
+            $self->_create_dialog_exit_lesson($on_exit);
         }
     );
     return $back_button;
+}
+
+sub _create_dialog_exit_lesson( $self, $on_exit ) {
+    my $dialog = Adw::AlertDialog->new( 'Exit the lessson',
+        'On exit you will lose your progress' );
+    $dialog->add_response( 'close', 'Continue' );
+    $dialog->add_response( $exit_the_lesson_id, 'Exit' );
+    $dialog->set_response_appearance( $exit_the_lesson_id, 'destructive' );
+    $dialog->signal_connect(
+        'response',
+        sub( $obj, $response ) {
+            $self->_on_dialog_exit_lesson_response( $response, $on_exit );
+        }
+    );
+    $self->app->present_dialog($dialog);
+    return $dialog;
+}
+
+sub _on_dialog_exit_lesson_response( $self, $response, $on_exit ) {
+    if ( $response eq $exit_the_lesson_id ) {
+        $on_exit->();
+        require JapaChar::View::MainMenu;
+        JapaChar::View::MainMenu->new( app => $self->app )->run;
+    }
 }
 
 sub finish_lesson_screen($self) {
