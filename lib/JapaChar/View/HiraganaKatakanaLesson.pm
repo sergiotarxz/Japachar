@@ -149,7 +149,7 @@ sub create_exit_lesson_back_button( $self, $on_exit ) {
                     if ( $response eq $exit_the_lesson_id ) {
                         $on_exit->();
                         require JapaChar::View::MainMenu;
-                        JapaChar::View::MainMenu->new( app => $self )->run;
+                        JapaChar::View::MainMenu->new( app => $self->app )->run;
                         return;
                     }
                 }
