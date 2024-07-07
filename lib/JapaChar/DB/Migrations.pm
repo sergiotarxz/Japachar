@@ -23,6 +23,7 @@ sub MIGRATIONS {
             score INTEGER NOT NULL DEFAULT 0,
             consecutive_success INTEGER NOT NULL DEFAULT 0
         );',
+        'INSERT INTO options (name, value) VALUES (\'user_score\', \'0\');',
     );
 }
 1;
