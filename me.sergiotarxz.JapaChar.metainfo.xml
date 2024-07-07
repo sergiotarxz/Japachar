@@ -30,6 +30,12 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v0.20" date="2024-07-05">
+    <description>
+       <p>Major refactor and new windows before entering a lesson and after leaving it.</p>
+       <p>There is now an score that meassures how much effort you gave to the app.</p>
+    </description>
+  </release>
   <release version="v0.19" date="2024-07-05">
     <description>
        <p>The last small display fixes went badly this version tries to smooth that fixes.</p>
