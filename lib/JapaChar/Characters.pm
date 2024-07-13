@@ -9,6 +9,8 @@ use Moo;
 use Path::Tiny;
 use JSON;
 use Data::Dumper;
+use Encode      qw(encode);
+use Digest::SHA qw(sha1_hex);
 
 use JapaChar::Random;
 
@@ -185,4 +187,15 @@ sub _retrieve_started_chars_not_finished( $self, $type ) {
     );
 }
 
+sub get_color_attr($self, $text) {
+    my $style_manager = Adw::StyleManager::get_default();
+    my $hex_color     = sha1_hex( encode 'utf-8', $text);
+    my @foreground =
+      map { $_ & 0xffff }
+      map { int($_ * ( $style_manager->get_dark ? 2 : 0.5 )) }
+      map { ( $_ << 8 ) | $_ }
+      map { $_ = hex $_; } $hex_color =~ /(..)(..)(..)/;
+    my $fore_attr = Pango::AttrForeground->new(@foreground);
+    return $fore_attr;
+}
 1;

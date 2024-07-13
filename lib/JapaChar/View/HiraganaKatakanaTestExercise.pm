@@ -16,8 +16,6 @@ use JapaChar::Characters;
 use Pango;
 use JapaChar::Random;
 use JapaChar::Score;
-use Digest::SHA qw(sha1_hex);
-use Encode qw(encode);
 
 use Glib::IO;
 
@@ -164,16 +162,13 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
     my $box = Gtk::Box->new( 'horizontal', 10 );
     $box->set_valign('center');
     $box->set_halign('center');
-    my $resize_buttons = sub {
-    };
-    $resize_buttons->();
 
     for my $button (@buttons) {
         $box->append($button);
     }
     $self->_buttons_box($box);
     $self->_on_resize_buttons->();
-    $self->_app->on_resize($resize_buttons);
+    $self->_app->on_resize($self->_on_resize_buttons);
     $grid->attach( $box,             0, 2, 12, 1 );
     $grid->attach( $continue_button, 6, 3, 5,  1 );
 }
@@ -190,6 +185,10 @@ sub _build__on_resize_buttons($self) {
             my $size              = Pango::AttrSize->new($size_number);
             if ( $size_pango_number < $size_number ) {
                 $size = Pango::AttrSize->new($size_pango_number);
+            }
+            if ($self->_app->accessibility->is_dyslexia) {
+                my $fore_attr = $self->_app->characters->get_color_attr($button->get_child->get_text);
+                $attr_list->insert($fore_attr);
             }
             $attr_list->insert($size);
             $button->get_child->set_attributes($attr_list);
@@ -210,15 +209,11 @@ sub _get_label_featured_character( $self, $text ) {
     my $size      = Pango::AttrSize->new( 72 * PANGO_SCALE );
     my $color     = Pango::Color->new;
 
-    my $hex_color = sha1_hex(encode 'utf-8', $text);
-    my @foreground = map { $_ = hex $_; ($_ << 8) | $_ } $hex_color =~ /(..)(..)(..)/;
-    my @background = map { 0xffff - $_ } @foreground;
-    my $fore_attr = Pango::AttrForeground->new(@foreground);
-    my $back_attr = Pango::AttrBackground->new(@background);
     $attr_list->insert($size);
-    if ($self->_app->accessibility->is_dyslexia) {
+    my $fore_attr = $self->_app->characters->get_color_attr($text);
+
+    if ( $self->_app->accessibility->is_dyslexia ) {
         $attr_list->insert($fore_attr);
-        $attr_list->insert($back_attr);
     }
     $label->set_attributes($attr_list);
     $label->set_halign('center');
