@@ -30,6 +30,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v0.24" date="2024-07-13">
+    <description>
+       <p>Fixing regression nothing works because of uncommitted file.</p>
+    </description>
+  </release>
   <release version="v0.23" date="2024-07-13">
     <description>
        <p>Improving mode for dyslexia.</p>
