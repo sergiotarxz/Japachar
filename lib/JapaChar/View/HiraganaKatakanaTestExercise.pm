@@ -16,6 +16,8 @@ use JapaChar::Characters;
 use Pango;
 use JapaChar::Random;
 use JapaChar::Score;
+use Digest::SHA qw(sha1_hex);
+use Encode qw(encode);
 
 use Glib::IO;
 
@@ -95,9 +97,10 @@ sub _new_challenge_romanji($self) {
 }
 
 sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
-    my $type       = $self->_type;
-    my $grid       = $self->_create_grid_challenge;
-    my $char       = JapaChar::Characters->new->next_char($type);
+    my $type = $self->_type;
+    my $grid = $self->_create_grid_challenge;
+    my $char =
+      $self->_app->characters->next_char( $self->_app->accessibility, $type );
     my $kana_label = $self->_get_label_featured_character( $char->get($show) );
     my $rng        = JapaChar::Random->new->get( 1, 100 );
 
@@ -205,7 +208,13 @@ sub _get_label_featured_character( $self, $text ) {
     my $label     = Gtk::Label->new($text);
     my $attr_list = Pango::AttrList->new;
     my $size      = Pango::AttrSize->new( 72 * PANGO_SCALE );
+    my $color     = Pango::Color->new;
+
+    my $hex_color = sha1_hex(encode 'utf-8', $text);
+    my ($r, $g, $b) = map { $_ = hex $_; ($_ << 8) | $_ } $hex_color =~ /(..)(..)(..)/;
+    my $color_attr = Pango::AttrForeground->new($r, $g, $b);
     $attr_list->insert($size);
+    $attr_list->insert($color_attr);
     $label->set_attributes($attr_list);
     $label->set_halign('center');
     return $label;
@@ -314,18 +323,24 @@ sub _on_click_continue_button( $self, $grid, $char, $guess ) {
     }
     $self->_first_press_continue(0);
     my $label_feedback;
+    my $is_repeating = $self->_app->characters->is_repeated;
     {
         if ( $self->_final_answer eq $char->get($guess) ) {
             $label_feedback = Gtk::Label->new('You are doing it great.');
             $label_feedback->add_css_class('success');
             $self->lesson->add_one_success;
-            $char->success;
+            $char->success if !$is_repeating;
             next;
         }
         $label_feedback = Gtk::Label->new(
             'Meck!! The correct answer is ' . $char->get($guess) );
         $label_feedback->add_css_class('error');
-        $char->fail;
+        $char->fail if !$is_repeating;
+    }
+    if ( $is_repeating && $self->_app->characters->last_repeated ) {
+
+        # TODO This is not ideal.
+        $self->success;
     }
     my $attr_list = Pango::AttrList->new;
     my $size      = Pango::AttrSize->new( 23 * $self->_app->get_width );

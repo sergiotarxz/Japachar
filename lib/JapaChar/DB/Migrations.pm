@@ -24,6 +24,7 @@ sub MIGRATIONS {
             consecutive_success INTEGER NOT NULL DEFAULT 0
         );',
         'INSERT INTO options (name, value) VALUES (\'user_score\', \'0\');',
+        'ALTER TABLE basic_characters ADD consecutive_failures INTEGER NOT NULL DEFAULT 0',
     );
 }
 1;

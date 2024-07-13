@@ -16,6 +16,9 @@ my $option_populated = 'populated_basic_characters';
 require JapaChar::DB;
 require JapaChar::Schema;
 
+has is_repeated => ( is => 'rw', default => sub { 0 } );
+has _times_repeated => ( is => 'rw', default => sub { 0 });
+
 sub populate_basic_characters($self) {
     my $dbh    = JapaChar::DB->connect;
     my $result = $dbh->selectrow_hashref(
@@ -40,11 +43,10 @@ sub _populate_type( $self, $type ) {
         my $kana    = $char->{kana};
         my $romanji = $char->{roumaji};
         next if $romanji =~ /pause/i;
-        push @array_for_insertion, { value => $kana, romanji => $romanji, type => $type };
+        push @array_for_insertion,
+          { value => $kana, romanji => $romanji, type => $type };
     }
-    $basic_character_resultset->populate([
-        @array_for_insertion
-    ]);
+    $basic_character_resultset->populate( [@array_for_insertion] );
 }
 
 sub _get_characters_of_type( $self, $type ) {
@@ -60,7 +62,7 @@ sub get_4_incorrect_answers( $self, $char ) {
       JapaChar::Schema->Schema->resultset('BasicCharacter');
     my @bad_answers = $basic_character_resultset->search(
         {
-            type => $char->type,
+            type    => $char->type,
             value   => { '!=', $char->value },
             romanji => { '!=', $char->romanji },
             -bool   => 'started',
@@ -79,9 +81,7 @@ sub _next_review_char( $self, $type = undef ) {
     my @chars = $basic_character_resultset->search(
         {
             score => { '>=' => 100 },
-            (
-                ( defined $type ) ? ( type => $type, ) : ()
-            )
+            ( ( defined $type ) ? ( type => $type, ) : () )
         },
         {
             order_by => { -asc => \'RANDOM()' },
@@ -94,22 +94,59 @@ sub _next_review_char( $self, $type = undef ) {
     return $chars[0];
 }
 
-sub next_char( $self, $type = undef ) {
+sub _try_next_char_dyslexia($self, $type = undef) {
+    my $next_repeated_character = $self->_next_repeated_character($type);
+    if ( !defined $next_repeated_character ) {
+        return;
+    }
+    $self->is_repeated(1);
+    $self->_times_repeated($self->_times_repeated + 1);
+    if ($self->_times_repeated > 4) {
+        $self->is_repeated(0);
+        $self->_times_repeated(0);
+        return;
+    }
+    return $next_repeated_character;
+}
+
+sub last_repeated($self) {
+    return $self->_times_repeated >= 4;
+}
+
+sub next_char( $self, $accesibility, $type = undef ) {
+    if ( $accesibility->is_dyslexia ) {
+        my $dyslexia_char = $self->_try_next_char_dyslexia;
+        return $dyslexia_char if defined $dyslexia_char;
+    }
+    $self->is_repeated(0);
     my $next_review   = $self->_next_review_char($type);
     my $next_learning = $self->_next_learning_char($type);
     if ( !defined $next_review ) {
         return $next_learning;
     }
-    if ( !defined $next_learning) {
+    if ( !defined $next_learning ) {
         return $next_review;
     }
-    my $rng = JapaChar::Random->new->get(1, 100);
+    my $rng = JapaChar::Random->new->get( 1, 100 );
     if ( $rng > 20 ) {
         return $next_learning;
     }
     return $next_review;
 }
 
+sub _next_repeated_character( $self, $type = undef ) {
+    my $basic_character_resultset =
+      JapaChar::Schema->Schema->resultset('BasicCharacter');
+    my ($char) = $basic_character_resultset->search(
+        {
+            consecutive_failures => { '>=' => 3 },
+        },
+        {
+            order_by => { -asc => 'id' },
+        }
+    );
+    return $char;
+}
 
 sub _next_learning_char( $self, $type = undef ) {
     $self->populate_basic_characters;
@@ -120,9 +157,7 @@ sub _next_learning_char( $self, $type = undef ) {
         my @new_chars = $basic_character_resultset->search(
             {
                 -not_bool => 'started',
-                (
-                    ( defined $type ) ? ( type => $type, ) : ()
-                )
+                ( ( defined $type ) ? ( type => $type, ) : () )
             },
             {
                 order_by => { -asc => 'id' },
@@ -143,9 +178,7 @@ sub _retrieve_started_chars_not_finished( $self, $type ) {
       JapaChar::Schema->Schema->resultset('BasicCharacter');
     return $basic_character_resultset->search(
         {
-            (
-                ( defined $type ) ? ( type => $type, ) : ()
-            ),
+            ( ( defined $type ) ? ( type => $type, ) : () ),
             score => { '<' => 100 },
             -bool => 'started',
         }

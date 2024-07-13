@@ -49,9 +49,21 @@ Glib::Object::Introspection->setup(
 has headerbar         => ( is => 'rw', );
 has _on_resize_lesson => ( is => 'rw', );
 
-has _gresources_path           => ( is => 'lazy', );
-has _window                    => ( is => 'rw' );
-has _on_resize_triggers        => ( is => 'ro', default => sub { {}; } );
+has _gresources_path    => ( is => 'lazy', );
+has _window             => ( is => 'rw' );
+has _on_resize_triggers => ( is => 'ro', default => sub { {}; } );
+has accessibility       => ( is => 'lazy' );
+has characters => ( is => 'lazy' );
+
+sub _build_characters($self) {
+    require JapaChar::Characters;
+    return JapaChar::Characters->new;
+}
+
+sub _build_accessibility($self) {
+    require JapaChar::Accessibility;
+    return JapaChar::Accessibility->new(app => $self);
+}
 
 sub _build__gresources_path($self) {
     my $root       = path(__FILE__)->parent->parent;

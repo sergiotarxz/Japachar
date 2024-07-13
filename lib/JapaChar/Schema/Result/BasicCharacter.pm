@@ -21,7 +21,7 @@ __PACKAGE__->add_columns(
     value => {
         data_type   => 'TEXT',
         is_nullable => 0,
-        accessor => '_value',
+        accessor    => '_value',
     },
     romanji => {
         data_type   => 'TEXT',
@@ -43,10 +43,14 @@ __PACKAGE__->add_columns(
         data_type   => 'INTEGER',
         is_nullable => 1,
     },
+    consecutive_failures => {
+        data_type   => 'INTEGER',
+        is_nullable => 1,
+    },
 );
 
-sub value($self, $value = undef) {
-    if (defined $value) {
+sub value( $self, $value = undef ) {
+    if ( defined $value ) {
         $self->_value($value);
     }
     return decode 'utf-8', $self->_value;
@@ -55,41 +59,45 @@ sub value($self, $value = undef) {
 __PACKAGE__->set_primary_key('id');
 
 sub fail($self) {
-    my $score               = $self->score;
-    my $consecutive_success = 0;
+    my $score                = $self->score;
+    my $consecutive_success  = 0;
+    my $consecutive_failures = $self->consecutive_failures + 1;
     $score -= 25;
     if ( $score < 0 ) {
         $score = 0;
     }
     $self->update(
         {
-            score               => $score,
-            consecutive_success => 0
+            score                => $score,
+            consecutive_failures => $consecutive_failures,
+            consecutive_success  => 0,
         }
     );
 }
 
-sub get($self, $what) {
-    if ($what eq 'kana') {
+sub get( $self, $what ) {
+    if ( $what eq 'kana' ) {
         return $self->value;
     }
-    if ($what eq 'romanji') {
+    if ( $what eq 'romanji' ) {
         return $self->romanji;
     }
     return;
 }
 
 sub success($self) {
-    my $score               = $self->score;
-    my $consecutive_success = $self->consecutive_success + 1;
+    my $score                = $self->score;
+    my $consecutive_success  = $self->consecutive_success + 1;
+    my $consecutive_failures = 0;
     $score += 5 + 10 * $consecutive_success;
     if ( $score > 130 ) {
         $score = 130;
     }
     $self->update(
         {
-            score               => $score,
-            consecutive_success => $consecutive_success,
+            score                => $score,
+            consecutive_success  => $consecutive_success,
+            consecutive_failures => $consecutive_failures,
         }
     );
 }

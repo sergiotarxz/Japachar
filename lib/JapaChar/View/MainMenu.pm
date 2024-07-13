@@ -106,12 +106,21 @@ sub run($self) {
     $grid->attach( $box_score_basic_lesson, 0, 0, 5, 1 );
     $button_start_basic_lesson->set_valign('end');
     $button_start_basic_lesson->set_halign('center');
+    my $button_assisted_mode = Gtk::Button->new_with_label('Assisted Mode');
     $box->set_margin_top(40);
     $box->append($button_start_hiragana_lesson);
     $box->append($button_start_katakana_lesson);
     $box->set_valign('start');
     $box->set_halign('center');
     $grid->attach( $box, 0, 1, 5, 1 );
+    $grid->attach( $button_assisted_mode, 0, 2, 5, 1 );
+    $button_assisted_mode->signal_connect('clicked', sub {
+        $self->app->accessibility->show_assisted_mode_selection;
+    });
+    $button_assisted_mode->set_vexpand(1);
+    $button_assisted_mode->set_hexpand(1);
+    $button_assisted_mode->set_valign('center');
+    $button_assisted_mode->set_halign('center');
     $self->app->window_set_child($grid);
 }
 1;
