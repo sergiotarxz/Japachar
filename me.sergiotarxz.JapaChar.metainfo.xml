@@ -30,6 +30,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v0.23" date="2024-07-13">
+    <description>
+       <p>Improving mode for dyslexia.</p>
+    </description>
+  </release>
   <release version="v0.22" date="2024-07-13">
     <description>
        <p>Adding mode for dyslexia.</p>
