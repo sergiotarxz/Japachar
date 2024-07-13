@@ -30,6 +30,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v0.25" date="2024-07-13">
+    <description>
+       <p>Improving select buttons in dyslexia mode and general contrast.</p>
+    </description>
+  </release>
   <release version="v0.24" date="2024-07-13">
     <description>
        <p>Fixing regression nothing works because of uncommitted file.</p>
