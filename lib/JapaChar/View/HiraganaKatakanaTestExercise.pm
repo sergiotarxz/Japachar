@@ -211,10 +211,15 @@ sub _get_label_featured_character( $self, $text ) {
     my $color     = Pango::Color->new;
 
     my $hex_color = sha1_hex(encode 'utf-8', $text);
-    my ($r, $g, $b) = map { $_ = hex $_; ($_ << 8) | $_ } $hex_color =~ /(..)(..)(..)/;
-    my $color_attr = Pango::AttrForeground->new($r, $g, $b);
+    my @foreground = map { $_ = hex $_; ($_ << 8) | $_ } $hex_color =~ /(..)(..)(..)/;
+    my @background = map { 0xffff - $_ } @foreground;
+    my $fore_attr = Pango::AttrForeground->new(@foreground);
+    my $back_attr = Pango::AttrBackground->new(@background);
     $attr_list->insert($size);
-    $attr_list->insert($color_attr);
+    if ($self->_app->accessibility->is_dyslexia) {
+        $attr_list->insert($fore_attr);
+        $attr_list->insert($back_attr);
+    }
     $label->set_attributes($attr_list);
     $label->set_halign('center');
     return $label;
