@@ -22,9 +22,12 @@ BEGIN {
 };
 
 {
+    my $tempdir = Path::Tiny->tempdir;
+    my $test_db = $tempdir->child('test.db');
+    system 'cp', path(__FILE__)->parent->child('all-learned-basic-characters.db'), $test_db;
     my $mock_db = Test::MockModule->new('JapaChar::DB');
     $mock_db->mock(_db_path => sub {
-        return path(__FILE__)->parent->child('all-learned-basic-characters.db');
+        return $test_db;
     });
     my $mock_random = Test::MockModule->new('JapaChar::Random');
     $mock_random->mock(get => sub {
@@ -36,7 +39,9 @@ BEGIN {
         $next_review_char = $mock_characters->original('_next_review_char')->(@_);
         return $next_review_char;
     });
-    my $next_char = JapaChar::Characters->new->next_char;
+    require JapaChar::Accessibility;
+    my $accessibility = JapaChar::Accessibility->new;
+    my $next_char = JapaChar::Characters->new->next_char($accessibility);
     ok defined($next_char), 'The next char is defined.';
     is_deeply $next_char, $next_review_char, 'The next char is a review one when all characters are learned.';
 }
@@ -60,7 +65,8 @@ BEGIN {
         $next_learning = $mock_characters->original('_next_learning_char')->(@_);
         return $next_learning;
     });
-    my $next_char = JapaChar::Characters->new->next_char;
+    my $accessibility = JapaChar::Accessibility->new;
+    my $next_char = JapaChar::Characters->new->next_char($accessibility);
     ok defined($next_char), 'The next char is defined.';
     is_deeply $next_char, $next_learning, 'The next char is a learning one when there is no progress.';
 }
