@@ -30,10 +30,16 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
-  <release version="v0.26" date="2024-11-09">
+<<<<<<< HEAD
+  <release version="v0.27" date="2024-11-09">
     <description>
        <p>Bundling noto-cjk by default to not having to ask users to install
         third party fonts.</p>
+    </description>
+  </release>
+  <release version="v0.26" date="2024-07-13">
+    <description>
+       <p>Avoiding skip without reading the correct answer with a timeout.</p>
     </description>
   </release>
   <release version="v0.25" date="2024-07-13">
