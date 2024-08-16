@@ -30,6 +30,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v0.26" date="2024-07-13">
+    <description>
+       <p>Avoiding skip without reading the correct answer with a timeout.</p>
+    </description>
+  </release>
   <release version="v0.25" date="2024-07-13">
     <description>
        <p>Improving select buttons in dyslexia mode and general contrast.</p>
