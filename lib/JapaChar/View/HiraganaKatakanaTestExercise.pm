@@ -17,6 +17,7 @@ use Pango;
 use JapaChar::Random;
 use JapaChar::Score;
 
+use Glib;
 use Glib::IO;
 
 use constant PANGO_SCALE => 1024;
@@ -131,7 +132,7 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
     );
     $self->_continue_button($continue_button);
     $self->_on_resize_continue_button->();
-    my $on_answer = sub {
+    my $on_answer = sub ($correct) {
         $continue_button->set_sensitive(1);
     };
     my $correct_answer_button =
@@ -140,7 +141,7 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
         'clicked',
         sub {
             $self->_final_answer( $char->get($guess) );
-            $on_answer->();
+            $on_answer->(1);
         }
     );
     push @buttons, $correct_answer_button;
@@ -153,7 +154,7 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
             'clicked',
             sub {
                 $self->_final_answer( $char->get($guess) );
-                $on_answer->();
+                $on_answer->(0);
             }
         );
         push @buttons, $incorrect_button;
@@ -336,6 +337,11 @@ sub _on_click_continue_button( $self, $grid, $char, $guess ) {
             'Meck!! The correct answer is ' . $char->get($guess) );
         $label_feedback->add_css_class('error');
         $char->fail if !$is_repeating;
+        $continue_button->set_sensitive(0);
+        Glib::Timeout->add_seconds(1, sub {
+            $continue_button->set_sensitive(1);
+            return 0;
+        });
     }
     if ( $is_repeating && $self->_app->characters->last_repeated ) {
 
