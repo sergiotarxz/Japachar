@@ -21,6 +21,7 @@ my $build = Module::Build->new(
         'DBIx::Class'                 => 0,
         'Pango'                       => 0,
         'Crypt::URandom'              => 0,
+        'Inline::C'                   => 0,
     },
     test_requires => {
         'Test::MockModule' => 0,
