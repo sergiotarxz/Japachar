@@ -17,7 +17,7 @@ use Pango;
 use JapaChar::Random;
 use JapaChar::Score;
 use JapaChar::View::MainMenu;
-
+use JapaChar::Fontconfig;
 use Glib::IO;
 
 use constant PANGO_SCALE => 1024;
@@ -133,6 +133,7 @@ sub _application_start( $self, $app ) {
 sub start($self) {
     Glib::IO::resources_register(
         Glib::IO::Resource::load( $self->_gresources_path ) );
+    JapaChar::Fontconfig->new->set_current;
     my $app =
       Adw::Application->new( 'me.sergiotarxz.JapaChar', 'default-flags' );
     $app->signal_connect(
