@@ -23,13 +23,19 @@
 </content_rating>
 
 <branding>
-  <color type="primary" scheme_preference="light">#d5459b</color>
-  <color type="primary" scheme_preference="dark">#7e1d70</color>
+  <color type="primary" scheme_preference="light">#c76dbf</color>
+  <color type="primary" scheme_preference="dark">#5d1b52</color>
 </branding>
 
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v0.26" date="2024-11-09">
+    <description>
+       <p>Bundling noto-cjk by default to not having to ask users to install
+        third party fonts.</p>
+    </description>
+  </release>
   <release version="v0.25" date="2024-07-13">
     <description>
        <p>Improving select buttons in dyslexia mode and general contrast.</p>
@@ -124,9 +130,7 @@
     <p>
       It keeps a inner score of how much you know a character to give priority to ask you again about it if needed and introduces new characters when you are ready.
     </p>
-    <p>
-        You are going to need to have installed japanese fonts on your linux system in order of this app to correctly work, I recommend noto-cjk.
-    </p>
+    <p>It works now without having to install any third party font.</p>
   </description>
   
   <launchable type="desktop-id">me.sergiotarxz.JapaChar.desktop</launchable>
