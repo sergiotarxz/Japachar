@@ -11,10 +11,13 @@ use Path::Tiny;
 
 use Data::Dumper;
 
-use Inline C => DATA => LIBS => '-lfontconfig -lfreetype';
+require XSLoader;
+XSLoader::load('JapaChar');
+
 
 sub _font_dir($self) {
-    my $root = path(__FILE__)->parent->parent->parent;
+    require JapaChar;
+    my $root = JapaChar->root;
     return $root->child('fonts');
 }
 
@@ -23,15 +26,4 @@ sub set_current($self) {
     $self->_set_current_c( '' . $font_dir );
 }
 1;
-__DATA__
-__C__
-#include <stdio.h>
-#include <fontconfig/fontconfig.h>
 
-void
-_set_current_c(SV *self, char *font_dir) {
-    FcConfig *config = FcConfigGetCurrent();
-    FcConfigAppFontAddDir(config, font_dir);
-    FcConfigBuildFonts(config);
-    FcConfigSetCurrent(config);
-}

@@ -23,6 +23,7 @@ my $build = Module::Build->new(
         'Crypt::URandom'              => 0,
         'Inline::C'                   => 0,
     },
+    extra_linker_flags => ['-lfontconfig', '-lfreetype'],
     test_requires => {
         'Test::MockModule' => 0,
         'Test::Most'       => 0,

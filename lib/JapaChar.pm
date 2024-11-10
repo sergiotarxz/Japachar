@@ -65,8 +65,12 @@ sub _build_accessibility($self) {
     return JapaChar::Accessibility->new(app => $self);
 }
 
+sub root($self) {
+    return path(__FILE__)->parent->parent->parent;
+}
+
 sub _build__gresources_path($self) {
-    my $root       = path(__FILE__)->parent->parent;
+    my $root = $self->root;
     my $gresources = $root->child('resources.gresource');
     0 == system( 'which',                  'glib-compile-resources' )
       && system( 'glib-compile-resources', $root->child('resources.xml') );
@@ -84,7 +88,7 @@ sub get_width($self) {
 
 sub config($class) {
     my $ypp = YAML::PP->new;
-    $ypp->load_file( '' . path(__FILE__)->parent->parent->child('config.yml') );
+    $ypp->load_file( '' . $class->root->child('config.yml') );
 }
 
 sub on_resize( $self, $sub ) {

@@ -53,8 +53,9 @@ sub _populate_type( $self, $type ) {
 
 sub _get_characters_of_type( $self, $type ) {
     my $current_file = path __FILE__;
+    require JapaChar;
     my $array =
-      from_json( $current_file->parent->parent->parent->child("$type.json")
+      from_json( JapaChar->root->child("$type.json")
           ->slurp_utf8 );
     return $array;
 }

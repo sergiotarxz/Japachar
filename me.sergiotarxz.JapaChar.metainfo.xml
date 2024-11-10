@@ -30,6 +30,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v0.28" date="2024-11-09">
+    <description>
+       <p>Migrating to XS because Inline::C is giving compatibility issues.</p>
+    </description>
+  </release>
   <release version="v0.27" date="2024-11-09">
     <description>
        <p>Bundling noto-cjk by default to not having to ask users to install
