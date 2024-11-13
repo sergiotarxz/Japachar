@@ -82,6 +82,11 @@ sub _build__gresources_path($self) {
     return $gresources;
 }
 
+sub launch_discord($self) {
+    my $launcher = Gtk::UriLauncher->new( 'https://discord.gg/qsvzSJPX' );
+    $launcher->launch( $self->_window, undef, undef );
+}
+
 sub get_width($self) {
     return $self->_window->get_property('default-width');
 }

@@ -121,6 +121,17 @@ sub run($self) {
     $button_assisted_mode->set_hexpand(1);
     $button_assisted_mode->set_valign('center');
     $button_assisted_mode->set_halign('center');
+    my $button_discord_community = Gtk::Button->new_with_label('Join the discord community');
+    $button_discord_community->set_vexpand(1);
+    $button_discord_community->set_hexpand(1);
+    $button_discord_community->set_valign('center');
+    $button_discord_community->set_halign('center');
+    $button_discord_community->signal_connect(
+        clicked => sub {
+            $self->app->launch_discord;
+        }
+    );
+    $grid->attach( $button_discord_community, 0, 3, 5, 1 );
     $self->app->window_set_child($grid);
 }
 1;
