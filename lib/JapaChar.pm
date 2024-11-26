@@ -53,7 +53,12 @@ has _gresources_path    => ( is => 'lazy', );
 has _window             => ( is => 'rw' );
 has _on_resize_triggers => ( is => 'ro', default => sub { {}; } );
 has accessibility       => ( is => 'lazy' );
-has characters => ( is => 'lazy' );
+has characters          => ( is => 'lazy' );
+has kanji               => ( is => 'lazy' );
+
+sub _build_kanji($self) {
+    return JapaChar::Kanji->new(app => $self);
+}
 
 sub _build_characters($self) {
     require JapaChar::Characters;
@@ -62,7 +67,7 @@ sub _build_characters($self) {
 
 sub _build_accessibility($self) {
     require JapaChar::Accessibility;
-    return JapaChar::Accessibility->new(app => $self);
+    return JapaChar::Accessibility->new( app => $self );
 }
 
 sub root($self) {
@@ -70,7 +75,7 @@ sub root($self) {
 }
 
 sub _build__gresources_path($self) {
-    my $root = $self->root;
+    my $root       = $self->root;
     my $gresources = $root->child('resources.gresource');
     0 == system( 'which',                  'glib-compile-resources' )
       && system( 'glib-compile-resources', $root->child('resources.xml') );
@@ -83,7 +88,7 @@ sub _build__gresources_path($self) {
 }
 
 sub launch_discord($self) {
-    my $launcher = Gtk::UriLauncher->new( 'https://discord.gg/qsvzSJPX' );
+    my $launcher = Gtk::UriLauncher->new('https://discord.gg/qsvzSJPX');
     $launcher->launch( $self->_window, undef, undef );
 }
 
@@ -124,7 +129,7 @@ sub window_set_child( $self, $child ) {
 sub _application_start( $self, $app ) {
     my $main_window = Adw::ApplicationWindow->new($app);
     $self->_window($main_window);
-    $main_window->set_default_size( 1200, 600 );
+    $main_window->set_default_size( 1200, 800 );
     $main_window->signal_connect(
         notify => sub( $object, $param ) {
             if ( $param->{name} eq 'default-width' ) {

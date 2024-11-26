@@ -19,7 +19,9 @@
 
 <content_rating type="oars-1.1">
     <content_attribute id="language-humor">mild</content_attribute>
-    <content_attribute id="money-advertising">mild</content_attribute>
+    <content_attribute id="social-contacts">intense</content_attribute>
+    <content_attribute id="money-purchasing">intense</content_attribute>
+    <content_attribute id="money-advertising">intense</content_attribute>
 </content_rating>
 
 <branding>

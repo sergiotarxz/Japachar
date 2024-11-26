@@ -99,7 +99,12 @@ sub _apply_migration {
             $current_migration->($dbh);
             next;
         }
-        $dbh->do($current_migration);
+        eval {
+            $dbh->do($current_migration);
+        };
+        if ($@) {
+            die "$current_migration\n$@"
+        }
     }
     $dbh->do( <<'EOF', undef, 'current_migration', $migration_number );
 INSERT INTO options

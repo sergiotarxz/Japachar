@@ -17,6 +17,7 @@ use Pango;
 use JapaChar::Random;
 use JapaChar::Score;
 use JapaChar::View::HiraganaKatakanaLesson;
+use JapaChar::View::SelectKanjiLesson;
 
 use Glib::IO;
 
@@ -74,6 +75,7 @@ sub run($self) {
         }
     );
     my $button_start_katakana_lesson = Gtk::Button->new_with_label('Katakana');
+    my $button_start_kanji_lesson = Gtk::Button->new_with_label('Kanji (BETA)');
     $button_start_katakana_lesson->signal_connect(
         'clicked',
         sub {
@@ -84,14 +86,21 @@ sub run($self) {
             $lesson->run;
         }
     );
-    for my $button ( $button_start_basic_lesson, $button_start_hiragana_lesson,
-        $button_start_katakana_lesson )
+    for my $button (
+        $button_start_basic_lesson,    $button_start_hiragana_lesson,
+        $button_start_katakana_lesson, $button_start_kanji_lesson
+      )
     {
         my $attr_list = Pango::AttrList->new;
         my $size      = Pango::AttrSize->new( 25 * PANGO_SCALE );
         $attr_list->insert($size);
         $button->get_child->set_attributes($attr_list);
     }
+    $button_start_kanji_lesson->signal_connect(
+        clicked => sub {
+            JapaChar::View::SelectKanjiLesson->new( app => $self->app, )->run;
+        }
+    );
     my $box                    = Gtk::Box->new( 'horizontal', 10 );
     my $box_score_basic_lesson = Gtk::Box->new( 'vertical',   10 );
     my $score_label =
@@ -110,18 +119,25 @@ sub run($self) {
     $box->set_margin_top(40);
     $box->append($button_start_hiragana_lesson);
     $box->append($button_start_katakana_lesson);
+    $button_start_kanji_lesson->set_halign('center');
+    $button_start_kanji_lesson->set_valign('center');
     $box->set_valign('start');
     $box->set_halign('center');
-    $grid->attach( $box, 0, 1, 5, 1 );
-    $grid->attach( $button_assisted_mode, 0, 2, 5, 1 );
-    $button_assisted_mode->signal_connect('clicked', sub {
-        $self->app->accessibility->show_assisted_mode_selection;
-    });
+    $grid->attach( $box,                       0, 1, 5, 1 );
+    $grid->attach( $button_start_kanji_lesson, 0, 2, 5, 1 );
+    $grid->attach( $button_assisted_mode,      0, 3, 5, 1 );
+    $button_assisted_mode->signal_connect(
+        'clicked',
+        sub {
+            $self->app->accessibility->show_assisted_mode_selection;
+        }
+    );
     $button_assisted_mode->set_vexpand(1);
     $button_assisted_mode->set_hexpand(1);
     $button_assisted_mode->set_valign('center');
     $button_assisted_mode->set_halign('center');
-    my $button_discord_community = Gtk::Button->new_with_label('Join the discord community');
+    my $button_discord_community =
+      Gtk::Button->new_with_label('Join the discord community');
     $button_discord_community->set_vexpand(1);
     $button_discord_community->set_hexpand(1);
     $button_discord_community->set_valign('center');
@@ -131,7 +147,7 @@ sub run($self) {
             $self->app->launch_discord;
         }
     );
-    $grid->attach( $button_discord_community, 0, 3, 5, 1 );
+    $grid->attach( $button_discord_community, 0, 4, 5, 1 );
     $self->app->window_set_child($grid);
 }
 1;
