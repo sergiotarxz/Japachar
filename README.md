@@ -48,4 +48,4 @@ Discord if you do not now how to solve them and maybe update the docs.
 
 ### Contact
 
-You can find us in our [Discord community](https://discord.gg/qsvzSJPX), we understand using Discord is not acceptable for everybody, if you step up to moderate a parallel community in a more free platform we will help you as much as we can.
+You can find us in our [Discord community](https://discord.gg/CXUqrwtzu2), we understand using Discord is not acceptable for everybody, if you step up to moderate a parallel community in a more free platform we will help you as much as we can.

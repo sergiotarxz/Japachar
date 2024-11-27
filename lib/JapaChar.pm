@@ -88,7 +88,7 @@ sub _build__gresources_path($self) {
 }
 
 sub launch_discord($self) {
-    my $launcher = Gtk::UriLauncher->new('https://discord.gg/qsvzSJPX');
+    my $launcher = Gtk::UriLauncher->new('https://discord.gg/CXUqrwtzu2');
     $launcher->launch( $self->_window, undef, undef );
 }
 
