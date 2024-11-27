@@ -115,6 +115,18 @@ sub _select_kanji($self) {
     my $grades = $self->_kanji->grades;
     my $box = Gtk::Box->new( 'vertical', 10 );
 
+    my $discord = Gtk::Button->new_with_label('Report bugs and share feedback');
+
+    $discord->signal_connect(clicked => sub {
+        $self->app->launch_discord;
+    });
+
+    $discord->add_css_class('destructive-action');
+    $discord->set_halign('center');
+
+
+    $box->append(Gtk::Label->new('This feature is in BETA and will become for paid users when stabilized, your kanji progress until stabilized may be lost between updates because the processing of Kanji may vary wildly.'));
+
     my $button = Gtk::Button->new_with_label("Study everything ordered by grade");
     $button->signal_connect(clicked => sub {
         JapaChar::View::KanjiLesson->new(app => $self->app)->run;
@@ -140,6 +152,7 @@ sub _select_kanji($self) {
     $button->set_property('width-request', 330);
     $button->set_halign('center');
     $box->append($button);
+    $box->append($discord);
     $self->app->window_set_child($box);
     $self->app->headerbar->pack_start($back_button);
 }
