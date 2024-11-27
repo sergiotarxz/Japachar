@@ -14,8 +14,6 @@ use JapaChar::Schema;
 
 use Moo;
 
-use List::MoreUtils qw(uniq);
-
 use Encode qw/decode/;
 
 has app             => ( is => 'ro', required => 1 );
