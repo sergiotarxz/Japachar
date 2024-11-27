@@ -21,9 +21,10 @@ my $build = Module::Build->new(
         'DBIx::Class'                 => 0,
         'Pango'                       => 0,
         'Crypt::URandom'              => 0,
+        'Mojolicious'                 => 0,
     },
-    extra_linker_flags => ['-lfontconfig', '-lfreetype'],
-    test_requires => {
+    extra_linker_flags => [ '-lfontconfig', '-lfreetype' ],
+    test_requires      => {
         'Test::MockModule' => 0,
         'Test::Most'       => 0,
         'Test::MockObject' => 0,
