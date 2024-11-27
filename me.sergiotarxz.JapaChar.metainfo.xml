@@ -32,6 +32,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v1.00" date="2024-11-27">
+    <description>
+       <p>Adding BETA Kanji support.</p>
+    </description>
+  </release>
   <release version="v0.29" date="2024-11-13">
     <description>
        <p>Adding discord community to retrieve feedback from users.</p>
@@ -153,28 +158,36 @@
   <launchable type="desktop-id">me.sergiotarxz.JapaChar.desktop</launchable>
   <screenshots>
     <screenshot type="default">
-      <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/commit/c46a846ca9d4a232dede21af29ccb596347a9a37/Screenshot%20from%202024-07-04%2012-43-44.png</image>
-      <caption>Success screen after resolving an exercise</caption>
+      <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/commit/3de6ac7fef7c0dd6fadc5d96c3e627e7ebc111ae/Screenshot%20from%202024-11-27%2017-28-21.png</image>
+      <caption>Success screen after resolving a katakana exercise</caption>
     </screenshot>
     <screenshot>
-      <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/commit/c46a846ca9d4a232dede21af29ccb596347a9a37/Screenshot%20from%202024-07-04%2012-43-14.png</image>
-      <caption>Selection of challenge between basic characters, hiragana and katakan.</caption>
+      <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/commit/3de6ac7fef7c0dd6fadc5d96c3e627e7ebc111ae/Screenshot%20from%202024-11-27%2017-27-10.png</image>
+      <caption>Main menu.</caption>
     </screenshot>
     <screenshot>
-      <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/commit/c46a846ca9d4a232dede21af29ccb596347a9a37/Screenshot%20from%202024-07-04%2012-43-33.png</image>
-      <caption>Failure screen.</caption>
+      <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/commit/3de6ac7fef7c0dd6fadc5d96c3e627e7ebc111ae/Screenshot%20from%202024-11-27%2017-28-35.png</image>
+      <caption>Failure screen</caption>
     </screenshot>
     <screenshot>
-      <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/commit/c46a846ca9d4a232dede21af29ccb596347a9a37/Screenshot%20from%202024-07-04%2012-43-52.png</image>
-      <caption>Premature exit of lesson menu.</caption>
+      <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/commit/3de6ac7fef7c0dd6fadc5d96c3e627e7ebc111ae/Screenshot%20from%202024-11-27%2017-31-28.png</image>
+      <caption>Kanji lesson select menu</caption>
     </screenshot>
     <screenshot>
       <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/commit/13c912db257a2d18e3604081b6b57d2af6b65923/Screenshot%20from%202024-07-05%2001-40-51.png</image>
-      <caption>Success on a guess romanji exercise.</caption>
+      <caption>Success on a guess romanji exercise</caption>
     </screenshot>
     <screenshot>
-      <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/commit/c46a846ca9d4a232dede21af29ccb596347a9a37/Screenshot%20from%202024-07-04%2012-44-06.png</image>
-      <caption>Showcasing dark theme.</caption>
+      <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/commit/3de6ac7fef7c0dd6fadc5d96c3e627e7ebc111ae/Screenshot%20from%202024-11-27%2017-31-46.png</image>
+      <caption>Kanji start lesson menu</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/commit/3de6ac7fef7c0dd6fadc5d96c3e627e7ebc111ae/Screenshot%20from%202024-11-27%2017-31-53.png</image>
+      <caption>Asking for kanji meaning</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://git.owlcode.tech/sergiotarxz/JapaChar/raw/commit/3de6ac7fef7c0dd6fadc5d96c3e627e7ebc111ae/Screenshot%20from%202024-11-27%2017-32-18.png</image>
+      <caption>Asking for kanji Reading in On</caption>
     </screenshot>
   </screenshots>
 </component>
