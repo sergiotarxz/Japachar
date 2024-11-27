@@ -77,11 +77,10 @@ sub run($self) {
         $self->lesson->finish_lesson_screen();
         return;
     }
-    my $rng = JapaChar::Random->new->get( 1, 100 );
     my $char =
       $self->_app->kanji->next_char( $self->_app->accessibility, $self->_type );
     my @available_guessses = ($char->meanings, $char->on_readings, $char->kun_readings);
-    $rng = JapaChar::Random->new->get( 0, scalar(@available_guessses) - 1 );
+    my $rng = JapaChar::Random->new->get( 0, scalar(@available_guessses) - 1 );
     $self->_create_challenge($char, $available_guessses[$rng]);
 }
 
@@ -95,10 +94,44 @@ sub _create_challenge($self, $char, $guess) {
     my $kanji_label = $self->_get_label_featured_character( $char->kanji );
     $kanji_label->set_halign('center');
     $kanji_label->set_valign('center');
+    my $exercise_type;
+    my $exercise_type_class;
+    my @helpers;
+    if ($guess->isa('JapaChar::Schema::Result::KanjiMeanings')) {
+        $exercise_type = 'Meaning';
+        $exercise_type_class = 'meaning';
+        @helpers = ('on_readings', 'kun_readings');
+    }
+    if ($guess->isa('JapaChar::Schema::Result::KanjiOnReadings')) {
+        $exercise_type = 'On';
+        $exercise_type_class = 'on-reading';
+        @helpers = ('meanings', 'kun_readings');
+    }
+    if ($guess->isa('JapaChar::Schema::Result::KanjiKunReadings')) {
+        $exercise_type = 'Kun';
+        $exercise_type_class = 'kun-reading';
+        @helpers = ('meanings', 'on_readings');
+    }
+    my $exercise_label = Gtk::Label->new($exercise_type);
+    $exercise_label->add_css_class('exercise_type');
+    $exercise_label->add_css_class($exercise_type_class);
+    $exercise_label->set_halign('center');
     my $box_kanji = Gtk::Box->new( 'vertical', 10 );
     $box_kanji->append( $self->_new_exercise_number_label );
     $box_kanji->append($kanji_label);
-    $grid->attach( $box_kanji, 0, 0, 12, 1 );
+    $box_kanji->append($exercise_label);
+    for my $helper (@helpers) {
+        my $result;
+        {
+            if ($helper eq 'meanings') {
+                $result = join ', ', map {decode 'utf-8', $_->meaning} $char->can($helper)->($char);
+                next
+            }
+            $result = join ', ', map {decode 'utf-8', $_->reading} $char->can($helper)->($char);
+        }
+        $box_kanji->append(Gtk::Label->new("$helper: $result"));
+    }
+    $grid->attach( $box_kanji, 0, 0, 12, 4 );
     $self->_app->window_set_child($grid);
     my $back_button = $self->lesson->create_exit_lesson_back_button(
         sub {

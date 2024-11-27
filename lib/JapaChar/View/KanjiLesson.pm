@@ -166,7 +166,7 @@ sub _on_dialog_exit_lesson_response( $self, $response, $on_exit ) {
 }
 
 sub finish_lesson_screen($self) {
-    my $notable_lesson = $self->_successes >= 7;
+    my $notable_lesson = $self->_successes >= 7 * 3;
     my $feedback_label;
     my $box = Gtk::Box->new( 'vertical', 10 );
     if ($notable_lesson) {

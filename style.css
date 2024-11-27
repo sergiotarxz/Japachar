@@ -5,3 +5,22 @@ headerbar box {
 button {
     min-width: 0;
 }
+
+label.exercise_type {
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: bold;
+    color: white;
+}
+
+label.on-reading {
+    background: red;
+}
+
+label.kun-reading {
+    background: blue;
+}
+
+label.meaning {
+    background: green;
+}
