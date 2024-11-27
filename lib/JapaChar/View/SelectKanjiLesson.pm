@@ -45,11 +45,11 @@ has app    => ( is => 'ro' );
 has _kanji => ( is => 'lazy' );
 
 sub _build__kanji($self) {
-    return JapaChar::Kanji->new(app => JapaChar->new);
+    return JapaChar::Kanji->new( app => JapaChar->new );
 }
 
 sub run($self) {
-    if (!$self->_kanji->migrated) {
+    if ( !$self->_kanji->migrated ) {
         $self->_migrate_kanji;
         return;
     }
@@ -57,8 +57,8 @@ sub run($self) {
 }
 
 sub _migrate_kanji($self) {
-    my $box = Gtk::Box->new( 'vertical', 10 );
-    my $label = Gtk::Label->new('Populating Kanji database...');
+    my $box          = Gtk::Box->new( 'vertical', 10 );
+    my $label        = Gtk::Label->new('Populating Kanji database...');
     my $progress_bar = Gtk::ProgressBar->new;
     $progress_bar->set_halign('center');
     $box->set_vexpand(1);
@@ -67,40 +67,45 @@ sub _migrate_kanji($self) {
     $box->append($label);
     $box->append($progress_bar);
     $self->app->window_set_child($box);
-    my ($read, $write);
+    my ( $read, $write );
     pipe $read, $write;
     my $parent_pid = $$;
-    my $pid = fork;
-    if (!$pid) {
-        $self->_kanji->populate_kanji($parent_pid, $write);
+    my $pid        = fork;
+
+    if ( !$pid ) {
+        $self->_kanji->populate_kanji( $parent_pid, $write );
         exit;
     }
     my $n_characters;
-    Glib::Timeout->add(1_000, sub {
-        $n_characters = <$read>;
-        chomp $n_characters;
-        say 'Copying ' . $n_characters . ' kanji';
-        Glib::Timeout->add(
-            100,
-            sub {
-                $read->blocking(0);
-                my $last_number;
-                my $line;
-                while ($line = <$read>) {
-                    $last_number = $line;
+    Glib::Timeout->add(
+        1_000,
+        sub {
+            $n_characters = <$read>;
+            chomp $n_characters;
+            say 'Copying ' . $n_characters . ' kanji';
+            Glib::Timeout->add(
+                100,
+                sub {
+                    $read->blocking(0);
+                    my $last_number;
+                    my $line;
+                    while ( $line = <$read> ) {
+                        $last_number = $line;
+                    }
+                    if ($last_number) {
+                        $progress_bar->set_fraction(
+                            $last_number / $n_characters );
+                    }
+                    if ( 0 == waitpid $pid, WNOHANG ) {
+                        return 1;
+                    }
+                    $self->_select_kanji;
+                    return 0;
                 }
-                if ($last_number) {
-                    $progress_bar->set_fraction($last_number / $n_characters);
-                }
-                if (0 == waitpid $pid, WNOHANG) {
-                    return 1;
-                }
-                $self->_select_kanji;
-                return 0;
-            }
-        );
-        return 0;
-    });
+            );
+            return 0;
+        }
+    );
 }
 
 sub _select_kanji($self) {
@@ -113,43 +118,64 @@ sub _select_kanji($self) {
         }
     );
     my $grades = $self->_kanji->grades;
-    my $box = Gtk::Box->new( 'vertical', 10 );
+    my $box    = Gtk::Box->new( 'vertical', 10 );
 
     my $discord = Gtk::Button->new_with_label('Report bugs and share feedback');
 
-    $discord->signal_connect(clicked => sub {
-        $self->app->launch_discord;
-    });
+    $discord->signal_connect(
+        clicked => sub {
+            $self->app->launch_discord;
+        }
+    );
 
     $discord->add_css_class('destructive-action');
     $discord->set_halign('center');
 
+    my $label = Gtk::Label->new(
+        'This feature is in BETA and will become for paid users when stabilized.
+Your kanji progress until stabilized may be lost between updates because
+the processing of Kanji may vary wildly.'
+    );
 
-    $box->append(Gtk::Label->new('This feature is in BETA and will become for paid users when stabilized, your kanji progress until stabilized may be lost between updates because the processing of Kanji may vary wildly.'));
+    $label->set_margin_top(20);
+    $box->append($label);
 
-    my $button = Gtk::Button->new_with_label("Study everything ordered by grade");
-    $button->signal_connect(clicked => sub {
-        JapaChar::View::KanjiLesson->new(app => $self->app)->run;
-    });
+    my $button =
+      Gtk::Button->new_with_label("Study everything ordered by grade");
+    $button->signal_connect(
+        clicked => sub {
+            JapaChar::View::KanjiLesson->new( app => $self->app )->run;
+        }
+    );
     $button->set_margin_top(20);
     $button->add_css_class('accent');
     $button->set_halign('center');
-    $button->set_property('width-request', 330);
+    $button->set_property( 'width-request', 330 );
     $box->append($button);
     for my $grade (@$grades) {
         my $button = Gtk::Button->new_with_label("Study kanji grade $grade");
-        $button->signal_connect(clicked => sub {
-            JapaChar::View::KanjiLesson->new(app => $self->app, type => $grade)->run;
-        });
+        $button->signal_connect(
+            clicked => sub {
+                JapaChar::View::KanjiLesson->new(
+                    app  => $self->app,
+                    type => $grade
+                )->run;
+            }
+        );
         $button->set_halign('center');
-        $button->set_property('width-request', 330);
+        $button->set_property( 'width-request', 330 );
         $box->append($button);
     }
     $button = Gtk::Button->new_with_label("Study unclassified kanjis");
-    $button->signal_connect(clicked => sub {
-        JapaChar::View::KanjiLesson->new(app => $self->app, type => undef)->run;
-    });
-    $button->set_property('width-request', 330);
+    $button->signal_connect(
+        clicked => sub {
+            JapaChar::View::KanjiLesson->new(
+                app  => $self->app,
+                type => undef
+            )->run;
+        }
+    );
+    $button->set_property( 'width-request', 330 );
     $button->set_halign('center');
     $box->append($button);
     $box->append($discord);
