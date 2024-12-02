@@ -32,6 +32,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v1.03" date="2024-12-02">
+    <description>
+       <p>Improving further the description to make know users about they are supposed to fail when they are starting because I got a bad review complaining about that.</p>
+    </description>
+  </release>
   <release version="v1.02" date="2024-12-02">
     <description>
        <p>Indicating there is kanji support in the description.</p>
@@ -156,9 +161,9 @@
   </developer>
   
   <description>
-    <p>
-      This application helps you to learn Japanese characters using a gradual learning algorithm which makes you test-like questions.
-    </p>
+    <p>This application helps you to learn Japanese characters using a gradual learning algorithm which makes you test-like questions.</p>
+
+    <p>You are expected to fail while starting, look up the correct answer when you fail, it helps you to learn faster. You can use this app even if you do not know anything.</p>
     <p>
       It keeps a inner score of how much you know a character to give priority to ask you again about it if needed and introduces new characters when you are ready.
     </p>
