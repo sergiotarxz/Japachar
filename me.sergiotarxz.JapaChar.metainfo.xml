@@ -32,6 +32,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v1.01" date="2024-12-02">
+    <description>
+       <p>Bugfix, avoiding blocking the program for a small time while waiting for the number of kanji characters to populate.</p>
+    </description>
+  </release>
   <release version="v1.00" date="2024-11-27">
     <description>
        <p>Adding BETA Kanji support.</p>

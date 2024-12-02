@@ -80,7 +80,11 @@ sub _migrate_kanji($self) {
     Glib::Timeout->add(
         1_000,
         sub {
+            $read->blocking(0);
             $n_characters = <$read>;
+            if (!defined $n_characters) {
+                return 1;
+            }
             chomp $n_characters;
             say 'Copying ' . $n_characters . ' kanji';
             Glib::Timeout->add(
