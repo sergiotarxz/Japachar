@@ -32,6 +32,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v1.02" date="2024-12-02">
+    <description>
+       <p>Indicating there is kanji support in the description.</p>
+    </description>
+  </release>
   <release version="v1.01" date="2024-12-02">
     <description>
        <p>Bugfix, avoiding blocking the program for a small time while waiting for the number of kanji characters to populate.</p>
@@ -157,6 +162,9 @@
     <p>
       It keeps a inner score of how much you know a character to give priority to ask you again about it if needed and introduces new characters when you are ready.
     </p>
+
+    <p>BETA Kanji support available.</p>
+
     <p>It works now without having to install any third party font.</p>
   </description>
   
