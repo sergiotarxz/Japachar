@@ -221,10 +221,14 @@ sub next_char( $self, $accesibility, $type = undef ) {
 
 sub _next_review_char( $self, $type = undef ) {
     my $kanji_resultset = JapaChar::Schema->Schema->resultset('Kanji');
+    my $grade = $type;
+    if (!defined $type) {
+        $grade = { is => undef };
+    }
     my @chars           = $kanji_resultset->search(
         {
             score => { '>=' => 300 },
-            ( ( $type ne 'all' ) ? ( grade => { is => $type } ) : () )
+            ( ( $type ne 'all' ) ? ( grade => $grade ) : () )
         },
         {
             order_by => { -asc => \'RANDOM()' },
@@ -240,15 +244,19 @@ sub _next_review_char( $self, $type = undef ) {
 sub _next_learning_char( $self, $type = undef ) {
     my $kanji_resultset = JapaChar::Schema->Schema->resultset('Kanji');
     my @candidate_chars = $self->_retrieve_started_chars_not_finished($type);
-    if ( @candidate_chars < 5 ) {
+    my $grade = $type;
+    if (!defined $type) {
+        $grade = { is => undef };
+    }
+    if ( @candidate_chars < 3 ) {
         my @new_chars = $kanji_resultset->search(
             {
                 -not_bool => 'started',
-                ( ( $type ne 'all' ) ? ( grade => { is => $type } ) : () )
+                ( ( $type ne 'all' ) ? ( grade => $grade ) : () )
             },
             {
                 order_by => { -asc => [ \'grade IS NULL', 'grade', 'id' ] },
-                rows     => 5 - scalar @candidate_chars,
+                rows     => 3 - scalar @candidate_chars,
             }
         );
         for my $char (@new_chars) {
@@ -262,9 +270,13 @@ sub _next_learning_char( $self, $type = undef ) {
 
 sub _retrieve_started_chars_not_finished( $self, $type ) {
     my $kanji_resultset = JapaChar::Schema->Schema->resultset('Kanji');
+    my $grade = $type;
+    if (!defined $type) {
+        $grade = { is => undef };
+    }
     return $kanji_resultset->search(
         {
-            ( ( $type ne 'all' ) ? ( grade => { is => $type } ) : () ),
+            ( ( $type ne 'all' ) ? ( grade => $grade ) : () ),
             score => { '<' => 100 },
             -bool => 'started',
         }

@@ -32,6 +32,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v1.04" date="2024-12-02">
+    <description>
+       <p>Fixing bug unable to select specific level and decreasing number of simultaneus kanji to learn.</p>
+    </description>
+  </release>
   <release version="v1.03" date="2024-12-02">
     <description>
        <p>Improving further the description to make know users about they are supposed to fail when they are starting because I got a bad review complaining about that.</p>
