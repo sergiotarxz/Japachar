@@ -113,7 +113,7 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
     my $box_kana = Gtk::Box->new( 'vertical', 10 );
     $box_kana->append( $self->_new_exercise_number_label );
     $box_kana->append($kana_label);
-    $grid->attach( $box_kana, 0, 0, 12, 1 );
+    $grid->attach( $box_kana, 0, 0, 12, 4 );
     $self->_app->window_set_child($grid);
     my $back_button = $self->lesson->create_exit_lesson_back_button(
         sub {
@@ -229,7 +229,7 @@ sub _new_typing_romanji_challenge( $self, $char ) {
     my $box_kana = Gtk::Box->new( 'vertical', 10 );
     $box_kana->append( $self->_new_exercise_number_label );
     $box_kana->append($kana_label);
-    $grid->attach( $box_kana, 0, 0, 12, 1 );
+    $grid->attach( $box_kana, 0, 0, 12, 4 );
     $self->_app->window_set_child($grid);
     my $back_button = $self->lesson->create_exit_lesson_back_button(
         sub {
@@ -281,7 +281,7 @@ sub _new_typing_romanji_challenge( $self, $char ) {
 
     $romanji_entry->set_valign('center');
     $romanji_entry->set_halign('center');
-    $grid->attach( $romanji_entry, 2, 1, 8, 1 );
+    $grid->attach( $romanji_entry, 2, 2, 8, 1 );
 
     $grid->attach( $continue_button, 6, 3, 5, 1 );
 }

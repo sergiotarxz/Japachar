@@ -32,6 +32,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v1.05" date="2024-12-13">
+    <description>
+       <p>Avoiding window resize on hiragana and katakana exercises.</p>
+    </description>
+  </release>
   <release version="v1.04" date="2024-12-02">
     <description>
        <p>Fixing bug unable to select specific level and decreasing number of simultaneus kanji to learn.</p>
