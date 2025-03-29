@@ -32,6 +32,13 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v1.06" date="2025-03-29">
+    <description>
+       <p>Fixing unable to see Japanese characters while having installed
+        some system fonts. This error is known to happen in Tuxedo OS in
+        version v1.05 while noto-cjk is uninstalled. (Thanks Vaun).</p>
+    </description>
+  </release>
   <release version="v1.05" date="2024-12-13">
     <description>
        <p>Avoiding window resize on hiragana and katakana exercises.</p>

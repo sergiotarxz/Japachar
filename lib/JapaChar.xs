@@ -8,7 +8,7 @@
 
 void
 japachar_fontconfig__set_current_c(SV *self, char *font_dir) {
-    FcConfig *config = FcConfigGetCurrent();
+    FcConfig *config = FcConfigCreate();
     FcConfigAppFontAddDir(config, font_dir);
     FcConfigBuildFonts(config);
     FcConfigSetCurrent(config);
