@@ -32,6 +32,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v1.07" date="2025-03-30">
+    <description>
+       <p>Updating to GNOME 48, perl 5.40.1 and updating every cpan library.</p>
+    </description>
+  </release>
   <release version="v1.06" date="2025-03-29">
     <description>
        <p>Fixing unable to see Japanese characters while having installed
