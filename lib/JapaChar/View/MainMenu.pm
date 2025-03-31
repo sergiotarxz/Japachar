@@ -149,5 +149,168 @@ sub run($self) {
     );
     $grid->attach( $button_discord_community, 0, 4, 5, 1 );
     $self->app->window_set_child($grid);
+    my $hamburger_menu = Gtk::Button->new_from_icon_name('open-menu-symbolic');
+    $hamburger_menu->signal_connect(
+        'clicked',
+        sub {
+            $self->show_settings;
+        }
+    );
+    $self->app->headerbar->pack_end($hamburger_menu);
+}
+
+sub show_settings($self) {
+    my $grid = Gtk::Grid->new;
+    $grid->set_column_homogeneous(1);
+    $self->_create_option(
+        $grid,
+        'REVIEW_INSTEAD_OF_LEARNING_CHANCE_BASIC',
+        sub( $onget, $entry_buffer ) {
+            my $text = $entry_buffer->get_text;
+            $text = undef if $text =~ /^\s*$/;
+            return $onget->() if defined $text && $text !~ /^\d+$/;
+
+            my ($result) =
+              JapaChar::Schema->Schema->resultset('Option')->update_or_create(
+                {
+                    name => JapaChar::Schema::Result::Option
+                      ->REVIEW_INSTEAD_OF_LEARNING_CHANCE_BASIC,
+                    value => $text,
+                }
+              );
+            return $onget->();
+        },
+        \&JapaChar::Schema::Result::Option::get_review_instead_of_learning_chance_basic
+    );
+    $self->_create_option(
+        $grid,
+        'MAX_NUMBER_SIMULTANEOUS_LEARNING_BASIC_CHARACTERS',
+        sub( $onget, $entry_buffer ) {
+            my $text = $entry_buffer->get_text;
+            $text = undef if $text =~ /^\s*$/;
+            return $onget->() if defined $text && $text !~ /^\d+$/;
+
+            my ($result) =
+              JapaChar::Schema->Schema->resultset('Option')->update_or_create(
+                {
+                    name => JapaChar::Schema::Result::Option
+                      ->MAX_NUMBER_SIMULTANEOUS_LEARNING_BASIC_CHARACTERS,
+                    value => $text,
+                }
+              );
+            return $onget->();
+        },
+        \&JapaChar::Schema::Result::Option::get_max_number_simultaneous_learning_basic_characters
+    );
+    $self->_create_option(
+        $grid,
+        'NEW_CHARACTER_THREESHOLD_BASIC_CHARACTER_INNER_SCORE',
+        sub( $onget, $entry_buffer ) {
+            my $text = $entry_buffer->get_text;
+            $text = undef if $text =~ /^\s*$/;
+            return $onget->() if defined $text && $text !~ /^\d+$/;
+
+            my ($result) =
+              JapaChar::Schema->Schema->resultset('Option')->update_or_create(
+                {
+                    name => JapaChar::Schema::Result::Option
+                      ->NEW_CHARACTER_THREESHOLD_BASIC_CHARACTER_INNER_SCORE,
+                    value => $text,
+                }
+              );
+            return $onget->();
+        },
+        \&JapaChar::Schema::Result::Option::get_new_character_threeshold_basic_character_inner_score
+    );
+    $self->_create_option(
+        $grid,
+        'MAX_INNER_SCORE_BASIC_CHAR',
+        sub( $onget, $entry_buffer ) {
+            my $text = $entry_buffer->get_text;
+            $text = undef if $text =~ /^\s*$/;
+            return $onget->() if defined $text && $text !~ /^\d+$/;
+            my ($result) =
+              JapaChar::Schema->Schema->resultset('Option')->update_or_create(
+                {
+                    name => JapaChar::Schema::Result::Option
+                      ->MAX_INNER_SCORE_BASIC_CHAR,
+                    value => $text,
+                }
+              );
+            return $onget->();
+        },
+        \&JapaChar::Schema::Result::Option::get_max_inner_score_basic_char
+    );
+    $self->_create_option(
+        $grid,
+        'SUCCESS_REWARD_BASIC_CHARACTER',
+        sub( $onget, $entry_buffer ) {
+            my $text = $entry_buffer->get_text;
+            $text = undef if $text =~ /^\s*$/;
+            return $onget->() if defined $text && $text !~ /^\d+$/;
+
+            my ($result) =
+              JapaChar::Schema->Schema->resultset('Option')->update_or_create(
+                {
+                    name => JapaChar::Schema::Result::Option
+                      ->SUCCESS_REWARD_BASIC_CHARACTER,
+                    value => $text,
+                }
+              );
+            return $onget->();
+        },
+        \&JapaChar::Schema::Result::Option::get_success_reward_basic_character
+    );
+    $self->_create_option(
+        $grid,
+        'CONSECUTIVE_SUCCESS_REWARD_BASIC_CHARACTER',
+        sub( $onget, $entry_buffer ) {
+            my $text = $entry_buffer->get_text;
+            $text = undef if $text =~ /^\s*$/;
+            return $onget->() if defined $text && $text !~ /^\d+$/;
+
+            my ($result) =
+              JapaChar::Schema->Schema->resultset('Option')->update_or_create(
+                {
+                    name => JapaChar::Schema::Result::Option
+                      ->CONSECUTIVE_SUCCESS_REWARD_BASIC_CHARACTER,
+                    value => $text
+                }
+              );
+            return $onget->();
+        },
+        \&JapaChar::Schema::Result::Option::get_consecutive_success_reward_basic_character
+    );
+    $self->app->window_set_child($grid);
+    my $back_button = Gtk::Button->new_from_icon_name('go-previous-symbolic');
+    $back_button->signal_connect(
+        'clicked',
+        sub {
+            __PACKAGE__->new( app => $self->app )->run;
+        }
+    );
+    $self->app->headerbar->pack_start($back_button);
+}
+
+sub _create_option( $self, $grid, $label, $onchange, $onget ) {
+    state $row = 0;
+    $row++;
+    $label = Gtk::Label->new($label);
+    $grid->attach( $label, 0, $row, 1, 1 );
+    my $inital_text = $onget->();
+    my $entry_buffer =
+      Gtk::EntryBuffer->new( $inital_text, length $inital_text );
+    my $entry = Gtk::Entry->new_with_buffer($entry_buffer);
+    require JapaChar::Schema::Result::Option;
+    $entry->signal_connect(
+        'activate',
+        sub {
+            my $result = $onchange->( $onget, $entry_buffer );
+            if ( defined $result ) {
+                $entry_buffer->set_text( $result, length $result );
+            }
+        }
+    );
+    $grid->attach( $entry, 1, $row, 1, 1 );
 }
 1;

@@ -62,6 +62,7 @@ sub fail($self) {
     my $score                = $self->score;
     my $consecutive_success  = 0;
     my $consecutive_failures = $self->consecutive_failures + 1;
+
     $score -= 25;
     if ( $score < 0 ) {
         $score = 0;
@@ -89,9 +90,9 @@ sub success($self) {
     my $score                = $self->score;
     my $consecutive_success  = $self->consecutive_success + 1;
     my $consecutive_failures = 0;
-    $score += 5 + 10 * $consecutive_success;
-    if ( $score > 130 ) {
-        $score = 130;
+    $score += JapaChar::Schema::Result::Option->get_success_reward_basic_character + JapaChar::Schema::Result::Option->get_consecutive_success_reward_basic_character * $consecutive_success;
+    if ( $score > JapaChar::Schema::Result::Option->get_max_inner_score_basic_char ) {
+        $score = JapaChar::Schema::Result::Option->get_max_inner_score_basic_char;
     }
     $self->update(
         {

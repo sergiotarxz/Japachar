@@ -13,6 +13,7 @@ use Encode      qw(encode);
 use Digest::SHA qw(sha1_hex);
 
 use JapaChar::Random;
+use JapaChar::Schema::Result::Option;
 
 my $option_populated = 'populated_basic_characters';
 require JapaChar::DB;
@@ -83,7 +84,7 @@ sub _next_review_char( $self, $type = undef ) {
       JapaChar::Schema->Schema->resultset('BasicCharacter');
     my @chars = $basic_character_resultset->search(
         {
-            score => { '>=' => 100 },
+            score => { '>=' => JapaChar::Schema::Result::Option->get_new_character_threeshold_basic_character_inner_score },
             ( ( defined $type ) ? ( type => $type, ) : () )
         },
         {
@@ -131,7 +132,7 @@ sub next_char( $self, $accesibility, $type = undef ) {
         return $next_review;
     }
     my $rng = JapaChar::Random->new->get( 1, 100 );
-    if ( $rng > 20 ) {
+    if ( $rng > JapaChar::Schema::Result::Option->get_review_instead_of_learning_chance_basic() ) {
         return $next_learning;
     }
     return $next_review;
@@ -156,7 +157,7 @@ sub _next_learning_char( $self, $type = undef ) {
     my $basic_character_resultset =
       JapaChar::Schema->Schema->resultset('BasicCharacter');
     my @candidate_chars = $self->_retrieve_started_chars_not_finished($type);
-    if ( @candidate_chars < 5 ) {
+    if ( @candidate_chars < JapaChar::Schema::Result::Option->get_max_number_simultaneous_learning_basic_characters ) {
         my @new_chars = $basic_character_resultset->search(
             {
                 -not_bool => 'started',
@@ -164,7 +165,7 @@ sub _next_learning_char( $self, $type = undef ) {
             },
             {
                 order_by => { -asc => 'id' },
-                rows     => 5 - scalar @candidate_chars,
+                rows     => JapaChar::Schema::Result::Option->get_max_number_simultaneous_learning_basic_characters - scalar @candidate_chars,
             }
         );
         for my $char (@new_chars) {
@@ -182,7 +183,7 @@ sub _retrieve_started_chars_not_finished( $self, $type ) {
     return $basic_character_resultset->search(
         {
             ( ( defined $type ) ? ( type => $type, ) : () ),
-            score => { '<' => 100 },
+            score => { '<' => JapaChar::Schema::Result::Option->get_new_character_threeshold_basic_character_inner_score },
             -bool => 'started',
         }
     );

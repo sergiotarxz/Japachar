@@ -32,6 +32,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v1.08" date="2025-04-01">
+    <description>
+        <p>Adding the worst ever settings menu.</p>
+    </description>
+  </release>
   <release version="v1.07" date="2025-03-30">
     <description>
        <p>Updating to GNOME 48, perl 5.40.1 and updating every cpan library.</p>
@@ -193,6 +198,10 @@
     <p>BETA Kanji support available.</p>
 
     <p>It works now without having to install any third party font.</p>
+    
+    <p>There is a settings menu that allows you to tune your learning further
+    to your rithm, the numbers are saved with intro, if you leave a field empty
+    you will restore the default, good if you mess up with the settings.</p>
   </description>
   
   <launchable type="desktop-id">me.sergiotarxz.JapaChar.desktop</launchable>
