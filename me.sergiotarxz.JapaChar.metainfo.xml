@@ -32,6 +32,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v1.09" date="2025-04-01">
+    <description>
+        <p>Adding setting fail penalty.</p>
+    </description>
+  </release>
   <release version="v1.08" date="2025-04-01">
     <description>
         <p>Adding the worst ever settings menu.</p>
