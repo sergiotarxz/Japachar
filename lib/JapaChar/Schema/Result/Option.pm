@@ -15,6 +15,22 @@ sub FAIL_PENALTY_BASIC_CHARACTER {
     return 'fail_penalty_basic_character';
 }
 
+sub get_fail_penalty_basic_character {
+    my ($result) = JapaChar::Schema->Schema->resultset('Option')->search({ name => FAIL_PENALTY_BASIC_CHARACTER() });
+    if (!defined $result || !defined $result->value) {
+        return 25;
+    }
+
+    if ($result->value < 1) {
+        return 1;
+    }
+
+    if ($result->value > 100) {
+        return 100;
+    }
+
+    return $result->value;
+}
 sub SUCCESS_REWARD_BASIC_CHARACTER {
     return 'success_reward_basic_character';
 }

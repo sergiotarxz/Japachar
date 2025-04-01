@@ -263,6 +263,26 @@ sub show_settings($self) {
     );
     $self->_create_option(
         $grid,
+        'FAIL_PENALTY_BASIC_CHARACTER',
+        sub( $onget, $entry_buffer ) {
+            my $text = $entry_buffer->get_text;
+            $text = undef if $text =~ /^\s*$/;
+            return $onget->() if defined $text && $text !~ /^\d+$/;
+
+            my ($result) =
+              JapaChar::Schema->Schema->resultset('Option')->update_or_create(
+                {
+                    name => JapaChar::Schema::Result::Option
+                      ->FAIL_PENALTY_BASIC_CHARACTER,
+                    value => $text,
+                }
+              );
+            return $onget->();
+        },
+        \&JapaChar::Schema::Result::Option::get_fail_penalty_basic_character
+    );
+    $self->_create_option(
+        $grid,
         'CONSECUTIVE_SUCCESS_REWARD_BASIC_CHARACTER',
         sub( $onget, $entry_buffer ) {
             my $text = $entry_buffer->get_text;
