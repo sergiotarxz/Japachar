@@ -1,6 +1,6 @@
 package JapaChar::View::KanjiLesson;
 
-use v5.40.0;
+use v5.38.2;
 
 use strict;
 use warnings;
