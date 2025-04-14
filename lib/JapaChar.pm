@@ -87,6 +87,11 @@ sub _build__gresources_path($self) {
     return $gresources;
 }
 
+sub launch_website($self) {
+    my $launcher = Gtk::UriLauncher->new('https://japachar.sergiotarxz.me');
+    $launcher->launch( $self->_window, undef, undef );
+}
+
 sub launch_discord($self) {
     my $launcher = Gtk::UriLauncher->new('https://discord.gg/CXUqrwtzu2');
     $launcher->launch( $self->_window, undef, undef );

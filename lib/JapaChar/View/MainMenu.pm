@@ -136,6 +136,19 @@ sub run($self) {
     $button_assisted_mode->set_hexpand(1);
     $button_assisted_mode->set_valign('center');
     $button_assisted_mode->set_halign('center');
+    my $button_launch_website =
+      Gtk::Button->new_with_label('Visit the webpage to download for Windows and Linux');
+    $button_launch_website->set_vexpand(1);
+    $button_launch_website->set_hexpand(1);
+    $button_launch_website->set_valign('center');
+    $button_launch_website->set_halign('center');
+    $button_launch_website->signal_connect(
+        clicked => sub {
+            $self->app->launch_website;
+        }
+    );
+    say 'hola';
+    $grid->attach( $button_launch_website, 0, 4, 5, 1 );
     my $button_discord_community =
       Gtk::Button->new_with_label('Join the discord community');
     $button_discord_community->set_vexpand(1);
@@ -147,7 +160,7 @@ sub run($self) {
             $self->app->launch_discord;
         }
     );
-    $grid->attach( $button_discord_community, 0, 4, 5, 1 );
+    $grid->attach( $button_discord_community, 0, 5, 5, 1 );
     $self->app->window_set_child($grid);
     my $hamburger_menu = Gtk::Button->new_from_icon_name('open-menu-symbolic');
     $hamburger_menu->signal_connect(

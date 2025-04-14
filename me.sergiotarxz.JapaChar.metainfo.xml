@@ -14,8 +14,7 @@
     <control>touch</control>
   </supports>
 
-  <url type="homepage">https://git.owlcode.tech/sergiotarxz/JapaChar</url>
-  <url type="donation">https://ko-fi.com/sergiotarxz</url>
+  <url type="homepage">https://japachar.sergiotarxz.me</url>
 
 <content_rating type="oars-1.1">
     <content_attribute id="language-humor">mild</content_attribute>
@@ -32,6 +31,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v1.10" date="2025-04-14">
+    <description>
+        <p>Adding brand new website and fixes for windows. Salud y República. Happy 4/14.</p>
+    </description>
+  </release>
   <release version="v1.09" date="2025-04-01">
     <description>
         <p>Adding setting fail penalty.</p>
