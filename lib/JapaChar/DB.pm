@@ -42,6 +42,10 @@ sub connect {
 
 sub _db_path($class) {
     my $home = $ENV{HOME};
+    if ($^O eq 'MSWin32') {
+        $home = $ENV{userprofile};
+    }
+
     my $flatpak_config_dir = $ENV{XDG_CONFIG_HOME};
     my $db_path = '';
     {
