@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use feature 'signatures';
-use Forks::Super;
 
 use Moo;
 

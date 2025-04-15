@@ -22,7 +22,6 @@ my $build = Module::Build->new(
         'Pango'                       => 0,
         'Crypt::URandom'              => 0,
         'Mojolicious'                 => 0,
-        'Forks::Super'                => 0,
     },
     extra_linker_flags => [ '-lfontconfig', '-lfreetype' ],
     test_requires      => {
