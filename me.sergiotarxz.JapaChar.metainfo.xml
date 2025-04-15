@@ -31,6 +31,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v1.11" date="2025-04-15">
+    <description>
+        <p>Responsive fixes and clarifying the Kanji payment status.</p>
+    </description>
+  </release>
   <release version="v1.10" date="2025-04-14">
     <description>
         <p>Adding brand new website and porting to windows. Salud y República. Happy 4/14.</p>

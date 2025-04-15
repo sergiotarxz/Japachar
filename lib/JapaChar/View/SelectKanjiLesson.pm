@@ -122,6 +122,7 @@ sub _select_kanji($self) {
         }
     );
     my $grades = $self->_kanji->grades;
+    my $scroll = Gtk::ScrolledWindow->new;
     my $box    = Gtk::Box->new( 'vertical', 10 );
 
     my $discord = Gtk::Button->new_with_label('Report bugs and share feedback');
@@ -136,10 +137,9 @@ sub _select_kanji($self) {
     $discord->set_halign('center');
 
     my $label = Gtk::Label->new(
-        'This feature is in BETA and will become for paid users when stabilized.
-Your kanji progress until stabilized may be lost between updates because
-the processing of Kanji may vary wildly.'
+        'This feature is BETA and incomplete will remain free for a long time, we cannot ensure that time is forever though.'
     );
+    $label->set_wrap(1);
 
     $label->set_margin_top(20);
     $box->append($label);
@@ -183,7 +183,8 @@ the processing of Kanji may vary wildly.'
     $button->set_halign('center');
     $box->append($button);
     $box->append($discord);
-    $self->app->window_set_child($box);
+    $scroll->set_child($box);
+    $self->app->window_set_child($scroll);
     $self->app->headerbar->pack_start($back_button);
 }
 1;

@@ -50,6 +50,8 @@ Glib::Object::Introspection->setup(
 has app => ( is => 'ro' );
 
 sub run($self) {
+    my $scroll = Gtk::ScrolledWindow->new;
+    $scroll->set_policy('never', 'automatic');
     my $grid = Gtk::Grid->new;
     my $button_start_basic_lesson =
       Gtk::Button->new_with_label('Basic Characters');
@@ -138,6 +140,8 @@ sub run($self) {
     $button_assisted_mode->set_halign('center');
     my $button_launch_website =
       Gtk::Button->new_with_label('Visit the webpage to download for Windows and Linux');
+    my $label = $button_launch_website->get_property('child');
+    $label->set_wrap(1);
     $button_launch_website->set_vexpand(1);
     $button_launch_website->set_hexpand(1);
     $button_launch_website->set_valign('center');
@@ -147,7 +151,6 @@ sub run($self) {
             $self->app->launch_website;
         }
     );
-    say 'hola';
     $grid->attach( $button_launch_website, 0, 4, 5, 1 );
     my $button_discord_community =
       Gtk::Button->new_with_label('Join the discord community');
@@ -161,7 +164,8 @@ sub run($self) {
         }
     );
     $grid->attach( $button_discord_community, 0, 5, 5, 1 );
-    $self->app->window_set_child($grid);
+    $scroll->set_child($grid);
+    $self->app->window_set_child($scroll);
     my $hamburger_menu = Gtk::Button->new_from_icon_name('open-menu-symbolic');
     $hamburger_menu->signal_connect(
         'clicked',
@@ -174,7 +178,6 @@ sub run($self) {
 
 sub show_settings($self) {
     my $grid = Gtk::Grid->new;
-    $grid->set_column_homogeneous(1);
     $self->_create_option(
         $grid,
         'REVIEW_INSTEAD_OF_LEARNING_CHANCE_BASIC',
@@ -329,6 +332,8 @@ sub _create_option( $self, $grid, $label, $onchange, $onget ) {
     state $row = 0;
     $row++;
     $label = Gtk::Label->new($label);
+    $label->set_wrap(1);
+    $label->set_wrap_mode('char');
     $grid->attach( $label, 0, $row, 1, 1 );
     my $inital_text = $onget->();
     my $entry_buffer =
