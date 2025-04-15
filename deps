@@ -1,1 +1,1 @@
-DBI DBD::SQLite Cairo::GObject Glib::IO Glib::Object::Introspection JSON Moo YAML::PP Path::Tiny DBIx::Class Pango Crypt::URandom Mojolicious
+DBI DBD::SQLite Cairo::GObject Glib::IO Glib::Object::Introspection JSON Moo YAML::PP Path::Tiny DBIx::Class Pango Crypt::URandom Mojolicious Forks::Super

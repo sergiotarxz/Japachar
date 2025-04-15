@@ -6,6 +6,7 @@ use strict;
 use warnings;
 
 use feature 'signatures';
+use Forks::Super;
 
 use Moo;
 
@@ -77,29 +78,56 @@ sub _migrate_kanji($self) {
         exit;
     }
     my $n_characters;
+    use IO::Select;
+    my $select = IO::Select->new;
+    $select->add($read);
+    my $read_line_generator = sub {
+        my $read_newline = 0;
+        my $line = '';
+        return sub {
+            while ($select->can_read(0.01)) {
+                read $read, my $char, 1;
+                $line .= $char;
+                if ($char eq "\n") {
+                    $read_newline = 1;
+                    last;
+                }
+            }
+            if (!$read_newline) {
+                return undef;
+            }
+            chomp $line;
+            return $line + 0;
+        };
+    };
+    my $read_line;
     Glib::Timeout->add(
         1_000,
         sub {
-            $read->blocking(0);
-            $n_characters = <$read>;
+            if (!defined $read_line) {
+                $read_line = $read_line_generator->();
+            }
+            my $n_characters = $read_line->();
             if (!defined $n_characters) {
                 return 1;
             }
-            chomp $n_characters;
+            undef $read_line; 
             say 'Copying ' . $n_characters . ' kanji';
             Glib::Timeout->add(
                 100,
                 sub {
-                    $read->blocking(0);
                     my $last_number;
-                    my $line;
-                    while ( $line = <$read> ) {
-                        $last_number = $line;
+                    if (!defined $read_line) {
+                        $read_line = $read_line_generator->();
                     }
-                    if ($last_number) {
-                        $progress_bar->set_fraction(
-                            $last_number / $n_characters );
+                    $last_number = $read_line->();
+                    if (!defined $last_number) {
+                        return 1;
                     }
+                    say $last_number;
+                    $progress_bar->set_fraction(
+                        $last_number / $n_characters );
+                    $read_line = undef;
                     if ( 0 == waitpid $pid, WNOHANG ) {
                         return 1;
                     }
