@@ -72,27 +72,44 @@ sub _migrate_kanji($self) {
     my $parent_pid = $$;
     my $pid        = fork;
 
+    if ( $^O eq 'MSWin32' ) {
+        if ( -e 'ipc' ) {
+            system 'del', 'ipc' and die 'Unable to remove ipc';
+        }
+        open $write, '>', 'ipc';
+        open $read,  '<', 'ipc';
+        close $write;
+    }
+
     if ( !$pid ) {
+        open $write, '>', 'ipc' if $^O eq 'MSWin32';
         $self->_kanji->populate_kanji( $parent_pid, $write );
         exit;
     }
     my $n_characters;
     use IO::Select;
-    my $select = IO::Select->new;
-    $select->add($read);
     my $read_line_generator = sub {
         my $read_newline = 0;
-        my $line = '';
+        my $line         = '';
         return sub {
-            while ($select->can_read(0.01)) {
+            my $select = IO::Select->new;
+            $select->add($read);
+            my $check_can_read = sub {
+                if ( $^O eq 'MSWin32' ) {
+                    seek $read, 0, 1;
+                    return !$read->eof;
+                }
+                return $select->can_read(0.01);
+            };
+            while ( $check_can_read->() ) {
                 read $read, my $char, 1;
                 $line .= $char;
-                if ($char eq "\n") {
+                if ( $char eq "\n" ) {
                     $read_newline = 1;
                     last;
                 }
             }
-            if (!$read_newline) {
+            if ( !$read_newline ) {
                 return undef;
             }
             chomp $line;
@@ -103,31 +120,32 @@ sub _migrate_kanji($self) {
     Glib::Timeout->add(
         1_000,
         sub {
-            if (!defined $read_line) {
+            if ( !defined $read_line ) {
                 $read_line = $read_line_generator->();
             }
             my $n_characters = $read_line->();
-            if (!defined $n_characters) {
+            if ( !defined $n_characters ) {
                 return 1;
             }
-            undef $read_line; 
+            undef $read_line;
             say 'Copying ' . $n_characters . ' kanji';
             Glib::Timeout->add(
                 100,
                 sub {
                     my $last_number;
-                    if (!defined $read_line) {
+                    if ( !defined $read_line ) {
                         $read_line = $read_line_generator->();
                     }
                     $last_number = $read_line->();
-                    if (!defined $last_number) {
+                    if ( !defined $last_number ) {
                         return 1;
                     }
                     say $last_number;
-                    $progress_bar->set_fraction(
-                        $last_number / $n_characters );
+                    $progress_bar->set_fraction( $last_number / $n_characters );
                     $read_line = undef;
-                    if ( 0 == waitpid $pid, WNOHANG ) {
+                    if ( $last_number < $n_characters && 0 == waitpid $pid,
+                        WNOHANG )
+                    {
                         return 1;
                     }
                     $self->_select_kanji;
@@ -164,7 +182,7 @@ sub _select_kanji($self) {
     $discord->set_halign('center');
 
     my $label = Gtk::Label->new(
-        'This feature is BETA and incomplete will remain free for a long time, we cannot ensure that time is forever though.'
+'This feature is BETA and incomplete will remain free for a long time, we cannot ensure that time is forever though.'
     );
     $label->set_wrap(1);
 

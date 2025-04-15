@@ -111,6 +111,7 @@ sub migrated($self) {
 }
 
 sub populate_kanji( $self, $parent_pid, $write ) {
+    my @characters_dom;
     $self->_schema->txn_do(
         sub {
             my ($option_want_kanji_version) =
@@ -131,10 +132,10 @@ sub populate_kanji( $self, $parent_pid, $write ) {
             my @characters;
             my $i = 0;
 
-            my @characters_dom =
+            @characters_dom =
               grep { $_->type eq 'tag' && $_->tag eq 'character' }
               $dom->at('kanjidic2')->child_nodes->each;
-            $write->syswrite( ( scalar @characters_dom ) . "\n" );
+            $write->print( ( scalar @characters_dom ) . "\n" );
             $write->flush;
             for my $character_dom (@characters_dom) {
                 if ( !kill 0, $parent_pid ) {
@@ -194,13 +195,13 @@ sub populate_kanji( $self, $parent_pid, $write ) {
                 }
             }
             $self->_kanji_schema->populate( \@characters );
-            $write->syswrite( scalar @characters_dom . "\n" );
-            $write->flush;
             $option_kanji_version->update(
                 { value => $option_want_kanji_version->value } );
             say 'Populated kanji database';
         }
     );
+    $write->syswrite( scalar @characters_dom . "\n" );
+    $write->flush;
 }
 
 sub next_char( $self, $accesibility, $type = undef ) {
@@ -221,11 +222,11 @@ sub next_char( $self, $accesibility, $type = undef ) {
 
 sub _next_review_char( $self, $type = undef ) {
     my $kanji_resultset = JapaChar::Schema->Schema->resultset('Kanji');
-    my $grade = $type;
-    if (!defined $type) {
+    my $grade           = $type;
+    if ( !defined $type ) {
         $grade = { is => undef };
     }
-    my @chars           = $kanji_resultset->search(
+    my @chars = $kanji_resultset->search(
         {
             score => { '>=' => 300 },
             ( ( $type ne 'all' ) ? ( grade => $grade ) : () )
@@ -244,8 +245,8 @@ sub _next_review_char( $self, $type = undef ) {
 sub _next_learning_char( $self, $type = undef ) {
     my $kanji_resultset = JapaChar::Schema->Schema->resultset('Kanji');
     my @candidate_chars = $self->_retrieve_started_chars_not_finished($type);
-    my $grade = $type;
-    if (!defined $type) {
+    my $grade           = $type;
+    if ( !defined $type ) {
         $grade = { is => undef };
     }
     if ( @candidate_chars < 3 ) {
@@ -270,8 +271,8 @@ sub _next_learning_char( $self, $type = undef ) {
 
 sub _retrieve_started_chars_not_finished( $self, $type ) {
     my $kanji_resultset = JapaChar::Schema->Schema->resultset('Kanji');
-    my $grade = $type;
-    if (!defined $type) {
+    my $grade           = $type;
+    if ( !defined $type ) {
         $grade = { is => undef };
     }
     return $kanji_resultset->search(
