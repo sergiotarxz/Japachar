@@ -183,31 +183,35 @@ sub _create_challenge($self, $char, $guess) {
     $box->set_halign('center');
 
     for my $button (@buttons) {
+        $button->add_css_class('kanji-button');
         $box->append($button);
     }
+    my $scroll = Gtk::ScrolledWindow->new;
+    $scroll->set_policy('automatic', 'never');
     $self->_buttons_box($box);
+    $scroll->set_child($box);
     $self->_on_resize_buttons->();
     $self->_app->on_resize($self->_on_resize_buttons);
-    $grid->attach( $box,             0, 2, 12, 1 );
+    $grid->attach( $scroll,             0, 2, 12, 1 );
     $grid->attach( $continue_button, 6, 3, 5,  1 );
 }
 
 sub _build__on_resize_buttons($self) {
     return sub {
-        return if !defined $self->_buttons_box;
-        my @buttons     = $self->_buttons->@*;
-        my $window_size = $self->_app->get_width;
-        for my $button (@buttons) {
-            my $attr_list         = Pango::AttrList->new;
-            my $size_number       = 14 * $window_size;
-            my $size_pango_number = PANGO_SCALE * 60;
-            my $size              = Pango::AttrSize->new($size_number);
-            if ( $size_pango_number < $size_number ) {
-                $size = Pango::AttrSize->new($size_pango_number);
-            }
-            $attr_list->insert($size);
-            $button->get_child->set_attributes($attr_list);
-        }
+#        return if !defined $self->_buttons_box;
+#        my @buttons     = $self->_buttons->@*;
+#        my $window_size = $self->_app->get_width;
+#        for my $button (@buttons) {
+#            my $attr_list         = Pango::AttrList->new;
+#            my $size_number       = 14 * $window_size;
+#            my $size_pango_number = PANGO_SCALE * 60;
+#            my $size              = Pango::AttrSize->new($size_number);
+#            if ( $size_pango_number < $size_number ) {
+#                $size = Pango::AttrSize->new($size_pango_number);
+#            }
+#            $attr_list->insert($size);
+#            $button->get_child->set_attributes($attr_list);
+#        }
     };
 }
 
