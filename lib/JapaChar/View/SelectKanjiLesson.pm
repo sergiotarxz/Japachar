@@ -70,8 +70,6 @@ sub _migrate_kanji($self) {
     my ( $read, $write );
     pipe $read, $write;
     my $parent_pid = $$;
-    my $pid        = fork;
-
     if ( $^O eq 'MSWin32' ) {
         if ( -e 'ipc' ) {
             system 'del', 'ipc' and die 'Unable to remove ipc';
@@ -80,7 +78,7 @@ sub _migrate_kanji($self) {
         open $read,  '<', 'ipc';
         close $write;
     }
-
+    my $pid        = fork;
     if ( !$pid ) {
         open $write, '>', 'ipc' if $^O eq 'MSWin32';
         $self->_kanji->populate_kanji( $parent_pid, $write );
