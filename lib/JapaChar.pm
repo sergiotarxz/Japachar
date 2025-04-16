@@ -92,6 +92,11 @@ sub launch_website($self) {
     $launcher->launch( $self->_window, undef, undef );
 }
 
+sub launch_xmpp($self) {
+    my $launcher = Gtk::UriLauncher->new('https://xmpp.link/#japachar@conference.cyberdelia.com.ar%3Fjoin%3Fjoin');
+    $launcher->launch( $self->_window, undef, undef );
+}
+
 sub launch_discord($self) {
     my $launcher = Gtk::UriLauncher->new('https://discord.gg/CXUqrwtzu2');
     $launcher->launch( $self->_window, undef, undef );

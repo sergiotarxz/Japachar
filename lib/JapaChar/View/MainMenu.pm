@@ -152,8 +152,9 @@ sub run($self) {
         }
     );
     $grid->attach( $button_launch_website, 0, 4, 5, 1 );
+    my $buttons_social                    = Gtk::Box->new( 'horizontal', 10 );
     my $button_discord_community =
-      Gtk::Button->new_with_label('Join the discord community');
+      Gtk::Button->new_with_label('Join the Discord community');
     $button_discord_community->set_vexpand(1);
     $button_discord_community->set_hexpand(1);
     $button_discord_community->set_valign('center');
@@ -163,7 +164,20 @@ sub run($self) {
             $self->app->launch_discord;
         }
     );
-    $grid->attach( $button_discord_community, 0, 5, 5, 1 );
+    my $button_xmpp_community =
+      Gtk::Button->new_with_label('Join the XMPP community');
+    $button_xmpp_community->set_vexpand(1);
+    $button_xmpp_community->set_hexpand(1);
+    $button_xmpp_community->set_valign('center');
+    $button_xmpp_community->set_halign('center');
+    $button_xmpp_community->signal_connect(
+        clicked => sub {
+            $self->app->launch_xmpp;
+        }
+    );
+    $buttons_social->append($button_xmpp_community);
+    $buttons_social->append($button_discord_community);
+    $grid->attach( $buttons_social, 0, 5, 5, 1 );
     $scroll->set_child($grid);
     $self->app->window_set_child($scroll);
     my $hamburger_menu = Gtk::Button->new_from_icon_name('open-menu-symbolic');

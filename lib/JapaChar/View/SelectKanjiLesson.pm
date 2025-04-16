@@ -168,7 +168,18 @@ sub _select_kanji($self) {
     my $scroll = Gtk::ScrolledWindow->new;
     my $box    = Gtk::Box->new( 'vertical', 10 );
 
-    my $discord = Gtk::Button->new_with_label('Report bugs and share feedback');
+    my $xmpp = Gtk::Button->new_with_label('Report bugs and share feedback in XMPP');
+
+    $xmpp->signal_connect(
+        clicked => sub {
+            $self->app->launch_xmpp;
+        }
+    );
+
+    $xmpp->add_css_class('destructive-action');
+    $xmpp->set_halign('center');
+
+    my $discord = Gtk::Button->new_with_label('Report bugs and share feedback in Discord');
 
     $discord->signal_connect(
         clicked => sub {
@@ -225,6 +236,7 @@ sub _select_kanji($self) {
     $button->set_property( 'width-request', 330 );
     $button->set_halign('center');
     $box->append($button);
+    $box->append($xmpp);
     $box->append($discord);
     $scroll->set_child($box);
     $self->app->window_set_child($scroll);
