@@ -31,6 +31,16 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v1.13" date="2025-04-17">
+    <description>
+        <p>Changes in sizes to fix that our new responsive
+        standards were broken because the main menu was
+        not compiling with them.
+
+        Fixing feedback labels to small in Hiragana and
+        Katakana, Kanji remains broken in that sense...</p>
+    </description>
+  </release>
   <release version="v1.12" date="2025-04-16">
     <description>
         <p>Fixes for Windows and adding XMPP as a possible communication mean.</p>

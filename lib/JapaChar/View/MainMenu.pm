@@ -94,7 +94,7 @@ sub run($self) {
       )
     {
         my $attr_list = Pango::AttrList->new;
-        my $size      = Pango::AttrSize->new( 25 * PANGO_SCALE );
+        my $size      = Pango::AttrSize->new( 20000 );
         $attr_list->insert($size);
         $button->get_child->set_attributes($attr_list);
     }
@@ -138,12 +138,14 @@ sub run($self) {
     $button_assisted_mode->set_hexpand(1);
     $button_assisted_mode->set_valign('center');
     $button_assisted_mode->set_halign('center');
+    my $clamp_button_launch_website = Adw::Clamp->new;
+    $clamp_button_launch_website->set_unit('px');
+    $clamp_button_launch_website->set_maximum_size(400);
     my $button_launch_website =
       Gtk::Button->new_with_label('Visit the webpage to download for Windows and Linux');
-    my $label = $button_launch_website->get_property('child');
+    my $label = $button_launch_website->get_child;
     $label->set_wrap(1);
     $button_launch_website->set_vexpand(1);
-    $button_launch_website->set_hexpand(1);
     $button_launch_website->set_valign('center');
     $button_launch_website->set_halign('center');
     $button_launch_website->signal_connect(
@@ -151,14 +153,16 @@ sub run($self) {
             $self->app->launch_website;
         }
     );
-    $grid->attach( $button_launch_website, 0, 4, 5, 1 );
+    $clamp_button_launch_website->set_child($button_launch_website);
+    $grid->attach( $clamp_button_launch_website, 0, 4, 5, 1 );
     my $buttons_social                    = Gtk::Box->new( 'horizontal', 10 );
     my $button_discord_community =
       Gtk::Button->new_with_label('Join the Discord community');
     $button_discord_community->set_vexpand(1);
-    $button_discord_community->set_hexpand(1);
+    $button_discord_community->get_child->set_wrap(1);
     $button_discord_community->set_valign('center');
-    $button_discord_community->set_halign('center');
+    $button_discord_community->set_halign('fill');
+    $button_discord_community->set_hexpand(1);
     $button_discord_community->signal_connect(
         clicked => sub {
             $self->app->launch_discord;
@@ -167,9 +171,10 @@ sub run($self) {
     my $button_xmpp_community =
       Gtk::Button->new_with_label('Join the XMPP community');
     $button_xmpp_community->set_vexpand(1);
-    $button_xmpp_community->set_hexpand(1);
+    $button_xmpp_community->get_child->set_wrap(1);
     $button_xmpp_community->set_valign('center');
-    $button_xmpp_community->set_halign('center');
+    $button_xmpp_community->set_halign('fill');
+    $button_xmpp_community->set_hexpand(1);
     $button_xmpp_community->signal_connect(
         clicked => sub {
             $self->app->launch_xmpp;
@@ -177,7 +182,13 @@ sub run($self) {
     );
     $buttons_social->append($button_xmpp_community);
     $buttons_social->append($button_discord_community);
-    $grid->attach( $buttons_social, 0, 5, 5, 1 );
+    $buttons_social->set_halign('fill');
+    my $clamp_buttons_social = Adw::Clamp->new;
+    $clamp_buttons_social->set_halign('fill');
+    $clamp_buttons_social->set_unit('px');
+    $clamp_buttons_social->set_maximum_size(400);
+    $clamp_buttons_social->set_child($buttons_social);
+    $grid->attach( $clamp_buttons_social, 0, 5, 5, 1 );
     $scroll->set_child($grid);
     $self->app->window_set_child($scroll);
     my $hamburger_menu = Gtk::Button->new_from_icon_name('open-menu-symbolic');

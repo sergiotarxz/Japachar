@@ -349,9 +349,10 @@ sub _on_click_continue_button( $self, $grid, $char, $guess ) {
         $self->success;
     }
     my $attr_list = Pango::AttrList->new;
-    my $size      = Pango::AttrSize->new( 23 * $self->_app->get_width );
+    my $size      = Pango::AttrSize->new( 20000 );
     $attr_list->insert($size);
     $label_feedback->set_halign('center');
+    $label_feedback->set_wrap(1);
     $label_feedback->set_attributes($attr_list);
     $grid->attach( $label_feedback, 0, 3, 7, 1 );
 }
