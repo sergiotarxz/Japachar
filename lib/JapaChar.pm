@@ -128,6 +128,7 @@ sub window_set_child( $self, $child ) {
     my $window    = $self->_window;
     my $box       = Gtk::Box->new( 'vertical', 0 );
     my $headerbar = Adw::HeaderBar->new;
+    $window->set_title( 'Learn with Japachar' );
     $headerbar->set_title_widget( Gtk::Label->new('Japachar') );
     $box->append($headerbar);
     $box->append($child);
