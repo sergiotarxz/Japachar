@@ -51,7 +51,7 @@ has app => ( is => 'ro' );
 
 sub run($self) {
     my $scroll = Gtk::ScrolledWindow->new;
-    $scroll->set_policy('never', 'automatic');
+    $scroll->set_policy( 'never', 'automatic' );
     my $grid = Gtk::Grid->new;
     my $button_start_basic_lesson =
       Gtk::Button->new_with_label('Basic Characters');
@@ -94,7 +94,7 @@ sub run($self) {
       )
     {
         my $attr_list = Pango::AttrList->new;
-        my $size      = Pango::AttrSize->new( 20000 );
+        my $size      = Pango::AttrSize->new(10000);
         $attr_list->insert($size);
         $button->get_child->set_attributes($attr_list);
     }
@@ -142,7 +142,13 @@ sub run($self) {
     $clamp_button_launch_website->set_unit('px');
     $clamp_button_launch_website->set_maximum_size(400);
     my $button_launch_website =
-      Gtk::Button->new_with_label('Visit the webpage to download for Windows and Linux');
+      Gtk::Button->new_with_label(
+        'Visit the webpage to download for Windows and Linux');
+    my $attr_list = Pango::AttrList->new;
+    my $size      = Pango::AttrSize->new(5000);
+    $attr_list->insert($size);
+    $button_launch_website->get_child->set_attributes($attr_list);
+
     my $label = $button_launch_website->get_child;
     $label->set_wrap(1);
     $button_launch_website->set_vexpand(1);
@@ -155,9 +161,14 @@ sub run($self) {
     );
     $clamp_button_launch_website->set_child($button_launch_website);
     $grid->attach( $clamp_button_launch_website, 0, 4, 5, 1 );
-    my $buttons_social                    = Gtk::Box->new( 'horizontal', 10 );
+    my $buttons_social = Gtk::Box->new( 'horizontal', 10 );
     my $button_discord_community =
       Gtk::Button->new_with_label('Join the Discord community');
+
+    $attr_list = Pango::AttrList->new;
+    $size      = Pango::AttrSize->new(10000);
+    $attr_list->insert($size);
+    $button_discord_community->get_child->set_attributes($attr_list);
     $button_discord_community->set_vexpand(1);
     $button_discord_community->get_child->set_wrap(1);
     $button_discord_community->set_valign('center');
@@ -170,6 +181,10 @@ sub run($self) {
     );
     my $button_xmpp_community =
       Gtk::Button->new_with_label('Join the XMPP community');
+    $attr_list = Pango::AttrList->new;
+    $size      = Pango::AttrSize->new(8000);
+    $attr_list->insert($size);
+    $button_xmpp_community->get_child->set_attributes($attr_list);
     $button_xmpp_community->set_vexpand(1);
     $button_xmpp_community->get_child->set_wrap(1);
     $button_xmpp_community->set_valign('center');

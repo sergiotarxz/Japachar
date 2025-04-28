@@ -31,6 +31,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v1.14" date="2025-04-29">
+    <description>
+        <p>Avoiding UI overflow in OnePlus 6 with Phosh, my new phone. Just hoping the outage in Spain allows me to push.</p>
+    </description>
+  </release>
   <release version="v1.13" date="2025-04-17">
     <description>
         <p>Changes in sizes to fix that our new responsive

@@ -160,7 +160,7 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
         push @buttons, $incorrect_button;
     }
     @buttons = sort { rand() <=> rand() } @buttons;
-    my $box = Gtk::Box->new( 'horizontal', 10 );
+    my $box = Gtk::Box->new( 'horizontal', 3 );
     $box->set_valign('center');
     $box->set_halign('center');
 
@@ -170,8 +170,8 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
     $self->_buttons_box($box);
     $self->_on_resize_buttons->();
     $self->_app->on_resize($self->_on_resize_buttons);
-    $grid->attach( $box,             0, 2, 12, 1 );
-    $grid->attach( $continue_button, 6, 3, 5,  1 );
+    $grid->attach( $box,             0, 3, 12, 1 );
+    $grid->attach( $continue_button, 6, 4, 5,  3 );
 }
 
 sub _build__on_resize_buttons($self) {
@@ -181,7 +181,7 @@ sub _build__on_resize_buttons($self) {
         my $window_size = $self->_app->get_width;
         for my $button (@buttons) {
             my $attr_list         = Pango::AttrList->new;
-            my $size_number       = 45 * $window_size;
+            my $size_number       = 35 * $window_size;
             my $size_pango_number = PANGO_SCALE * 60;
             my $size              = Pango::AttrSize->new($size_number);
             if ( $size_pango_number < $size_number ) {
@@ -305,7 +305,7 @@ sub _build__on_resize_continue_button($self) {
 }
 
 sub _on_exit($self) {
-    $self->_app->delete_on_resize( $self->_on_resize_buttons );
+#    $self->_app->delete_on_resize( $self->_on_resize_buttons );
     $self->_app->delete_on_resize( $self->_on_resize_continue_button );
 }
 

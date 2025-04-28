@@ -140,10 +140,10 @@ sub window_set_child( $self, $child ) {
 sub _application_start( $self, $app ) {
     my $main_window = Adw::ApplicationWindow->new($app);
     $self->_window($main_window);
-    $main_window->set_default_size( 450, 800 );
+    $main_window->set_default_size( 300, 800 );
     my $settings = Gtk::Settings::get_default();
     $settings->set_property('gtk-font-name', 'Noto Sans CJK JP 12');
-    $main_window->set_property( width_request => 450);
+    $main_window->set_property( width_request => 300);
     $main_window->signal_connect(
         notify => sub( $object, $param ) {
             if ( $param->{name} eq 'default-width' ) {
