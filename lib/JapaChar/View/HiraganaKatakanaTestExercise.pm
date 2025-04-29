@@ -101,6 +101,7 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
     my $char =
       $self->_app->characters->next_char( $self->_app->accessibility, $type );
     my $kana_label = $self->_get_label_featured_character( $char->get($show) );
+    $kana_label->set_size_request(40, 300);
     my $rng        = JapaChar::Random->new->get( 1, 100 );
 
     if ( $char->score > 60 && $can_be_typed && $rng > 30 ) {
@@ -170,8 +171,9 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
     $self->_buttons_box($box);
     $self->_on_resize_buttons->();
     $self->_app->on_resize($self->_on_resize_buttons);
-    $grid->attach( $box,             0, 2, 12, 1 );
-    $grid->attach( $continue_button, 6, 3, 5,  1 );
+    $grid->attach( $box,             0, 4, 12, 1 );
+    $continue_button->set_margin_top(40);
+    $grid->attach( $continue_button, 6, 5, 5,  1 );
 }
 
 sub _build__on_resize_buttons($self) {
@@ -200,7 +202,6 @@ sub _build__on_resize_buttons($self) {
 sub _create_grid_challenge($self) {
     my $grid = Gtk::Grid->new;
     $grid->set_column_homogeneous(1);
-    $grid->set_row_homogeneous(1);
     return $grid;
 }
 
@@ -227,6 +228,7 @@ sub _new_typing_romanji_challenge( $self, $char ) {
     $kana_label->set_halign('center');
     $kana_label->set_valign('center');
     my $box_kana = Gtk::Box->new( 'vertical', 10 );
+    $box_kana->set_size_request(40, 300);
     $box_kana->append( $self->_new_exercise_number_label );
     $box_kana->append($kana_label);
     $grid->attach( $box_kana, 0, 0, 12, 4 );
@@ -281,9 +283,9 @@ sub _new_typing_romanji_challenge( $self, $char ) {
 
     $romanji_entry->set_valign('center');
     $romanji_entry->set_halign('center');
-    $grid->attach( $romanji_entry, 2, 2, 8, 1 );
-
-    $grid->attach( $continue_button, 6, 3, 5, 1 );
+    $grid->attach( $romanji_entry, 2, 4, 8, 1 );
+    $continue_button->set_margin_top(40);
+    $grid->attach( $continue_button, 6, 5, 5, 1 );
 }
 
 sub _new_exercise_number_label($self) {
@@ -354,6 +356,6 @@ sub _on_click_continue_button( $self, $grid, $char, $guess ) {
     $label_feedback->set_halign('center');
     $label_feedback->set_wrap(1);
     $label_feedback->set_attributes($attr_list);
-    $grid->attach( $label_feedback, 0, 3, 7, 1 );
+    $grid->attach( $label_feedback, 0, 5, 7, 1 );
 }
 1;
