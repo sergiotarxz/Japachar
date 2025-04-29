@@ -161,7 +161,7 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
     }
     @buttons = sort { rand() <=> rand() } @buttons;
     my $box = Gtk::Box->new( 'horizontal', 3 );
-    $box->set_valign('center');
+    $box->set_valign('end');
     $box->set_halign('center');
 
     for my $button (@buttons) {
@@ -170,8 +170,8 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
     $self->_buttons_box($box);
     $self->_on_resize_buttons->();
     $self->_app->on_resize($self->_on_resize_buttons);
-    $grid->attach( $box,             0, 3, 12, 1 );
-    $grid->attach( $continue_button, 6, 4, 5,  3 );
+    $grid->attach( $box,             0, 2, 12, 1 );
+    $grid->attach( $continue_button, 6, 3, 5,  1 );
 }
 
 sub _build__on_resize_buttons($self) {

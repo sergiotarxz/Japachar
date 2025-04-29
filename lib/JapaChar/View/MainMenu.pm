@@ -166,7 +166,7 @@ sub run($self) {
       Gtk::Button->new_with_label('Join the Discord community');
 
     $attr_list = Pango::AttrList->new;
-    $size      = Pango::AttrSize->new(10000);
+    $size      = Pango::AttrSize->new(8000);
     $attr_list->insert($size);
     $button_discord_community->get_child->set_attributes($attr_list);
     $button_discord_community->set_vexpand(1);
