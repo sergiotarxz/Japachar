@@ -55,9 +55,7 @@ has _buttons                   => ( is => 'rw' );
 has _buttons_box               => ( is => 'rw' );
 has _first_press_continue      => ( is => 'rw', default => sub { 1 } );
 has _continue_button           => ( is => 'rw' );
-has _on_resize_continue_button => ( is => 'lazy' );
 has _final_answer              => ( is => 'rw' );
-has _on_resize_buttons         => ( is => 'lazy' );
 
 sub _counter($self) {
     return $self->lesson->counter;
@@ -79,8 +77,11 @@ sub run($self) {
     }
     my $char =
       $self->_app->kanji->next_char( $self->_app->accessibility, $self->_type );
-    my @available_guessses = ($char->meanings, $char->on_readings, $char->kun_readings);
-    my $rng = JapaChar::Random->new->get( 0, scalar(@available_guessses) - 1 );
+    my @available_guessses = ($char->meanings);
+    my $rng = 0;
+    if (@available_guessses > 1) {
+        $rng = JapaChar::Random->new->get( 0, scalar(@available_guessses) - 1 );
+    }
     $self->_create_challenge($char, $available_guessses[$rng]);
 }
 
@@ -135,13 +136,11 @@ sub _create_challenge($self, $char, $guess) {
     $self->_app->window_set_child($grid);
     my $back_button = $self->lesson->create_exit_lesson_back_button(
         sub {
-            $self->_app->delete_on_resize( $self->_on_resize_continue_button );
         }
     );
     $self->_app->headerbar->pack_start($back_button);
     my $incorrect_answers =
       $self->_app->kanji->get_4_incorrect_answers($char, $guess);
-    $self->_app->on_resize( $self->_on_resize_continue_button );
     my @buttons;
     my $continue_button = $self->lesson->create_continue_lesson_button(
         sub {
@@ -149,7 +148,6 @@ sub _create_challenge($self, $char, $guess) {
         }
     );
     $self->_continue_button($continue_button);
-    $self->_on_resize_continue_button->();
     my $on_answer = sub ($correct) {
         $continue_button->set_sensitive(1);
     };
@@ -190,29 +188,8 @@ sub _create_challenge($self, $char, $guess) {
     $scroll->set_policy('automatic', 'never');
     $self->_buttons_box($box);
     $scroll->set_child($box);
-    $self->_on_resize_buttons->();
-    $self->_app->on_resize($self->_on_resize_buttons);
     $grid->attach( $scroll,             0, 2, 12, 1 );
     $grid->attach( $continue_button, 6, 3, 5,  1 );
-}
-
-sub _build__on_resize_buttons($self) {
-    return sub {
-#        return if !defined $self->_buttons_box;
-#        my @buttons     = $self->_buttons->@*;
-#        my $window_size = $self->_app->get_width;
-#        for my $button (@buttons) {
-#            my $attr_list         = Pango::AttrList->new;
-#            my $size_number       = 14 * $window_size;
-#            my $size_pango_number = PANGO_SCALE * 60;
-#            my $size              = Pango::AttrSize->new($size_number);
-#            if ( $size_pango_number < $size_number ) {
-#                $size = Pango::AttrSize->new($size_pango_number);
-#            }
-#            $attr_list->insert($size);
-#            $button->get_child->set_attributes($attr_list);
-#        }
-    };
 }
 
 sub _create_grid_challenge($self) {
@@ -243,20 +220,7 @@ sub _new_exercise_number_label($self) {
     return $return;
 }
 
-sub _build__on_resize_continue_button($self) {
-    return sub {
-        my $continue_button = $self->_continue_button;
-        my $attr_list       = Pango::AttrList->new;
-        my $size = Pango::AttrSize->new( 40 * $self->_app->get_width );
-
-        $attr_list->insert($size);
-        $continue_button->get_child->set_attributes($attr_list);
-    };
-}
-
 sub _on_exit($self) {
-    $self->_app->delete_on_resize( $self->_on_resize_buttons );
-    $self->_app->delete_on_resize( $self->_on_resize_continue_button );
 }
 
 sub _on_click_continue_button( $self, $grid, $char, $guess ) {

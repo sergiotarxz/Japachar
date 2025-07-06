@@ -31,6 +31,17 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v1.17" date="2025-07-06">
+    <description>
+        <ul>
+            <li>If you are using in linux phones scales over 200% will stop being supported soon since they are a pain to develop for, in phosh you can change this in the display settings.</li>
+            <li>Minor font size fixes, pretty much still not completely fixed, sorry.</li>
+            <li>Removing learning ON and KUN pronunciations since it is a useless way to memorize Kanji. Sorry, no radicals yet, I am not quite sure yet about how I will support them…</li>
+            <li>I need your help to continue improving Japachar, if you are used to the GTK and the GNOME ecosystem get in contact in sergiotarxz@owlcode.tech over XMPP.</li>
+            <li>I need a Job as Perl, C, C++, Javascript, Typescript, Java or Kotlin Developer, I am located in Spain, if you know about someone hiring or you are hiring yourself please get in contact too.</li>
+        </ul>
+    </description>
+  </release>
   <release version="v1.16" date="2025-04-29">
     <description>
         <p>Fixing grid.</p>
@@ -235,17 +246,38 @@
     <p>This application helps you to learn Japanese characters using a gradual learning algorithm which makes you test-like questions.</p>
 
     <p>You are expected to fail while starting, look up the correct answer when you fail, it helps you to learn faster. You can use this app even if you do not know anything.</p>
+
+    <p>This app pretends to be a way of learn but also somewhat of a game where you use your intuition and the previous things you learnt to avoid getting new characters
+        wrong, but you are expected to fail because you won't have at all times all the needed information, your shouldn't feel overwhelmed because characters are 
+        introduced gradually, but it can certainly happen that too much information is presented to you at once if you are too good memorizing, you can wipe
+        ~/.var/app/me.sergiotarxz.JapaChar/config/.japachar/db.sqlite at any time to start over or change the settings to make the game more slow, fast or challenging
+        depending on what do you want to get from this game.</p>
+
     <p>
       It keeps a inner score of how much you know a character to give priority to ask you again about it if needed and introduces new characters when you are ready.
     </p>
 
-    <p>BETA Kanji support available.</p>
+    <p>The BETA Kanji support now doesn't include (But did include in the past) KUN and ON readings since trying to memorize pronunciations of Kanji is discouraged for learners, instead
+        I will soon add a real word dictionary and quiz about the word pronunciations and meanings.</p>
 
     <p>It works now without having to install any third party font.</p>
     
     <p>There is a settings menu that allows you to tune your learning further
     to your rithm, the numbers are saved with intro, if you leave a field empty
     you will restore the default, good if you mess up with the settings.</p>
+
+    <p>This app doesn't and won't substitute studying the language using native texts, videos and audios, the goal is to reduce the initial barrier
+        of entry since the written script is wildly different than the latin one.</p>
+
+    <p>If you do not know any language based in latin script I cannot currently help you a lot with this app, sorry for that.</p>
+
+    <p>It is boring to develop alone, get in contact in sergiotarxz@owlcode.tech over XMPP to contribute, I talk both Spanish and English.</p>
+
+    <p>Do you have old phones around? It is very possible that some of them are capable of running Linux with Postmarketos, Mobian or Gentoo, try to test
+        the app there and help me to improve it further.</p>
+
+    <p>Would be nice to have sounds that I can put in the game to make it more engaging, if you are capable of designing Music or Sounds consider contributing
+        your abilities for this free software app to continue improving.</p>
   </description>
   
   <launchable type="desktop-id">me.sergiotarxz.JapaChar.desktop</launchable>

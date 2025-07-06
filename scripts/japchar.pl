@@ -5,11 +5,11 @@ use v5.38.2;
 use File::Basename;
 
 BEGIN {
-    open my $fh, '>&', \*STDERR;
-    open STDERR, '>', '/dev/null';
+#    open my $fh, '>&', \*STDERR;
+#    open STDERR, '>', '/dev/null';
     system 'perl', 'Build.PL';
     system 'perl', 'Build', 'build';
-    open STDERR, '>&', $fh;
+#    open STDERR, '>&', $fh;
 };
 
 use blib;

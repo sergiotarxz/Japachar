@@ -183,7 +183,7 @@ sub _build__on_resize_buttons($self) {
         my $window_size = $self->_app->get_width;
         for my $button (@buttons) {
             my $attr_list         = Pango::AttrList->new;
-            my $size_number       = 35 * $window_size;
+            my $size_number       = 40 * $window_size;
             my $size_pango_number = PANGO_SCALE * 60;
             my $size              = Pango::AttrSize->new($size_number);
             if ( $size_pango_number < $size_number ) {

@@ -4,6 +4,7 @@ use v5.38.2;
 
 use strict;
 use warnings;
+use utf8;
 
 use feature 'signatures';
 
@@ -34,11 +35,11 @@ Glib::Object::Introspection->setup(
     package  => 'Gtk::Gdk',
 );
 
-Glib::Object::Introspection->setup(
-    basename => 'Gsk',
-    version  => '4.0',
-    package  => 'Gtk::Gsk',
-);
+#Glib::Object::Introspection->setup(
+#    basename => 'Gsk',
+#    version  => '4.0',
+#    package  => 'Gtk::Gsk',
+#);
 
 Glib::Object::Introspection->setup(
     basename => 'Adw',

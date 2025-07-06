@@ -208,7 +208,6 @@ sub _select_kanji($self) {
     $button->set_margin_top(20);
     $button->add_css_class('accent');
     $button->set_halign('center');
-    $button->set_property( 'width-request', 330 );
     $box->append($button);
     for my $grade (@$grades) {
         my $button = Gtk::Button->new_with_label("Study kanji grade $grade");
@@ -221,7 +220,6 @@ sub _select_kanji($self) {
             }
         );
         $button->set_halign('center');
-        $button->set_property( 'width-request', 330 );
         $box->append($button);
     }
     $button = Gtk::Button->new_with_label("Study unclassified kanjis");
@@ -233,7 +231,6 @@ sub _select_kanji($self) {
             )->run;
         }
     );
-    $button->set_property( 'width-request', 330 );
     $button->set_halign('center');
     $box->append($button);
     $box->append($xmpp);

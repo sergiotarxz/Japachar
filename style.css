@@ -24,6 +24,15 @@ label.kun-reading {
 label.meaning {
     background: green;
 }
+
+label {
+    font-size: 0.9rem;
+}
+
+button label {
+    font-size: 0.6rem;
+}
+
 button.kanji-button label {
-    font-size: 1rem;
+    font-size: 0.6rem;
 }
