@@ -56,6 +56,11 @@ has _on_resize_triggers => ( is => 'ro', default => sub { {}; } );
 has accessibility       => ( is => 'lazy' );
 has characters          => ( is => 'lazy' );
 has kanji               => ( is => 'lazy' );
+has words               => ( is => 'lazy' );
+
+sub _build_words($self) {
+    return JapaChar::Words->new(app => $self);
+}
 
 sub _build_kanji($self) {
     return JapaChar::Kanji->new(app => $self);

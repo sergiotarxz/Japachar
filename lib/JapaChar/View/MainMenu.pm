@@ -18,6 +18,7 @@ use JapaChar::Random;
 use JapaChar::Score;
 use JapaChar::View::HiraganaKatakanaLesson;
 use JapaChar::View::SelectKanjiLesson;
+use JapaChar::View::SelectWordLesson;
 
 use Glib::IO;
 
@@ -78,6 +79,7 @@ sub run($self) {
     );
     my $button_start_katakana_lesson = Gtk::Button->new_with_label('Katakana');
     my $button_start_kanji_lesson = Gtk::Button->new_with_label('Kanji (BETA)');
+    my $button_start_words_lesson = Gtk::Button->new_with_label('Words (BETA)');
     $button_start_katakana_lesson->signal_connect(
         'clicked',
         sub {
@@ -90,7 +92,7 @@ sub run($self) {
     );
     for my $button (
         $button_start_basic_lesson,    $button_start_hiragana_lesson,
-        $button_start_katakana_lesson, $button_start_kanji_lesson
+        $button_start_katakana_lesson, $button_start_kanji_lesson, $button_start_words_lesson
       )
     {
         my $attr_list = Pango::AttrList->new;
@@ -101,6 +103,12 @@ sub run($self) {
     $button_start_kanji_lesson->signal_connect(
         clicked => sub {
             JapaChar::View::SelectKanjiLesson->new( app => $self->app, )->run;
+        }
+    );
+    $button_start_words_lesson->signal_connect(
+        clicked => sub {
+            say 'Starting words lesson';
+            JapaChar::View::SelectWordLesson->new( app => $self->app, )->run;
         }
     );
     my $box                    = Gtk::Box->new( 'horizontal', 10 );
@@ -123,11 +131,14 @@ sub run($self) {
     $box->append($button_start_katakana_lesson);
     $button_start_kanji_lesson->set_halign('center');
     $button_start_kanji_lesson->set_valign('center');
+    $button_start_words_lesson->set_halign('center');
+    $button_start_words_lesson->set_valign('center');
     $box->set_valign('start');
     $box->set_halign('center');
     $grid->attach( $box,                       0, 1, 5, 1 );
     $grid->attach( $button_start_kanji_lesson, 0, 2, 5, 1 );
-    $grid->attach( $button_assisted_mode,      0, 3, 5, 1 );
+    $grid->attach( $button_start_words_lesson, 0, 3, 5, 1 );
+    $grid->attach( $button_assisted_mode,      0, 4, 5, 1 );
     $button_assisted_mode->signal_connect(
         'clicked',
         sub {
@@ -160,7 +171,7 @@ sub run($self) {
         }
     );
     $clamp_button_launch_website->set_child($button_launch_website);
-    $grid->attach( $clamp_button_launch_website, 0, 4, 5, 1 );
+    $grid->attach( $clamp_button_launch_website, 0, 5, 5, 1 );
     my $buttons_social = Gtk::Box->new( 'horizontal', 10 );
     my $button_discord_community =
       Gtk::Button->new_with_label('Join the Discord community');
@@ -203,7 +214,7 @@ sub run($self) {
     $clamp_buttons_social->set_unit('px');
     $clamp_buttons_social->set_maximum_size(400);
     $clamp_buttons_social->set_child($buttons_social);
-    $grid->attach( $clamp_buttons_social, 0, 5, 5, 1 );
+    $grid->attach( $clamp_buttons_social, 0, 6, 5, 1 );
     $scroll->set_child($grid);
     $self->app->window_set_child($scroll);
     my $hamburger_menu = Gtk::Button->new_from_icon_name('open-menu-symbolic');
