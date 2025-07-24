@@ -31,6 +31,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v2.00-rc1" date="2025-07-24">
+    <description>
+        <p>Adding words support.</p>
+    </description>
+  </release>
   <release version="v1.18" date="2025-07-06">
     <description>
         <p>Updating the Perl libraries.</p>
