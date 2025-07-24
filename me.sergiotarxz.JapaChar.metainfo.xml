@@ -31,6 +31,11 @@
 
   <developer_name>sergiotarxz</developer_name>
 <releases>
+  <release version="v2.00-rc2" date="2025-07-25">
+    <description>
+        <p>Improving words population in db in memory constrained environments…</p>
+    </description>
+  </release>
   <release version="v2.00-rc1" date="2025-07-24">
     <description>
         <p>Adding words support.</p>
@@ -267,8 +272,9 @@
       It keeps a inner score of how much you know a character to give priority to ask you again about it if needed and introduces new characters when you are ready.
     </p>
 
-    <p>The BETA Kanji support now doesn't include (But did include in the past) KUN and ON readings since trying to memorize pronunciations of Kanji is discouraged for learners, instead
-        I will soon add a real word dictionary and quiz about the word pronunciations and meanings.</p>
+    <p>The BETA Kanji support now doesn't include (But did include in the past) KUN and ON readings since trying to memorize pronunciations of Kanji is discouraged for learners.</p>
+
+    <p>New BETA Word memorizing support</p>
 
     <p>It works now without having to install any third party font.</p>
     
