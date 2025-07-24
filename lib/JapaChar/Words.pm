@@ -94,8 +94,35 @@ sub migrated($self) {
     return 0;
 }
 
+sub _try_to_find_entry($self, $fh) {
+    my $buffer;
+    my $found_entry = 0;
+    while (1) {
+        my $return;
+        my $char;
+        {
+            $return = $fh->read($char, 1);
+            $buffer .= $char;
+            if (!$found_entry) {
+                if ($buffer =~ /<entry>$/) {
+                    $buffer =~ s/^.*(<entry>)$/$1/g;
+                    $found_entry = 1;
+                }
+                next;
+            }
+            if ($buffer =~ m{</entry>$}) {
+                my $dom = Mojo::DOM->new($buffer);
+                $dom->xml(1);
+                return $dom;
+            }
+        }
+        if (!$return) {
+            return;
+        }
+    }
+}
+
 sub populate_words( $self, $parent_pid, $write ) {
-    my @entries_dom;
     $self->_schema->txn_do(
         sub {
             my ($option_want_words_version) =
@@ -110,8 +137,7 @@ sub populate_words( $self, $parent_pid, $write ) {
             say 'Populating Words database, please wait...';
             my $schema = $self->_words_schema;
             my $root   = $self->app->root;
-            my $dom = Mojo::DOM->new( $root->child('JMdict_e.xml')->slurp_raw );
-            $dom->xml(1);
+            open my $fh, '<', $root->child('JMdict_e.xml');
             my @words;
             my $word_index                          = 0;
             my $representation_index                = 0;
@@ -120,12 +146,9 @@ sub populate_words( $self, $parent_pid, $write ) {
             my $representation_classification_index = 0;
             my %classifications;
 
-            @entries_dom =
-              grep { $_->type eq 'tag' && $_->tag eq 'entry' }
-              $dom->at('JMdict')->child_nodes->each;
-            $write->print( ( scalar @entries_dom ) . "\n" );
+            $write->print( 213000 . "\n" );
             $write->flush;
-            for my $entry_dom (@entries_dom) {
+            while (my $entry_dom = $self->_try_to_find_entry($fh)) {
                 if ( !kill 0, $parent_pid ) {
                     die 'Parent died';
                 }
@@ -218,7 +241,7 @@ sub populate_words( $self, $parent_pid, $write ) {
             say 'Populated Words database';
         }
     );
-    $write->syswrite( scalar @entries_dom . "\n" );
+    $write->print( 213000 . "\n" );
     $write->flush;
 }
 
