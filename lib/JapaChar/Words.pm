@@ -71,7 +71,7 @@ sub get_4_incorrect_answers( $self, $word, $guess ) {
             {
                 -bool => 'word.started',
                 value => { -not_in => $invalid_results },
-                type => 'hirakana',
+                type  => 'hirakana',
             },
             {
                 order_by => { -asc => \'RANDOM()' },
@@ -94,30 +94,48 @@ sub migrated($self) {
     return 0;
 }
 
-sub _try_to_find_entry($self, $fh) {
-    my $buffer;
-    my $found_entry = 0;
-    while (1) {
-        my $return;
-        my $char;
-        {
-            $return = $fh->read($char, 1);
-            $buffer .= $char;
-            if (!$found_entry) {
-                if ($buffer =~ /<entry>$/) {
-                    $buffer =~ s/^.*(<entry>)$/$1/g;
-                    $found_entry = 1;
+{
+    my $next = '';
+    my $dom  = Mojo::DOM->new->xml(1);
+
+    sub _try_to_find_entry( $self, $fh ) {
+        my $buffer      = '';
+        my $found_entry = 0;
+        while (1) {
+            my $return;
+            my $char;
+            {
+                if ( !$next ) {
+                    $return = $fh->read( $char, 1000 );
+                    $buffer .= $char;
                 }
-                next;
-            }
-            if ($buffer =~ m{</entry>$}) {
-                my $dom = Mojo::DOM->new($buffer);
-                $dom->xml(1);
+                else {
+                    $return = length $next;
+                    $buffer .= $next;
+                    $next = '';
+                }
+                if ( !$found_entry ) {
+                    my $index = index $buffer, '<entry>';
+                    if ( $index == -1 ) {
+                        next;
+                    }
+                    $buffer      = substr $buffer, $index;
+                    $found_entry = 1;
+                    next;
+                }
+                my $index = index $buffer, '</entry>';
+                if ( $index == -1 ) {
+                    next;
+                }
+                $next   = substr $buffer, $index;
+                $buffer = substr $buffer, 0, $index;
+                $buffer .= '</entry>';
+                my $dom = $dom->parse($buffer);
                 return $dom;
             }
-        }
-        if (!$return) {
-            return;
+            if ( !$return ) {
+                return;
+            }
         }
     }
 }
@@ -148,12 +166,22 @@ sub populate_words( $self, $parent_pid, $write ) {
 
             $write->print( 213000 . "\n" );
             $write->flush;
-            while (my $entry_dom = $self->_try_to_find_entry($fh)) {
+            my $tries      = 5;
+            my $chunk_size = 1;
+            my @times;
+            my $time_1 = time;
+            my $last_time;
+            my $decided_optimal = 0;
+            use List::Util qw/sum/;
+
+            while ( my $entry_dom = $self->_try_to_find_entry($fh) ) {
                 if ( !kill 0, $parent_pid ) {
-                    die 'Parent died';
+                    warn 'Parent died';
+                    exit 1;
                 }
                 my @representations;
-                for my $representation ( $entry_dom->find('k_ele,r_ele')->each ) {
+                for my $representation ( $entry_dom->find('k_ele,r_ele')->each )
+                {
                     if ( my $kanji = $representation->at('keb') ) {
                         my @classifications =
                           $representation->find('ke_pri')->each;
@@ -209,8 +237,7 @@ sub populate_words( $self, $parent_pid, $write ) {
                         );
                     }
                     if ( scalar @$classifications ) {
-                        $representation->{representation_classifications}
-                          = [
+                        $representation->{representation_classifications} = [
                             map {
                                 {
                                     id =>
@@ -219,7 +246,7 @@ sub populate_words( $self, $parent_pid, $write ) {
                                     id_representation => $representation->{id},
                                 }
                             } @classifications{@$classifications}
-                          ];
+                        ];
                     }
                 }
                 push @words,
@@ -228,11 +255,27 @@ sub populate_words( $self, $parent_pid, $write ) {
                     representations => \@representations,
                     meanings        => \@meanings,
                   };
-                if ( $word_index % 300 == 0 ) {
+                if ( $word_index % ($word_index > 500 ? $chunk_size : 25) == 0 ) {
                     $self->_words_schema->populate( \@words );
                     $write->syswrite( $word_index . "\n" );
                     $write->flush;
                     @words = ();
+                    if ($word_index > 500 && !$decided_optimal ) {
+                        next if $tries-- == 5;
+                        push @times, ( scalar time ) - $time_1;
+                        if ( $tries == 0 ) {
+                            my $median_time = sum(@times) / 5;
+                            if ( defined $last_time && $last_time < $median_time ) {
+                                warn "Optimal chunk size: $chunk_size";
+                                $decided_optimal = 1;
+                                next;
+                            }
+                            $tries = 5;
+                            $last_time = $median_time;
+                            $chunk_size++;
+                        }
+                        $time_1 = time;
+                    }
                 }
             }
             $self->_words_schema->populate( \@words );
@@ -249,7 +292,7 @@ sub next_word( $self, $accesibility, $type = undef ) {
     my $next_review   = $self->_next_review_word($type);
     my $next_learning = $self->_next_learning_word($type);
     if ( !defined $next_review ) {
-        if (!defined $next_learning) {
+        if ( !defined $next_learning ) {
             die 'Could not find any character';
         }
         return $next_learning;
@@ -302,7 +345,7 @@ sub _next_learning_word( $self, $type = undef ) {
     if ( @candidate_words < 3 ) {
         my @new_words = $words_resultset->search(
             {
-                -not_bool => 'started',
+                -not_bool              => 'started',
                 'representations.type' => 'kanji',
                 (
                     (
