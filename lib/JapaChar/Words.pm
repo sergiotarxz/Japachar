@@ -264,8 +264,9 @@ sub populate_words( $self, $parent_pid, $write ) {
                         next if $tries-- == 5;
                         push @times, ( scalar time ) - $time_1;
                         if ( $tries == 0 ) {
-                            my $median_time = sum(@times) / 5;
+                            my $median_time = (sum(@times) / 5) / $chunk_size;
                             if ( defined $last_time && $last_time < $median_time ) {
+                                $chunk_size--;
                                 warn "Optimal chunk size: $chunk_size";
                                 $decided_optimal = 1;
                                 next;
