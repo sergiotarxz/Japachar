@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=JapaChar
-Exec=japachar
+Exec=japachar %U
 Type=Application
 Icon=me.sergiotarxz.JapaChar
 Categories=Education;Game
+MimeType=x-scheme-handler/japachar
