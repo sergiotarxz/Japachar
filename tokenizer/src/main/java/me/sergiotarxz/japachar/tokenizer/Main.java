@@ -9,7 +9,7 @@ public class Main {
         Tokenizer tokenizer = new Tokenizer() ;
         List<Token> tokens = tokenizer.tokenize("お寿司が食べたい。");
         for (Token token : tokens) {
-            System.out.println(token.getSurface() + "\t" + token.getAllFeatures());
+            System.out.println(token.getSurface());
         }
     }
 }
