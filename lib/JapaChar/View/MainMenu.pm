@@ -152,25 +152,10 @@ sub run($self) {
     my $clamp_button_launch_website = Adw::Clamp->new;
     $clamp_button_launch_website->set_unit('px');
     $clamp_button_launch_website->set_maximum_size(400);
-    my $button_launch_website =
-      Gtk::Button->new_with_label(
-        'Visit the webpage to download for Windows and Linux');
     my $attr_list = Pango::AttrList->new;
     my $size      = Pango::AttrSize->new(5000);
     $attr_list->insert($size);
-    $button_launch_website->get_child->set_attributes($attr_list);
 
-    my $label = $button_launch_website->get_child;
-    $label->set_wrap(1);
-    $button_launch_website->set_vexpand(1);
-    $button_launch_website->set_valign('center');
-    $button_launch_website->set_halign('center');
-    $button_launch_website->signal_connect(
-        clicked => sub {
-            $self->app->launch_website;
-        }
-    );
-    $clamp_button_launch_website->set_child($button_launch_website);
     $grid->attach( $clamp_button_launch_website, 0, 5, 5, 1 );
     my $buttons_social = Gtk::Box->new( 'horizontal', 10 );
     my $button_discord_community =
