@@ -96,7 +96,7 @@ sub run($self) {
       )
     {
         my $attr_list = Pango::AttrList->new;
-        my $size      = Pango::AttrSize->new(10000);
+        my $size      = Pango::AttrSize->new(PANGO_SCALE * 10);
         $attr_list->insert($size);
         $button->get_child->set_attributes($attr_list);
     }
@@ -153,7 +153,7 @@ sub run($self) {
     $clamp_button_launch_website->set_unit('px');
     $clamp_button_launch_website->set_maximum_size(400);
     my $attr_list = Pango::AttrList->new;
-    my $size      = Pango::AttrSize->new(5000);
+    my $size      = Pango::AttrSize->new(PANGO_SCALE * 7);
     $attr_list->insert($size);
 
     $grid->attach( $clamp_button_launch_website, 0, 5, 5, 1 );
