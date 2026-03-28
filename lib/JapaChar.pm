@@ -20,6 +20,12 @@ use JapaChar::Score;
 use JapaChar::View::MainMenu;
 use JapaChar::Fontconfig;
 use Glib::IO;
+use Data::Dumper;
+use Mojo::Util qw/url_unescape/;
+use JSON qw/from_json/;
+
+require XSLoader;
+XSLoader::load('JapaChar');
 
 use constant PANGO_SCALE => 1024;
 
@@ -27,6 +33,16 @@ Glib::Object::Introspection->setup(
     basename => 'Gtk',
     version  => '4.0',
     package  => 'Gtk',
+);
+
+my $GIO_BASENAME = 'Gio';
+my $GIO_VERSION  = '2.0';
+my $GIO_PACKAGE  = 'Glib::IO';
+
+Glib::Object::Introspection->setup(
+	basename => $GIO_BASENAME,
+	version  => $GIO_VERSION,
+	package  => $GIO_PACKAGE,
 );
 
 Glib::Object::Introspection->setup(
@@ -57,6 +73,7 @@ has accessibility       => ( is => 'lazy' );
 has characters          => ( is => 'lazy' );
 has kanji               => ( is => 'lazy' );
 has words               => ( is => 'lazy' );
+has started => (is => 'rw', default => sub { 0 });
 
 sub _build_words($self) {
     return JapaChar::Words->new(app => $self);
@@ -144,6 +161,8 @@ sub window_set_child( $self, $child ) {
 }
 
 sub _application_start( $self, $app ) {
+	return if $self->started;
+	$self->started(1);
     my $main_window = Adw::ApplicationWindow->new($app);
     $self->_window($main_window);
     $main_window->set_default_size( 300, 800 );
@@ -164,17 +183,35 @@ sub _application_start( $self, $app ) {
     $main_window->present;
 }
 
+sub parse_params($self, $params) {
+	my ($url) = @$params;
+	return if !defined $url;
+	$url =~ s{^japachar://}{};
+	my $phrase = url_unescape(url_unescape($url));
+	say $phrase;
+	open my $fh, '-|', (qw/himotoki -j/, $phrase);
+	binmode $fh, ':utf8';
+	my $file = join '', <$fh>;
+	print Data::Dumper::Dumper from_json($file);
+}
+
 sub start($self) {
     Glib::IO::resources_register(
         Glib::IO::Resource::load( $self->_gresources_path ) );
     JapaChar::Fontconfig->new->set_current;
     my $app =
-      Adw::Application->new( 'me.sergiotarxz.JapaChar', 'default-flags' );
+      Adw::Application->new( 'me.sergiotarxz.JapaChar', [qw/default-flags handles_command_line/] );
     $app->signal_connect(
         'activate' => sub {
             $self->_application_start($app);
         }
     );
-    $app->run;
+	$app->signal_connect(command_line => sub {
+		say command => '';
+		$self->_application_start($app);
+		$self->parse_params($_[1]->get_arguments);
+		return;
+	});
+    $app->run([@ARGV]);
 }
 1;

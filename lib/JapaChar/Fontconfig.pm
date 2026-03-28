@@ -11,9 +11,6 @@ use Path::Tiny;
 
 use Data::Dumper;
 
-require XSLoader;
-XSLoader::load('JapaChar');
-
 sub _font_dir($self) {
     require JapaChar;
     my $root = JapaChar->root;
