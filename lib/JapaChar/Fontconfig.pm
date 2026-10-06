@@ -9,6 +9,8 @@ use Digest::SHA qw/sha256_hex/;
 use Moo;
 use Path::Tiny;
 
+has app => (is => 'ro');
+
 use Data::Dumper;
 
 sub _font_dir($self) {
@@ -19,7 +21,7 @@ sub _font_dir($self) {
 
 sub set_current($self) {
     my $font_dir = $self->_font_dir;
-    $self->_set_current_c( '' . $font_dir );
+    $self->app->app->load_font_dir( '' . $font_dir );
 }
 1;
 

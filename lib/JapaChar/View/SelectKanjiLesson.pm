@@ -13,33 +13,7 @@ use JapaChar;
 use JapaChar::Kanji;
 use JapaChar::View::KanjiLesson;
 
-use Glib::Object::Introspection;
-use Glib::IO;
 use POSIX qw/:sys_wait_h/;
-
-Glib::Object::Introspection->setup(
-    basename => 'Gtk',
-    version  => '4.0',
-    package  => 'Gtk',
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Gdk',
-    version  => '4.0',
-    package  => 'Gtk::Gdk',
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Gsk',
-    version  => '4.0',
-    package  => 'Gtk::Gsk',
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Adw',
-    version  => '1',
-    package  => 'Adw',
-);
 
 has app    => ( is => 'ro' );
 has _kanji => ( is => 'lazy' );
@@ -57,13 +31,14 @@ sub run($self) {
 }
 
 sub _migrate_kanji($self) {
-    my $box          = Gtk::Box->new( 'vertical', 10 );
+    my $const        = AlgaGTK::Constants->new;
+    my $box          = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 10 );
     my $label        = Gtk::Label->new('Populating Kanji database...');
     my $progress_bar = Gtk::ProgressBar->new;
-    $progress_bar->set_halign('center');
+    $progress_bar->set_halign($const->GTK_ALIGN_CENTER);
     $box->set_vexpand(1);
-    $box->set_valign('center');
-    $label->set_valign('center');
+    $box->set_valign($const->GTK_ALIGN_CENTER);
+    $label->set_valign($const->GTK_ALIGN_CENTER);
     $box->append($label);
     $box->append($progress_bar);
     $self->app->window_set_child($box);
@@ -115,7 +90,7 @@ sub _migrate_kanji($self) {
         };
     };
     my $read_line;
-    Glib::Timeout->add(
+    $self->app->app->timeout_add(
         1_000,
         sub {
             if ( !defined $read_line ) {
@@ -127,7 +102,7 @@ sub _migrate_kanji($self) {
             }
             undef $read_line;
             say 'Copying ' . $n_characters . ' kanji';
-            Glib::Timeout->add(
+            $self->app->app->timeout_add(
                 100,
                 sub {
                     my $last_number;
@@ -157,7 +132,7 @@ sub _migrate_kanji($self) {
 
 sub _select_kanji($self) {
     my $back_button = Gtk::Button->new_from_icon_name('go-previous-symbolic');
-    $back_button->signal_connect(
+    $back_button->connect(
         'clicked',
         sub {
             require JapaChar::View::MainMenu;
@@ -166,29 +141,30 @@ sub _select_kanji($self) {
     );
     my $grades = $self->_kanji->grades;
     my $scroll = Gtk::ScrolledWindow->new;
-    my $box    = Gtk::Box->new( 'vertical', 10 );
+    my $const        = AlgaGTK::Constants->new;
+    my $box    = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 10 );
 
-    my $xmpp = Gtk::Button->new_with_label('Report bugs and share feedback in XMPP');
+    my $xmpp = Gtk::Button->new('Report bugs and share feedback in XMPP');
 
-    $xmpp->signal_connect(
+    $xmpp->connect(
         clicked => sub {
             $self->app->launch_xmpp;
         }
     );
 
     $xmpp->add_css_class('destructive-action');
-    $xmpp->set_halign('center');
+    $xmpp->set_halign($const->GTK_ALIGN_CENTER);
 
-    my $discord = Gtk::Button->new_with_label('Report bugs and share feedback in Discord');
+    my $discord = Gtk::Button->new('Report bugs and share feedback in Discord');
 
-    $discord->signal_connect(
+    $discord->connect(
         clicked => sub {
             $self->app->launch_discord;
         }
     );
 
     $discord->add_css_class('destructive-action');
-    $discord->set_halign('center');
+    $discord->set_halign($const->GTK_ALIGN_CENTER);
 
     my $label = Gtk::Label->new(
 'This feature is BETA and incomplete will remain free for a long time, we cannot ensure that time is forever though.'
@@ -199,19 +175,19 @@ sub _select_kanji($self) {
     $box->append($label);
 
     my $button =
-      Gtk::Button->new_with_label("Study everything ordered by grade");
-    $button->signal_connect(
+      Gtk::Button->new("Study everything ordered by grade");
+    $button->connect(
         clicked => sub {
             JapaChar::View::KanjiLesson->new( app => $self->app )->run;
         }
     );
     $button->set_margin_top(20);
     $button->add_css_class('accent');
-    $button->set_halign('center');
+    $button->set_halign($const->GTK_ALIGN_CENTER);
     $box->append($button);
     for my $grade (@$grades) {
-        my $button = Gtk::Button->new_with_label("Study kanji grade $grade");
-        $button->signal_connect(
+        my $button = Gtk::Button->new("Study kanji grade $grade");
+        $button->connect(
             clicked => sub {
                 JapaChar::View::KanjiLesson->new(
                     app  => $self->app,
@@ -219,11 +195,11 @@ sub _select_kanji($self) {
                 )->run;
             }
         );
-        $button->set_halign('center');
+        $button->set_halign($const->GTK_ALIGN_CENTER);
         $box->append($button);
     }
-    $button = Gtk::Button->new_with_label("Study unclassified kanjis");
-    $button->signal_connect(
+    $button = Gtk::Button->new("Study unclassified kanjis");
+    $button->connect(
         clicked => sub {
             JapaChar::View::KanjiLesson->new(
                 app  => $self->app,
@@ -231,7 +207,7 @@ sub _select_kanji($self) {
             )->run;
         }
     );
-    $button->set_halign('center');
+    $button->set_halign($const->GTK_ALIGN_CENTER);
     $box->append($button);
     $box->append($xmpp);
     $box->append($discord);

@@ -11,42 +11,13 @@ use Encode qw/decode/;
 
 use Moo;
 use Path::Tiny;
-use Glib::Object::Introspection;
 use YAML::PP;
 use JapaChar::DB;
 use JapaChar::Characters;
-use Pango;
 use JapaChar::Random;
 use JapaChar::Score;
 
-use Glib;
-use Glib::IO;
-
 use constant PANGO_SCALE => 1024;
-
-Glib::Object::Introspection->setup(
-    basename => 'Gtk',
-    version  => '4.0',
-    package  => 'Gtk',
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Gdk',
-    version  => '4.0',
-    package  => 'Gtk::Gdk',
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Gsk',
-    version  => '4.0',
-    package  => 'Gtk::Gsk',
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Adw',
-    version  => '1',
-    package  => 'Adw',
-);
 
 has lesson                     => ( is => 'rw' );
 has _type                      => ( is => 'lazy' );
@@ -93,8 +64,9 @@ sub guess_to_string($self, $guess) {
 sub _create_challenge($self, $char, $guess) {
     my $grid = $self->_create_grid_challenge;
     my $kanji_label = $self->_get_label_featured_character( $char->kanji );
-    $kanji_label->set_halign('center');
-    $kanji_label->set_valign('center');
+    my $const = AlgaGTK::Constants->new;
+    $kanji_label->set_halign($const->GTK_ALIGN_CENTER);
+    $kanji_label->set_valign($const->GTK_ALIGN_CENTER);
     my $exercise_type;
     my $exercise_type_class;
     my @helpers;
@@ -116,8 +88,8 @@ sub _create_challenge($self, $char, $guess) {
     my $exercise_label = Gtk::Label->new($exercise_type);
     $exercise_label->add_css_class('exercise_type');
     $exercise_label->add_css_class($exercise_type_class);
-    $exercise_label->set_halign('center');
-    my $box_kanji = Gtk::Box->new( 'vertical', 10 );
+    $exercise_label->set_halign($const->GTK_ALIGN_CENTER);
+    my $box_kanji = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 10 );
     $box_kanji->append( $self->_new_exercise_number_label );
     $box_kanji->append($kanji_label);
     $box_kanji->append($exercise_label);
@@ -152,8 +124,8 @@ sub _create_challenge($self, $char, $guess) {
         $continue_button->set_sensitive(1);
     };
     my $correct_answer_button =
-      Gtk::ToggleButton->new_with_label( $self->guess_to_string($guess) );
-    $correct_answer_button->signal_connect(
+      Gtk::ToggleButton->new( $self->guess_to_string($guess) );
+    $correct_answer_button->connect(
         'clicked',
         sub {
             $self->_final_answer( $self->guess_to_string($guess) );
@@ -164,9 +136,9 @@ sub _create_challenge($self, $char, $guess) {
     $self->_buttons( \@buttons );
     for my $bad_answer (@$incorrect_answers) {
         my $incorrect_button =
-          Gtk::ToggleButton->new_with_label( $bad_answer );
+          Gtk::ToggleButton->new( $bad_answer );
         $incorrect_button->set_group($correct_answer_button);
-        $incorrect_button->signal_connect(
+        $incorrect_button->connect(
             'clicked',
             sub {
                 $self->_final_answer( $bad_answer );
@@ -176,16 +148,16 @@ sub _create_challenge($self, $char, $guess) {
         push @buttons, $incorrect_button;
     }
     @buttons = sort { rand() <=> rand() } @buttons;
-    my $box = Gtk::Box->new( 'horizontal', 10 );
-    $box->set_valign('center');
-    $box->set_halign('center');
+    my $box = Gtk::Box->new( $const->GTK_ORIENTATION_HORIZONTAL, 10 );
+    $box->set_valign($const->GTK_ALIGN_CENTER);
+    $box->set_halign($const->GTK_ALIGN_CENTER);
 
     for my $button (@buttons) {
         $button->add_css_class('kanji-button');
         $box->append($button);
     }
     my $scroll = Gtk::ScrolledWindow->new;
-    $scroll->set_policy('automatic', 'never');
+    $scroll->set_policy($const->GTK_POLICY_AUTOMATIC, $const->GTK_POLICY_NEVER);
     $self->_buttons_box($box);
     $scroll->set_child($box);
     $grid->attach( $scroll,             0, 2, 12, 1 );
@@ -203,20 +175,21 @@ sub _get_label_featured_character( $self, $text ) {
     my $label     = Gtk::Label->new($text);
     my $attr_list = Pango::AttrList->new;
     my $size      = Pango::AttrSize->new( 72 * PANGO_SCALE );
-    my $color     = Pango::Color->new;
 
     $attr_list->insert($size);
     my $fore_attr = $self->_app->characters->get_color_attr($text);
 
     $label->set_attributes($attr_list);
-    $label->set_halign('center');
+    my $const = AlgaGTK::Constants->new;
+    $label->set_halign($const->GTK_ALIGN_CENTER);
     return $label;
 }
 
 sub _new_exercise_number_label($self) {
     my $exercise_number = abs( $self->_counter - 31 );
     my $return          = Gtk::Label->new( 'Exercise: ' . $exercise_number );
-    $return->set_halign('start');
+    my $const = AlgaGTK::Constants->new;
+    $return->set_halign($const->GTK_ALIGN_START);
     return $return;
 }
 
@@ -260,7 +233,8 @@ sub _on_click_continue_button( $self, $grid, $char, $guess ) {
     my $attr_list = Pango::AttrList->new;
     my $size      = Pango::AttrSize->new( 15 * $self->_app->get_width );
     $attr_list->insert($size);
-    $label_feedback->set_halign('center');
+    my $const = AlgaGTK::Constants->new;
+    $label_feedback->set_halign($const->GTK_ALIGN_CENTER);
     $label_feedback->set_attributes($attr_list);
     $grid->attach( $label_feedback, 0, 3, 7, 1 );
 }

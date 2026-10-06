@@ -33,7 +33,7 @@ sub show_assisted_mode_selection($self) {
         'If you feel you are not progressing as well as you could try one of these, do not take one of them working for you as a diagnosis.' );
     $dialog->add_response( $dyslexia, 'Dyslexia' );
     $dialog->add_response( $remove_assisted_mode, 'Remove accessibility' );
-    $dialog->signal_connect(
+    $dialog->connect(
         'response',
         sub( $obj, $response ) {
             $self->_on_assisted_mode_selection_response( $response );

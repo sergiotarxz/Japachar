@@ -9,42 +9,14 @@ use feature 'signatures';
 
 use Moo;
 use Path::Tiny;
-use Glib::Object::Introspection;
 use YAML::PP;
 use JapaChar::DB;
 use JapaChar::Characters;
-use Pango;
 use JapaChar::Random;
 use JapaChar::Score;
 
-use Glib::IO;
-
 use constant PANGO_SCALE => 1024;
 my $exit_the_lesson_id = 'exit-the-lesson';
-
-Glib::Object::Introspection->setup(
-    basename => 'Gtk',
-    version  => '4.0',
-    package  => 'Gtk',
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Gdk',
-    version  => '4.0',
-    package  => 'Gtk::Gdk',
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Gsk',
-    version  => '4.0',
-    package  => 'Gtk::Gsk',
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Adw',
-    version  => '1',
-    package  => 'Adw',
-);
 
 has app        => ( is => 'ro', required => 1 );
 has type       => ( is => 'ro', default  => sub { 'all' } );
@@ -58,7 +30,8 @@ sub run($self) {
 
 sub _show_start_lesson($self) {
     my $type        = $self->type;
-    my $box         = Gtk::Box->new( 'vertical', 0 );
+    my $const = AlgaGTK::Constants->new;
+    my $box         = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 0 );
     my $back_button = Gtk::Button->new_from_icon_name('go-previous-symbolic');
     my $intro       = Gtk::Label->new('This lesson has 30 exercises.');
     my $intro2      = Gtk::Label->new('30 points on completion.');
@@ -67,9 +40,9 @@ sub _show_start_lesson($self) {
     $box->append($intro);
     $box->append($intro2);
     $box->append($intro3);
-    my $continue_button = Gtk::Button->new_with_label('Continue');
+    my $continue_button = Gtk::Button->new('Continue');
     $continue_button->add_css_class('accent');
-    $continue_button->signal_connect(
+    $continue_button->connect(
         'clicked',
         sub {
             $continue_button->set_sensitive(0);
@@ -79,10 +52,10 @@ sub _show_start_lesson($self) {
         }
     );
     $box->append($continue_button);
-    $continue_button->set_halign('end');
-    $continue_button->set_valign('end');
+    $continue_button->set_halign($const->GTK_ALIGN_END);
+    $continue_button->set_valign($const->GTK_ALIGN_END);
     $continue_button->set_vexpand(1);
-    $back_button->signal_connect(
+    $back_button->connect(
         'clicked',
         sub {
             require JapaChar::View::MainMenu;
@@ -96,12 +69,13 @@ sub _show_start_lesson($self) {
 
 sub create_continue_lesson_button( $self, $on_click ) {
     my $type            = $self->type;
-    my $continue_button = Gtk::Button->new_with_label('Continue');
-    $continue_button->set_valign('center');
-    $continue_button->set_halign('end');
+    my $continue_button = Gtk::Button->new('Continue');
+    my $const = AlgaGTK::Constants->new;
+    $continue_button->set_valign($const->GTK_ALIGN_CENTER);
+    $continue_button->set_halign($const->GTK_ALIGN_END);
     $continue_button->set_sensitive(0);
     $continue_button->add_css_class('accent');
-    $continue_button->signal_connect( 'clicked', $on_click, );
+    $continue_button->connect( 'clicked', $on_click, );
     return $continue_button;
 }
 
@@ -111,7 +85,7 @@ sub add_one_success($self) {
 
 sub create_exit_lesson_back_button( $self, $on_exit ) {
     my $back_button = Gtk::Button->new_from_icon_name('go-previous-symbolic');
-    $back_button->signal_connect(
+    $back_button->connect(
         'clicked',
         sub {
             $back_button->set_sensitive(0);
@@ -126,8 +100,9 @@ sub _create_dialog_exit_lesson( $self, $on_exit ) {
         'On exit you will lose your progress' );
     $dialog->add_response( 'close',             'Continue' );
     $dialog->add_response( $exit_the_lesson_id, 'Exit' );
-    $dialog->set_response_appearance( $exit_the_lesson_id, 'destructive' );
-    $dialog->signal_connect(
+    my $const = AlgaGTK::Constants->new;
+    $dialog->set_response_appearance( $exit_the_lesson_id, $const->ADW_RESPONSE_DESTRUCTIVE );
+    $dialog->connect(
         'response',
         sub( $obj, $response ) {
             $self->_on_dialog_exit_lesson_response( $response, $on_exit );
@@ -148,7 +123,8 @@ sub _on_dialog_exit_lesson_response( $self, $response, $on_exit ) {
 sub finish_lesson_screen($self) {
     my $notable_lesson = $self->_successes >= 7 * 3;
     my $feedback_label;
-    my $box = Gtk::Box->new( 'vertical', 10 );
+    my $const = AlgaGTK::Constants->new;
+    my $box = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 10 );
     if ($notable_lesson) {
         $feedback_label =
           Gtk::Label->new('You did it great, here you have your 60 points.');
@@ -158,19 +134,19 @@ sub finish_lesson_screen($self) {
             'You need to continue improving, we have 30 points for you');
     }
 
-    my $continue_button = Gtk::Button->new_with_label('Continue');
+    my $continue_button = Gtk::Button->new('Continue');
     $continue_button->add_css_class('accent');
-    $continue_button->set_halign('end');
-    $continue_button->set_valign('end');
+    $continue_button->set_halign($const->GTK_ALIGN_END);
+    $continue_button->set_valign($const->GTK_ALIGN_END);
     $continue_button->set_vexpand(1);
-    $feedback_label->set_valign('center');
-    $feedback_label->set_halign('center');
+    $feedback_label->set_valign($const->GTK_ALIGN_CENTER);
+    $feedback_label->set_halign($const->GTK_ALIGN_CENTER);
     $feedback_label->set_vexpand(1);
     $continue_button->set_margin_end(50);
     $continue_button->set_margin_bottom(50);
     $box->append($feedback_label);
     $box->append($continue_button);
-    $continue_button->signal_connect(
+    $continue_button->connect(
         'clicked',
         sub {
             JapaChar::Score->sum( $notable_lesson ? 60 : 30 );

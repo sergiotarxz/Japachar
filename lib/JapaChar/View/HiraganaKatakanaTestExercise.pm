@@ -9,42 +9,13 @@ use feature 'signatures';
 
 use Moo;
 use Path::Tiny;
-use Glib::Object::Introspection;
 use YAML::PP;
 use JapaChar::DB;
 use JapaChar::Characters;
-use Pango;
 use JapaChar::Random;
 use JapaChar::Score;
 
-use Glib;
-use Glib::IO;
-
 use constant PANGO_SCALE => 1024;
-
-Glib::Object::Introspection->setup(
-    basename => 'Gtk',
-    version  => '4.0',
-    package  => 'Gtk',
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Gdk',
-    version  => '4.0',
-    package  => 'Gtk::Gdk',
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Gsk',
-    version  => '4.0',
-    package  => 'Gtk::Gsk',
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Adw',
-    version  => '1',
-    package  => 'Adw',
-);
 
 has lesson                     => ( is => 'rw' );
 has _type                      => ( is => 'lazy' );
@@ -109,9 +80,10 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
         return;
 
     }
-    $kana_label->set_halign('center');
-    $kana_label->set_valign('center');
-    my $box_kana = Gtk::Box->new( 'vertical', 10 );
+    my $const = AlgaGTK::Constants->new;
+    $kana_label->set_halign($const->GTK_ALIGN_CENTER);
+    $kana_label->set_valign($const->GTK_ALIGN_CENTER);
+    my $box_kana = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 10 );
     $box_kana->append( $self->_new_exercise_number_label );
     $box_kana->append($kana_label);
     $grid->attach( $box_kana, 0, 0, 12, 4 );
@@ -137,8 +109,8 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
         $continue_button->set_sensitive(1);
     };
     my $correct_answer_button =
-      Gtk::ToggleButton->new_with_label( $char->get($guess) );
-    $correct_answer_button->signal_connect(
+      Gtk::ToggleButton->new( $char->get($guess) );
+    $correct_answer_button->connect(
         'clicked',
         sub {
             $self->_final_answer( $char->get($guess) );
@@ -149,9 +121,9 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
     $self->_buttons( \@buttons );
     for my $char (@$incorrect_chars) {
         my $incorrect_button =
-          Gtk::ToggleButton->new_with_label( $char->get($guess) );
+          Gtk::ToggleButton->new( $char->get($guess) );
         $incorrect_button->set_group($correct_answer_button);
-        $incorrect_button->signal_connect(
+        $incorrect_button->connect(
             'clicked',
             sub {
                 $self->_final_answer( $char->get($guess) );
@@ -161,9 +133,9 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
         push @buttons, $incorrect_button;
     }
     @buttons = sort { rand() <=> rand() } @buttons;
-    my $box = Gtk::Box->new( 'horizontal', 3 );
-    $box->set_valign('end');
-    $box->set_halign('center');
+    my $box = Gtk::Box->new( $const->GTK_ORIENTATION_HORIZONTAL, 3 );
+    $box->set_valign($const->GTK_ALIGN_END);
+    $box->set_halign($const->GTK_ALIGN_CENTER);
 
     for my $button (@buttons) {
         $box->append($button);
@@ -194,7 +166,11 @@ sub _build__on_resize_buttons($self) {
                 $attr_list->insert($fore_attr);
             }
             $attr_list->insert($size);
-            $button->get_child->set_attributes($attr_list);
+            {
+                my $label = bless $button->get_child, 'Gtk::Label';
+                $label->inc_ref;
+                $label->set_attributes($attr_list);
+            }
         }
     };
 }
@@ -209,7 +185,6 @@ sub _get_label_featured_character( $self, $text ) {
     my $label     = Gtk::Label->new($text);
     my $attr_list = Pango::AttrList->new;
     my $size      = Pango::AttrSize->new( 72 * PANGO_SCALE );
-    my $color     = Pango::Color->new;
 
     $attr_list->insert($size);
     my $fore_attr = $self->_app->characters->get_color_attr($text);
@@ -218,7 +193,8 @@ sub _get_label_featured_character( $self, $text ) {
         $attr_list->insert($fore_attr);
     }
     $label->set_attributes($attr_list);
-    $label->set_halign('center');
+    my $const = AlgaGTK::Constants->new;
+    $label->set_halign($const->GTK_ALIGN_CENTER);
     return $label;
 }
 
@@ -268,13 +244,13 @@ sub _new_typing_romanji_challenge( $self, $char ) {
         $self->_final_answer( lc($text) );
         $continue_button->set_sensitive(1);
     };
-    $buffer->signal_connect(
+    $buffer->connect(
         'inserted-text',
         sub {
             $on_change_buffer->();
         }
     );
-    $buffer->signal_connect(
+    $buffer->connect(
         'deleted-text',
         sub {
             $on_change_buffer->();
@@ -289,9 +265,10 @@ sub _new_typing_romanji_challenge( $self, $char ) {
 }
 
 sub _new_exercise_number_label($self) {
-    my $exercise_number = abs( $self->_counter - 11 );
+    my $exercise_number = abs( $self->_counter - 1 );
     my $return          = Gtk::Label->new( 'Exercise: ' . $exercise_number );
-    $return->set_halign('start');
+    my $const = AlgaGTK::Constants->new;
+    $return->set_halign($const->GTK_ALIGN_START);
     return $return;
 }
 
@@ -302,7 +279,11 @@ sub _build__on_resize_continue_button($self) {
         my $size = Pango::AttrSize->new( 40 * $self->_app->get_width );
 
         $attr_list->insert($size);
-        $continue_button->get_child->set_attributes($attr_list);
+        {
+            my $label = bless $continue_button->get_child, 'Gtk::Label';
+            $label->inc_ref;
+            $label->set_attributes($attr_list);
+        }
     };
 }
 
@@ -347,7 +328,7 @@ sub _on_click_continue_button( $self, $grid, $char, $guess ) {
     }
     if ( $is_repeating && $self->_app->characters->last_repeated ) {
 
-        # TODO This is not ideal.
+        # TODO This is not ideal. Because the last one in dyslexia is always successful
         $self->success;
     }
     my $attr_list = Pango::AttrList->new;

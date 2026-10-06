@@ -9,54 +9,27 @@ use feature 'signatures';
 
 use Moo;
 use Path::Tiny;
-use Glib::Object::Introspection;
 use YAML::PP;
 use JapaChar::DB;
 use JapaChar::Characters;
-use Pango;
 use JapaChar::Random;
 use JapaChar::Score;
 use JapaChar::View::HiraganaKatakanaLesson;
 use JapaChar::View::SelectKanjiLesson;
 use JapaChar::View::SelectWordLesson;
 
-use Glib::IO;
-
 use constant PANGO_SCALE => 1024;
-
-Glib::Object::Introspection->setup(
-    basename => 'Gtk',
-    version  => '4.0',
-    package  => 'Gtk',
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Gdk',
-    version  => '4.0',
-    package  => 'Gtk::Gdk',
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Gsk',
-    version  => '4.0',
-    package  => 'Gtk::Gsk',
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Adw',
-    version  => '1',
-    package  => 'Adw',
-);
 
 has app => ( is => 'ro' );
 
 sub run($self) {
     my $scroll = Gtk::ScrolledWindow->new;
-    $scroll->set_policy( 'never', 'automatic' );
+    my $const = AlgaGTK::Constants->new;
+    $scroll->set_policy( $const->GTK_POLICY_NEVER, $const->GTK_POLICY_AUTOMATIC );
     my $grid = Gtk::Grid->new;
     my $button_start_basic_lesson =
-      Gtk::Button->new_with_label('Basic Characters');
-    $button_start_basic_lesson->signal_connect(
+      Gtk::Button->new('Basic Characters');
+    $button_start_basic_lesson->connect(
         'clicked',
         sub {
             my $lesson =
@@ -66,8 +39,8 @@ sub run($self) {
     );
     $grid->set_column_homogeneous(1);
     $grid->set_row_homogeneous(1);
-    my $button_start_hiragana_lesson = Gtk::Button->new_with_label('Hiragana');
-    $button_start_hiragana_lesson->signal_connect(
+    my $button_start_hiragana_lesson = Gtk::Button->new('Hiragana');
+    $button_start_hiragana_lesson->connect(
         'clicked',
         sub {
             my $lesson = JapaChar::View::HiraganaKatakanaLesson->new(
@@ -77,10 +50,10 @@ sub run($self) {
             $lesson->run;
         }
     );
-    my $button_start_katakana_lesson = Gtk::Button->new_with_label('Katakana');
-    my $button_start_kanji_lesson = Gtk::Button->new_with_label('Kanji (BETA)');
-    my $button_start_words_lesson = Gtk::Button->new_with_label('Words (BETA)');
-    $button_start_katakana_lesson->signal_connect(
+    my $button_start_katakana_lesson = Gtk::Button->new('Katakana');
+    my $button_start_kanji_lesson = Gtk::Button->new('Kanji (BETA)');
+    my $button_start_words_lesson = Gtk::Button->new('Words (BETA)');
+    $button_start_katakana_lesson->connect(
         'clicked',
         sub {
             my $lesson = JapaChar::View::HiraganaKatakanaLesson->new(
@@ -98,48 +71,50 @@ sub run($self) {
         my $attr_list = Pango::AttrList->new;
         my $size      = Pango::AttrSize->new(PANGO_SCALE * 10);
         $attr_list->insert($size);
-        $button->get_child->set_attributes($attr_list);
+        my $label = (bless $button->get_child, 'Gtk::Label');
+        $label->inc_ref;
+        $label->set_attributes($attr_list);
     }
-    $button_start_kanji_lesson->signal_connect(
+    $button_start_kanji_lesson->connect(
         clicked => sub {
             JapaChar::View::SelectKanjiLesson->new( app => $self->app, )->run;
         }
     );
-    $button_start_words_lesson->signal_connect(
+    $button_start_words_lesson->connect(
         clicked => sub {
             say 'Starting words lesson';
             JapaChar::View::SelectWordLesson->new( app => $self->app, )->run;
         }
     );
-    my $box                    = Gtk::Box->new( 'horizontal', 10 );
-    my $box_score_basic_lesson = Gtk::Box->new( 'vertical',   10 );
+    my $box                    = Gtk::Box->new( $const->GTK_ORIENTATION_HORIZONTAL, 10 );
+    my $box_score_basic_lesson = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL,   10 );
     my $score_label =
       Gtk::Label->new("Total Score: @{[JapaChar::Score->new->get]}");
     $box_score_basic_lesson->append($score_label);
     $box_score_basic_lesson->append($button_start_basic_lesson);
-    $score_label->set_halign('start');
-    $score_label->set_valign('start');
+    $score_label->set_halign($const->GTK_ALIGN_START);
+    $score_label->set_valign($const->GTK_ALIGN_START);
     $box_score_basic_lesson->set_vexpand(1);
     $button_start_basic_lesson->set_vexpand(1);
-    $button_start_basic_lesson->set_valign('end');
     $grid->attach( $box_score_basic_lesson, 0, 0, 5, 1 );
-    $button_start_basic_lesson->set_valign('end');
-    $button_start_basic_lesson->set_halign('center');
-    my $button_assisted_mode = Gtk::Button->new_with_label('Assisted Mode');
+    $button_start_basic_lesson->set_valign($const->GTK_ALIGN_END);
+    $button_start_basic_lesson->set_valign($const->GTK_ALIGN_END);
+    $button_start_basic_lesson->set_halign($const->GTK_ALIGN_CENTER);
+    my $button_assisted_mode = Gtk::Button->new('Assisted Mode');
     $box->set_margin_top(40);
     $box->append($button_start_hiragana_lesson);
     $box->append($button_start_katakana_lesson);
-    $button_start_kanji_lesson->set_halign('center');
-    $button_start_kanji_lesson->set_valign('center');
-    $button_start_words_lesson->set_halign('center');
-    $button_start_words_lesson->set_valign('center');
-    $box->set_valign('start');
-    $box->set_halign('center');
+    $button_start_kanji_lesson->set_halign($const->GTK_ALIGN_CENTER);
+    $button_start_kanji_lesson->set_valign($const->GTK_ALIGN_CENTER);
+    $button_start_words_lesson->set_halign($const->GTK_ALIGN_CENTER);
+    $button_start_words_lesson->set_valign($const->GTK_ALIGN_CENTER);
+    $box->set_valign($const->GTK_ALIGN_START);
+    $box->set_halign($const->GTK_ALIGN_CENTER);
     $grid->attach( $box,                       0, 1, 5, 1 );
     $grid->attach( $button_start_kanji_lesson, 0, 2, 5, 1 );
     $grid->attach( $button_start_words_lesson, 0, 3, 5, 1 );
     $grid->attach( $button_assisted_mode,      0, 4, 5, 1 );
-    $button_assisted_mode->signal_connect(
+    $button_assisted_mode->connect(
         'clicked',
         sub {
             $self->app->accessibility->show_assisted_mode_selection;
@@ -147,63 +122,71 @@ sub run($self) {
     );
     $button_assisted_mode->set_vexpand(1);
     $button_assisted_mode->set_hexpand(1);
-    $button_assisted_mode->set_valign('center');
-    $button_assisted_mode->set_halign('center');
+    $button_assisted_mode->set_valign($const->GTK_ALIGN_CENTER);
+    $button_assisted_mode->set_halign($const->GTK_ALIGN_CENTER);
     my $clamp_button_launch_website = Adw::Clamp->new;
-    $clamp_button_launch_website->set_unit('px');
+    $clamp_button_launch_website->set_unit($const->ADW_LENGTH_UNIT_PX);
     $clamp_button_launch_website->set_maximum_size(400);
     my $attr_list = Pango::AttrList->new;
     my $size      = Pango::AttrSize->new(PANGO_SCALE * 7);
     $attr_list->insert($size);
 
     $grid->attach( $clamp_button_launch_website, 0, 5, 5, 1 );
-    my $buttons_social = Gtk::Box->new( 'horizontal', 10 );
+    my $buttons_social = Gtk::Box->new( $const->GTK_ORIENTATION_HORIZONTAL, 10 );
     my $button_discord_community =
-      Gtk::Button->new_with_label('Join the Discord community');
+      Gtk::Button->new('Join the Discord community');
 
     $attr_list = Pango::AttrList->new;
     $size      = Pango::AttrSize->new(8000);
     $attr_list->insert($size);
-    $button_discord_community->get_child->set_attributes($attr_list);
+    {
+        my $label = bless $button_discord_community->get_child, 'Gtk::Label';
+        $label->inc_ref;
+        $label->set_attributes($attr_list);
+        $label->set_wrap(1);
+    }
     $button_discord_community->set_vexpand(1);
-    $button_discord_community->get_child->set_wrap(1);
-    $button_discord_community->set_valign('center');
-    $button_discord_community->set_halign('fill');
+    $button_discord_community->set_valign($const->GTK_ALIGN_CENTER);
+    $button_discord_community->set_halign($const->GTK_ALIGN_FILL);
     $button_discord_community->set_hexpand(1);
-    $button_discord_community->signal_connect(
+    $button_discord_community->connect(
         clicked => sub {
             $self->app->launch_discord;
         }
     );
     my $button_xmpp_community =
-      Gtk::Button->new_with_label('Join the XMPP community');
+      Gtk::Button->new('Join the XMPP community');
     $attr_list = Pango::AttrList->new;
     $size      = Pango::AttrSize->new(8000);
     $attr_list->insert($size);
-    $button_xmpp_community->get_child->set_attributes($attr_list);
+    {
+        my $label = bless $button_xmpp_community->get_child, 'Gtk::Label';
+        $label->inc_ref;
+        $label->set_attributes($attr_list);
+        $label->set_wrap(1);
+    }
     $button_xmpp_community->set_vexpand(1);
-    $button_xmpp_community->get_child->set_wrap(1);
-    $button_xmpp_community->set_valign('center');
-    $button_xmpp_community->set_halign('fill');
+    $button_xmpp_community->set_valign($const->GTK_ALIGN_CENTER);
+    $button_xmpp_community->set_halign($const->GTK_ALIGN_FILL);
     $button_xmpp_community->set_hexpand(1);
-    $button_xmpp_community->signal_connect(
+    $button_xmpp_community->connect(
         clicked => sub {
             $self->app->launch_xmpp;
         }
     );
     $buttons_social->append($button_xmpp_community);
     $buttons_social->append($button_discord_community);
-    $buttons_social->set_halign('fill');
+    $buttons_social->set_halign($const->GTK_ALIGN_FILL);
     my $clamp_buttons_social = Adw::Clamp->new;
-    $clamp_buttons_social->set_halign('fill');
-    $clamp_buttons_social->set_unit('px');
+    $clamp_buttons_social->set_halign($const->GTK_ALIGN_FILL);
+    $clamp_buttons_social->set_unit($const->ADW_LENGTH_UNIT_PX);
     $clamp_buttons_social->set_maximum_size(400);
     $clamp_buttons_social->set_child($buttons_social);
     $grid->attach( $clamp_buttons_social, 0, 6, 5, 1 );
     $scroll->set_child($grid);
     $self->app->window_set_child($scroll);
     my $hamburger_menu = Gtk::Button->new_from_icon_name('open-menu-symbolic');
-    $hamburger_menu->signal_connect(
+    $hamburger_menu->connect(
         'clicked',
         sub {
             $self->show_settings;
@@ -355,7 +338,7 @@ sub show_settings($self) {
     );
     $self->app->window_set_child($grid);
     my $back_button = Gtk::Button->new_from_icon_name('go-previous-symbolic');
-    $back_button->signal_connect(
+    $back_button->connect(
         'clicked',
         sub {
             __PACKAGE__->new( app => $self->app )->run;
@@ -376,7 +359,7 @@ sub _create_option( $self, $grid, $label, $onchange, $onget ) {
       Gtk::EntryBuffer->new( $inital_text, length $inital_text );
     my $entry = Gtk::Entry->new_with_buffer($entry_buffer);
     require JapaChar::Schema::Result::Option;
-    $entry->signal_connect(
+    $entry->connect(
         'activate',
         sub {
             my $result = $onchange->( $onget, $entry_buffer );

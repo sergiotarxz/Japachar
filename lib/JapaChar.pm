@@ -10,58 +10,19 @@ use feature 'signatures';
 
 use Moo;
 use Path::Tiny;
-use Glib::Object::Introspection;
 use YAML::PP;
 use JapaChar::DB;
 use JapaChar::Characters;
-use Pango;
 use JapaChar::Random;
 use JapaChar::Score;
 use JapaChar::View::MainMenu;
 use JapaChar::Fontconfig;
-use Glib::IO;
 use Data::Dumper;
 use Mojo::Util qw/url_unescape/;
 use JSON qw/from_json/;
-
-require XSLoader;
-XSLoader::load('JapaChar');
+use AlgaGTK;
 
 use constant PANGO_SCALE => 1024;
-
-Glib::Object::Introspection->setup(
-    basename => 'Gtk',
-    version  => '4.0',
-    package  => 'Gtk',
-);
-
-my $GIO_BASENAME = 'Gio';
-my $GIO_VERSION  = '2.0';
-my $GIO_PACKAGE  = 'Glib::IO';
-
-Glib::Object::Introspection->setup(
-	basename => $GIO_BASENAME,
-	version  => $GIO_VERSION,
-	package  => $GIO_PACKAGE,
-);
-
-Glib::Object::Introspection->setup(
-    basename => 'Gdk',
-    version  => '4.0',
-    package  => 'Gtk::Gdk',
-);
-
-#Glib::Object::Introspection->setup(
-#    basename => 'Gsk',
-#    version  => '4.0',
-#    package  => 'Gtk::Gsk',
-#);
-
-Glib::Object::Introspection->setup(
-    basename => 'Adw',
-    version  => '1',
-    package  => 'Adw',
-);
 
 has headerbar         => ( is => 'rw', );
 has _on_resize_lesson => ( is => 'rw', );
@@ -74,6 +35,7 @@ has characters          => ( is => 'lazy' );
 has kanji               => ( is => 'lazy' );
 has words               => ( is => 'lazy' );
 has started => (is => 'rw', default => sub { 0 });
+has app => (is => 'rw');
 
 sub _build_words($self) {
     return JapaChar::Words->new(app => $self);
@@ -149,7 +111,8 @@ sub present_dialog( $self, $dialog ) {
 
 sub window_set_child( $self, $child ) {
     my $window    = $self->_window;
-    my $box       = Gtk::Box->new( 'vertical', 0 );
+    my $const = AlgaGTK::Constants->new;
+    my $box       = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 0 );
     my $headerbar = Adw::HeaderBar->new;
     $window->set_title( 'Learn with Japachar' );
     $headerbar->set_title_widget( Gtk::Label->new('Japachar') );
@@ -169,7 +132,7 @@ sub _application_start( $self, $app ) {
     my $settings = Gtk::Settings::get_default();
     $settings->set_property('gtk-font-name', 'Noto Sans CJK JP 12');
     $main_window->set_property( width_request => 300);
-    $main_window->signal_connect(
+    $main_window->connect(
         notify => sub( $object, $param ) {
             if ( $param->{name} eq 'default-width' ) {
                 for my $resize_key ( keys $self->_on_resize_triggers->%* ) {
@@ -196,22 +159,17 @@ sub parse_params($self, $params) {
 }
 
 sub start($self) {
-    Glib::IO::resources_register(
-        Glib::IO::Resource::load( $self->_gresources_path ) );
-    JapaChar::Fontconfig->new->set_current;
+    my $const = AlgaGTK::Constants->new;
     my $app =
-      Adw::Application->new( 'me.sergiotarxz.JapaChar', [qw/default-flags handles_command_line/] );
-    $app->signal_connect(
+      Adw::Application->new( 'me.sergiotarxz.JapaChar', 0 | $const->G_APPLICATION_CAN_OVERRIDE_APP_ID | $const->G_APPLICATION_ALLOW_REPLACEMENT);
+    $self->app($app);
+    JapaChar::Fontconfig->new(app => $self)->set_current;
+    $app->connect(
         'activate' => sub {
             $self->_application_start($app);
         }
     );
-	$app->signal_connect(command_line => sub {
-		say command => '';
-		$self->_application_start($app);
-		$self->parse_params($_[1]->get_arguments);
-		return;
-	});
-    $app->run([@ARGV]);
+    $app->load_resource($self->_gresources_path);
+    $app->run(@ARGV);
 }
 1;
