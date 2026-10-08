@@ -7,6 +7,7 @@ my $build = Module::Build->new(
     license       => 'AGPLv3',
     dist_author   => 'Sergio Iglesias <contact@owlcode.tech>',
     dist_abstract => 'Learn Japanese Characters.',
+    create_makefile_pl => 'traditional',
     requires      => {
         'DBI'                         => 0,
         'DBD::SQLite'                 => 0,

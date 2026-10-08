@@ -39,9 +39,12 @@ sub connect {
     $class->_migrate($dbh);
     return $dbh;
 }
+sub is_android {
+    return  -d '/data' && -d '/system';
+}
 
 sub _db_path($class) {
-    my $home = $ENV{HOME};
+    my $home = $class->is_android ? '/data/data/org.example.perltest/files/' : $ENV{HOME};
     if ($^O eq 'MSWin32') {
         $home = $ENV{userprofile};
     }

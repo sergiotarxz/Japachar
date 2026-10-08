@@ -12,6 +12,7 @@ use Moo;
 use JapaChar;
 use JapaChar::Words;
 use JapaChar::View::WordLesson;
+use JapaChar::DB_precomp;
 
 use POSIX qw/:sys_wait_h/;
 
@@ -54,6 +55,11 @@ sub _migrate_words($self) {
         open $write, '>', 'ipc';
         open $read,  '<', 'ipc';
         close $write;
+    }
+    my $db = JapaChar::DB_precomp->_db_path;
+    if (-e $db) {
+        $self->_words->direct_copy_precomp_words_db;
+        return $self->_select_words;
     }
     my $pid        = fork;
     if ( !$pid ) {
@@ -123,7 +129,10 @@ sub _migrate_words($self) {
                     {
                         return 1;
                     }
-                    $self->_select_words;
+                    if (-e $db) {
+                        $self->_words->direct_copy_precomp_words_db;
+                        $self->_select_words;
+                    }
                     return 0;
                 }
             );

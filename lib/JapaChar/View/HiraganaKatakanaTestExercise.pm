@@ -201,8 +201,9 @@ sub _get_label_featured_character( $self, $text ) {
 sub _new_typing_romanji_challenge( $self, $char ) {
     my $grid       = $self->_create_grid_challenge;
     my $kana_label = $self->_get_label_featured_character( $char->get('kana') );
-    $kana_label->set_halign('center');
-    $kana_label->set_valign('center');
+    my $const = AlgaGTK::Constants->new;
+    $kana_label->set_halign($const->GTK_ALIGN_CENTER);
+    $kana_label->set_valign($const->GTK_ALIGN_CENTER);
     my $box_kana = Gtk::Box->new( 'vertical', 10 );
     $box_kana->set_size_request(40, 300);
     $box_kana->append( $self->_new_exercise_number_label );
@@ -257,8 +258,8 @@ sub _new_typing_romanji_challenge( $self, $char ) {
         }
     );
 
-    $romanji_entry->set_valign('center');
-    $romanji_entry->set_halign('center');
+    $romanji_entry->set_valign($const->GTK_ALIGN_CENTER);
+    $romanji_entry->set_halign($const->GTK_ALIGN_CENTER);
     $grid->attach( $romanji_entry, 2, 4, 8, 1 );
     $continue_button->set_margin_top(40);
     $grid->attach( $continue_button, 6, 5, 5, 1 );
@@ -321,7 +322,7 @@ sub _on_click_continue_button( $self, $grid, $char, $guess ) {
         $label_feedback->add_css_class('error');
         $char->fail if !$is_repeating;
         $continue_button->set_sensitive(0);
-        Glib::Timeout->add_seconds(1, sub {
+        $self->lesson->app->app->timeout_add(1000, sub {
             $continue_button->set_sensitive(1);
             return 0;
         });
@@ -334,7 +335,8 @@ sub _on_click_continue_button( $self, $grid, $char, $guess ) {
     my $attr_list = Pango::AttrList->new;
     my $size      = Pango::AttrSize->new( 20000 );
     $attr_list->insert($size);
-    $label_feedback->set_halign('center');
+    my $const = AlgaGTK::Constants->new;
+    $label_feedback->set_halign($const->GTK_ALIGN_CENTER);
     $label_feedback->set_wrap(1);
     $label_feedback->set_attributes($attr_list);
     $grid->attach( $label_feedback, 0, 5, 7, 1 );

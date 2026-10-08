@@ -11,6 +11,8 @@ use Data::Dumper;
 use Mojo::DOM;
 
 use JapaChar::Schema;
+use JapaChar::Schema_precomp;
+use JapaChar::DB_precomp;
 
 use Moo;
 
@@ -20,9 +22,14 @@ has app             => ( is => 'ro', required => 1 );
 has _words_schema   => ( is => 'lazy' );
 has _options_schema => ( is => 'lazy' );
 has _schema         => ( is => 'lazy' );
+has _schema_precomp         => ( is => 'lazy' );
 
 sub _build__schema($self) {
     return JapaChar::Schema->Schema;
+}
+
+sub _build__schema_precomp($self) {
+    return JapaChar::Schema_precomp->Schema;
 }
 
 sub _build__words_schema($self) {
@@ -140,7 +147,36 @@ sub migrated($self) {
     }
 }
 
+sub direct_copy_precomp_words_db($self) {
+    my $dbh = JapaChar::DB->connect;
+    my ($word) = @{$dbh->selectall_arrayref('select * from words limit 1')};
+    if ($word) {
+        return;
+    }
+
+    $dbh->do( 'ATTACH DATABASE ? AS source',
+        undef, JapaChar::DB_precomp->_db_path );
+
+    my @tables =
+      qw{ word_classifications word_meanings word_representation_classifications word_representations words };
+    eval {
+        $dbh->begin_work;
+        for my $table (@tables) {
+            $dbh->do(
+                "INSERT INTO main.$table
+        SELECT * FROM source.$table"
+            );
+        }
+
+        $dbh->commit;
+    };
+    if ($@) {
+        eval { warn $@; $dbh->rollback };
+    }
+}
+
 sub populate_words( $self, $parent_pid, $write ) {
+    require JapaChar::DB_precomp;
     $self->_schema->txn_do(
         sub {
             my ($option_want_words_version) =
@@ -153,7 +189,7 @@ sub populate_words( $self, $parent_pid, $write ) {
                 return;
             }
             say 'Populating Words database, please wait...';
-            my $schema = $self->_words_schema;
+            my $schema = $self->_schema_precomp->resultset('Word');
             my $root   = $self->app->root;
             open my $fh, '<', $root->child('JMdict_e.xml');
             my @words;
@@ -218,7 +254,7 @@ sub populate_words( $self, $parent_pid, $write ) {
                       };
                 }
                 my $classifications_resultset =
-                  JapaChar::Schema->Schema->resultset('WordClassification');
+                  JapaChar::Schema_precomp->Schema->resultset('WordClassification');
 
                 for my $representation (@representations) {
                     my $classifications =
@@ -256,7 +292,7 @@ sub populate_words( $self, $parent_pid, $write ) {
                     meanings        => \@meanings,
                   };
                 if ( $word_index % ($word_index > 500 ? $chunk_size : 25) == 0 ) {
-                    $self->_words_schema->populate( \@words );
+                    $self->_schema_precomp->resultset('Word')->populate( \@words );
                     $write->syswrite( $word_index . "\n" );
                     $write->flush;
                     @words = ();
@@ -279,7 +315,7 @@ sub populate_words( $self, $parent_pid, $write ) {
                     }
                 }
             }
-            $self->_words_schema->populate( \@words );
+            $self->_schema_precomp->resultset('Word')->populate( \@words );
             $option_words_version->update(
                 { value => $option_want_words_version->value } );
             say 'Populated Words database';

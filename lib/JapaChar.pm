@@ -55,7 +55,12 @@ sub _build_accessibility($self) {
     return JapaChar::Accessibility->new( app => $self );
 }
 
+sub is_android {
+    return  -d '/data' && -d '/system';
+}
+
 sub root($self) {
+    return path(__FILE__)->parent if $self->is_android;
     return path(__FILE__)->parent->parent->parent;
 }
 

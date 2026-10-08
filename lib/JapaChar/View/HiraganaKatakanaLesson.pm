@@ -24,7 +24,7 @@ has counter    => ( is => 'rw' );
 has _successes => ( is => 'rw' );
 
 sub run($self) {
-    $self->counter(1);
+    $self->counter(11);
     $self->_show_start_lesson;
 }
 
