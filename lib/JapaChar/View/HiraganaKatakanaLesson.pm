@@ -126,7 +126,8 @@ sub _create_dialog_exit_lesson( $self, $on_exit ) {
         'On exit you will lose your progress' );
     $dialog->add_response( 'close', 'Continue' );
     $dialog->add_response( $exit_the_lesson_id, 'Exit' );
-    $dialog->set_response_appearance( $exit_the_lesson_id, 'destructive' );
+    my $const = AlgaGTK::Constants->new;
+    $dialog->set_response_appearance( $exit_the_lesson_id, $const->ADW_RESPONSE_DESTRUCTIVE );
     $dialog->connect(
         'response',
         sub( $obj, $response ) {

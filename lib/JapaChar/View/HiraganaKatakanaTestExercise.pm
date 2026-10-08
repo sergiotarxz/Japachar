@@ -204,7 +204,7 @@ sub _new_typing_romanji_challenge( $self, $char ) {
     my $const = AlgaGTK::Constants->new;
     $kana_label->set_halign($const->GTK_ALIGN_CENTER);
     $kana_label->set_valign($const->GTK_ALIGN_CENTER);
-    my $box_kana = Gtk::Box->new( 'vertical', 10 );
+    my $box_kana = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 10 );
     $box_kana->set_size_request(40, 300);
     $box_kana->append( $self->_new_exercise_number_label );
     $box_kana->append($kana_label);
