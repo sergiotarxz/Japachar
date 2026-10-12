@@ -44,7 +44,7 @@ sub is_android {
 }
 
 sub _db_path($class) {
-    my $home = $class->is_android ? $ENV{XDG_CONFIG_HOME} : $ENV{HOME};
+    my $home = $class->is_android ? '/storage/emulated/0/Android/data/me.sergiotarxz.japachar/files/' : $ENV{HOME};
     if ($^O eq 'MSWin32') {
         $home = $ENV{userprofile};
     }
