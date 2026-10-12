@@ -350,13 +350,17 @@ sub show_settings($self) {
 sub _create_option( $self, $grid, $label, $onchange, $onget ) {
     state $row = 0;
     $row++;
+    my $const = AlgaGTK::Constants->new;
     $label = Gtk::Label->new($label);
+    $label->set_width_chars(20);
+    $label->set_max_width_chars(20);
     $label->set_wrap(1);
-    $label->set_wrap_mode('char');
+    $label->set_wrap_mode($const->PANGO_WRAP_CHAR);
+    $label->set_halign($const->GTK_ALIGN_START);
     $grid->attach( $label, 0, $row, 1, 1 );
     my $inital_text = $onget->();
     my $entry_buffer =
-      Gtk::EntryBuffer->new( $inital_text, length $inital_text );
+      Gtk::EntryBuffer->new( $inital_text );
     my $entry = Gtk::Entry->new_with_buffer($entry_buffer);
     require JapaChar::Schema::Result::Option;
     $entry->connect(
