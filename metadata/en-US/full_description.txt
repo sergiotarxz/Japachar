@@ -1,0 +1,7 @@
+Learn Japanese with Japachar.
+
+This apps teachs you Hiragana, Katakana, Kanji and Words.
+
+It comes with a learning algorithm so you can progressively learn
+new things and if you get stuck you can unstuck yourself at your
+pace.
