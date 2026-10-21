@@ -55,7 +55,6 @@ sub Schema ($class) {
                 return $mark_results{$c};
               }
               ->();
-            say $result;
             return $result;
         }
     );

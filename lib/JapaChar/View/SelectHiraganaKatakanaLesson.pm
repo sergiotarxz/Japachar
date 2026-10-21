@@ -36,25 +36,12 @@ sub _select_mark($self) {
     my $const        = AlgaGTK::Constants->new;
     my $box    = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 10 );
 
-    my $label = Gtk::Label->new(
-'This feature is BETA and incomplete will remain free for a long time, we cannot ensure that time is forever though.'
-    );
+    my $label = Gtk::Label->new( "Study @{[$self->type]}" );
     $label->set_wrap(1);
 
     $label->set_margin_top(20);
     $box->append($label);
 
-    my $button =
-      Gtk::Button->new("Study everything ordered by grade");
-    $button->connect(
-        clicked => sub {
-            JapaChar::View::KanjiLesson->new( app => $self->app )->run;
-        }
-    );
-    $button->set_margin_top(20);
-    $button->add_css_class('accent');
-    $button->set_halign($const->GTK_ALIGN_CENTER);
-    $box->append($button);
     my @marks_to_study = ('Study All', qw/None Dakuten Handakuten/);
     my %translate = (
         'Study All'  => undef,
@@ -76,7 +63,6 @@ sub _select_mark($self) {
         $button->set_halign($const->GTK_ALIGN_CENTER);
         $box->append($button);
     }
-    $button->set_halign($const->GTK_ALIGN_CENTER);
     $scroll->set_child($box);
     $self->app->window_set_child($scroll);
     $self->app->headerbar->pack_start($back_button);
