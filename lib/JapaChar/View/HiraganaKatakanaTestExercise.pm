@@ -19,6 +19,7 @@ use constant PANGO_SCALE => 1024;
 
 has lesson                     => ( is => 'rw' );
 has _type                      => ( is => 'lazy' );
+has _mark                      => ( is => 'lazy' );
 has _app                       => ( is => 'lazy' );
 has _buttons                   => ( is => 'rw' );
 has _buttons_box               => ( is => 'rw' );
@@ -34,6 +35,10 @@ sub _counter($self) {
 
 sub _build__type($self) {
     return $self->lesson->type;
+}
+
+sub _build__mark($self) {
+    return $self->lesson->mark;
 }
 
 sub _build__app($self) {
@@ -67,10 +72,9 @@ sub _new_challenge_romanji($self) {
 }
 
 sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
-    my $type = $self->_type;
     my $grid = $self->_create_grid_challenge;
     my $char =
-      $self->_app->characters->next_char( $self->_app->accessibility, $type );
+      $self->_app->characters->next_char( $self->_app->accessibility, $self->_type, $self->_mark );
     my $kana_label = $self->_get_label_featured_character( $char->get($show) );
     $kana_label->set_size_request(40, 300);
     my $rng        = JapaChar::Random->new->get( 1, 100 );
@@ -95,7 +99,7 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
     );
     $self->_app->headerbar->pack_start($back_button);
     my $incorrect_chars =
-      JapaChar::Characters->new->get_4_incorrect_answers($char);
+      JapaChar::Characters->new->get_4_incorrect_answers($char, $self->_mark);
     $self->_app->on_resize( $self->_on_resize_continue_button );
     my @buttons;
     my $continue_button = $self->lesson->create_continue_lesson_button(

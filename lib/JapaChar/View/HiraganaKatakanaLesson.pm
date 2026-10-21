@@ -20,6 +20,7 @@ my $exit_the_lesson_id = 'exit-the-lesson';
 
 has app        => ( is => 'ro' );
 has type       => ( is => 'ro' );
+has mark       => ( is => 'ro' );
 has counter    => ( is => 'rw' );
 has _successes => ( is => 'rw' );
 

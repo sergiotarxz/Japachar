@@ -15,6 +15,7 @@ use JapaChar::Characters;
 use JapaChar::Random;
 use JapaChar::Score;
 use JapaChar::View::HiraganaKatakanaLesson;
+use JapaChar::View::SelectHiraganaKatakanaLesson;
 use JapaChar::View::SelectKanjiLesson;
 use JapaChar::View::SelectWordLesson;
 
@@ -43,7 +44,7 @@ sub run($self) {
     $button_start_hiragana_lesson->connect(
         'clicked',
         sub {
-            my $lesson = JapaChar::View::HiraganaKatakanaLesson->new(
+            my $lesson = JapaChar::View::SelectHiraganaKatakanaLesson->new(
                 app  => $self->app,
                 type => 'hiragana'
             );
@@ -56,7 +57,7 @@ sub run($self) {
     $button_start_katakana_lesson->connect(
         'clicked',
         sub {
-            my $lesson = JapaChar::View::HiraganaKatakanaLesson->new(
+            my $lesson = JapaChar::View::SelectHiraganaKatakanaLesson->new(
                 app  => $self->app,
                 type => 'katakana'
             );

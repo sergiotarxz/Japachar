@@ -208,7 +208,6 @@ sub _select_kanji($self) {
         }
     );
     $button->set_halign($const->GTK_ALIGN_CENTER);
-    $box->append($button);
     $box->append($xmpp);
     $box->append($discord);
     $scroll->set_child($box);

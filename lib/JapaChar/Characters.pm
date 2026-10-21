@@ -61,12 +61,17 @@ sub _get_characters_of_type( $self, $type ) {
     return $array;
 }
 
-sub get_4_incorrect_answers( $self, $char ) {
+sub get_4_incorrect_answers( $self, $char, $mark ) {
     my $basic_character_resultset =
       JapaChar::Schema->Schema->resultset('BasicCharacter');
     my @bad_answers = $basic_character_resultset->search(
         {
             type    => $char->type,
+            (
+                    defined $mark
+                ? ( -and => [ \[ 'mark(value) = ?', $mark ] ] )
+                : ()
+            ),
             value   => { '!=', $char->value },
             romanji => { '!=', $char->romanji },
             -bool   => 'started',
@@ -79,13 +84,18 @@ sub get_4_incorrect_answers( $self, $char ) {
     return \@bad_answers;
 }
 
-sub _next_review_char( $self, $type = undef ) {
+sub _next_review_char( $self, $type = undef, $mark = undef) {
     my $basic_character_resultset =
       JapaChar::Schema->Schema->resultset('BasicCharacter');
     my @chars = $basic_character_resultset->search(
         {
             score => { '>=' => JapaChar::Schema::Result::Option->get_new_character_threeshold_basic_character_inner_score },
-            ( ( defined $type ) ? ( type => $type, ) : () )
+            ( ( defined $type ) ? ( type => $type, ) : () ),
+            (
+                defined $mark
+                ? ( -and => [ \[ 'mark(value) = ?', $mark ] ] )
+                : ()
+            ),
         },
         {
             order_by => { -asc => \'RANDOM()' },
@@ -117,14 +127,14 @@ sub last_repeated($self) {
     return $self->_times_repeated >= 4;
 }
 
-sub next_char( $self, $accesibility, $type = undef ) {
+sub next_char( $self, $accesibility, $type = undef, $mark = undef ) {
     if ( $accesibility->is_dyslexia ) {
         my $dyslexia_char = $self->_try_next_char_dyslexia;
         return $dyslexia_char if defined $dyslexia_char;
     }
     $self->is_repeated(0);
-    my $next_review   = $self->_next_review_char($type);
-    my $next_learning = $self->_next_learning_char($type);
+    my $next_review   = $self->_next_review_char($type, $mark);
+    my $next_learning = $self->_next_learning_char($type, $mark);
     if ( !defined $next_review ) {
         return $next_learning;
     }
@@ -152,16 +162,21 @@ sub _next_repeated_character( $self, $type = undef ) {
     return $char;
 }
 
-sub _next_learning_char( $self, $type = undef ) {
+sub _next_learning_char( $self, $type = undef, $mark = undef) {
     $self->populate_basic_characters;
     my $basic_character_resultset =
       JapaChar::Schema->Schema->resultset('BasicCharacter');
-    my @candidate_chars = $self->_retrieve_started_chars_not_finished($type);
+    my @candidate_chars = $self->_retrieve_started_chars_not_finished($type, $mark);
     if ( @candidate_chars < JapaChar::Schema::Result::Option->get_max_number_simultaneous_learning_basic_characters ) {
         my @new_chars = $basic_character_resultset->search(
             {
                 -not_bool => 'started',
-                ( ( defined $type ) ? ( type => $type, ) : () )
+                ( ( defined $type ) ? ( type => $type, ) : () ),
+                (
+                        defined $mark
+                    ? ( -and => [ \[ 'mark(value) = ?', $mark ] ] )
+                    : ()
+                )
             },
             {
                 order_by => { -asc => 'id' },
@@ -171,18 +186,23 @@ sub _next_learning_char( $self, $type = undef ) {
         for my $char (@new_chars) {
             $char->update( { started => 1 } );
         }
-        @candidate_chars = $self->_retrieve_started_chars_not_finished($type);
+        @candidate_chars = $self->_retrieve_started_chars_not_finished($type, $mark);
     }
     my $char = $candidate_chars[ int( rand( scalar @candidate_chars ) ) ];
     return $char;
 }
 
-sub _retrieve_started_chars_not_finished( $self, $type ) {
+sub _retrieve_started_chars_not_finished( $self, $type, $mark ) {
     my $basic_character_resultset =
       JapaChar::Schema->Schema->resultset('BasicCharacter');
     return $basic_character_resultset->search(
         {
             ( ( defined $type ) ? ( type => $type, ) : () ),
+            (
+                    defined $mark
+                ? ( -and => [ \[ 'mark(value) = ?', $mark ] ] )
+                : ()
+            ),
             score => { '<' => JapaChar::Schema::Result::Option->get_new_character_threeshold_basic_character_inner_score },
             -bool => 'started',
         }
