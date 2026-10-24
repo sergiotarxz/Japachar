@@ -26,13 +26,21 @@ label.meaning {
 }
 
 label {
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
 
 button label {
-    font-size: 0.6rem;
+    font-size: 1rem;
 }
 
 button.kanji-button label {
-    font-size: 0.6rem;
+    font-size: 1.0rem;
+}
+
+label.featured-char {
+    font-size: 3rem;
+}
+
+label.featured-word {
+    font-size: 3rem;
 }

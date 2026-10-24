@@ -25,11 +25,9 @@ use AlgaGTK;
 use constant PANGO_SCALE => 1024;
 
 has headerbar         => ( is => 'rw', );
-has _on_resize_lesson => ( is => 'rw', );
 
 has _gresources_path    => ( is => 'lazy', );
 has _window             => ( is => 'rw' );
-has _on_resize_triggers => ( is => 'ro', default => sub { {}; } );
 has accessibility       => ( is => 'lazy' );
 has characters          => ( is => 'lazy' );
 has kanji               => ( is => 'lazy' );
@@ -101,15 +99,6 @@ sub config($class) {
     $ypp->load_file( '' . $class->root->child('config.yml') );
 }
 
-sub on_resize( $self, $sub ) {
-    $self->_on_resize_triggers->{$sub} = $sub;
-}
-
-sub delete_on_resize( $self, $sub ) {
-    return if !defined $sub;
-    delete $self->_on_resize_triggers->{$sub};
-}
-
 sub present_dialog( $self, $dialog ) {
     $dialog->present( $self->_window );
 }
@@ -137,15 +126,6 @@ sub _application_start( $self, $app ) {
     my $settings = Gtk::Settings::get_default();
     $settings->set_property('gtk-font-name', 'Noto Sans CJK JP 12');
     $main_window->set_property( width_request => 300);
-    $main_window->connect(
-        notify => sub( $object, $param ) {
-            if ( $param->{name} eq 'default-width' ) {
-                for my $resize_key ( keys $self->_on_resize_triggers->%* ) {
-                    $self->_on_resize_triggers->{$resize_key}->();
-                }
-            }
-        }
-    );
     my $display = $main_window->get_property('display');
     JapaChar::View::MainMenu->new( app => $self )->run;
     $main_window->present;

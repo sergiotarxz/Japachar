@@ -70,8 +70,6 @@ sub run($self) {
       )
     {
         my $attr_list = Pango::AttrList->new;
-        my $size      = Pango::AttrSize->new(PANGO_SCALE * 10);
-        $attr_list->insert($size);
         my $label = (bless $button->get_child, 'Gtk::Label');
         $label->inc_ref;
         $label->set_attributes($attr_list);
@@ -129,8 +127,6 @@ sub run($self) {
     $clamp_button_launch_website->set_unit($const->ADW_LENGTH_UNIT_PX);
     $clamp_button_launch_website->set_maximum_size(400);
     my $attr_list = Pango::AttrList->new;
-    my $size      = Pango::AttrSize->new(PANGO_SCALE * 7);
-    $attr_list->insert($size);
 
     $grid->attach( $clamp_button_launch_website, 0, 5, 5, 1 );
     my $buttons_social = Gtk::Box->new( $const->GTK_ORIENTATION_HORIZONTAL, 10 );
@@ -138,8 +134,6 @@ sub run($self) {
       Gtk::Button->new('Join the Discord community');
 
     $attr_list = Pango::AttrList->new;
-    $size      = Pango::AttrSize->new(8000);
-    $attr_list->insert($size);
     {
         my $label = bless $button_discord_community->get_child, 'Gtk::Label';
         $label->inc_ref;
@@ -158,8 +152,6 @@ sub run($self) {
     my $button_xmpp_community =
       Gtk::Button->new('Join the XMPP community');
     $attr_list = Pango::AttrList->new;
-    $size      = Pango::AttrSize->new(8000);
-    $attr_list->insert($size);
     {
         my $label = bless $button_xmpp_community->get_child, 'Gtk::Label';
         $label->inc_ref;

@@ -32,13 +32,12 @@ sub _show_start_lesson($self) {
     my $const = AlgaGTK::Constants->new;
     my $box         = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 0 );
     my $back_button = Gtk::Button->new_from_icon_name('go-previous-symbolic');
-    my $intro       = Gtk::Label->new('This lesson has 30 exercises.');
-    my $intro2      = Gtk::Label->new('30 points on completion.');
-    my $intro3      = Gtk::Label->new('30 extra points if you do it very well');
+    my $intro       = Gtk::Label->new('This lesson has 30 exercises. 30 points on completion. 30 extra points if you do it very well');
     $intro->set_margin_top(50);
+    $intro->set_margin_start(5);
+    $intro->set_margin_end(5);
+    $intro->set_wrap(1);
     $box->append($intro);
-    $box->append($intro2);
-    $box->append($intro3);
     my $continue_button = Gtk::Button->new('Continue');
     $continue_button->add_css_class('accent');
     $continue_button->connect(
@@ -127,10 +126,12 @@ sub finish_lesson_screen($self) {
     if ($notable_lesson) {
         $feedback_label =
           Gtk::Label->new('You did it great, here you have your 60 points.');
+        $feedback_label->set_wrap(1);
     }
     else {
         $feedback_label = Gtk::Label->new(
             'You need to continue improving, we have 30 points for you');
+        $feedback_label->set_wrap(1);
     }
 
     my $continue_button = Gtk::Button->new('Continue');

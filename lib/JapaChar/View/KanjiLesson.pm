@@ -128,10 +128,12 @@ sub finish_lesson_screen($self) {
     if ($notable_lesson) {
         $feedback_label =
           Gtk::Label->new('You did it great, here you have your 60 points.');
+        $feedback_label->set_wrap(1);
     }
     else {
         $feedback_label = Gtk::Label->new(
             'You need to continue improving, we have 30 points for you');
+        $feedback_label->set_wrap(1);
     }
 
     my $continue_button = Gtk::Button->new('Continue');

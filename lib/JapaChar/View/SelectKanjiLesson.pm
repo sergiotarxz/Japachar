@@ -145,6 +145,11 @@ sub _select_kanji($self) {
     my $box    = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 10 );
 
     my $xmpp = Gtk::Button->new('Report bugs and share feedback in XMPP');
+    {
+        my $label = bless $xmpp->get_child, 'Gtk::Label';
+        $label->inc_ref;
+        $label->set_wrap(1);
+    }
 
     $xmpp->connect(
         clicked => sub {
@@ -156,7 +161,11 @@ sub _select_kanji($self) {
     $xmpp->set_halign($const->GTK_ALIGN_CENTER);
 
     my $discord = Gtk::Button->new('Report bugs and share feedback in Discord');
-
+    {
+        my $label = bless $discord->get_child, 'Gtk::Label';
+        $label->inc_ref;
+        $label->set_wrap(1);
+    }
     $discord->connect(
         clicked => sub {
             $self->app->launch_discord;
@@ -170,12 +179,19 @@ sub _select_kanji($self) {
 'This feature is BETA and incomplete will remain free for a long time, we cannot ensure that time is forever though.'
     );
     $label->set_wrap(1);
+    $label->set_margin_end(5);
+    $label->set_margin_start(5);
 
     $label->set_margin_top(20);
     $box->append($label);
 
     my $button =
       Gtk::Button->new("Study everything ordered by grade");
+    {
+        my $label = bless $button->get_child, 'Gtk::Label';
+        $label->inc_ref;
+        $label->set_wrap(1);
+    }
     $button->connect(
         clicked => sub {
             JapaChar::View::KanjiLesson->new( app => $self->app )->run;

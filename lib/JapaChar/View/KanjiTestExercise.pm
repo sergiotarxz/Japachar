@@ -104,7 +104,7 @@ sub _create_challenge($self, $char, $guess) {
         }
         $box_kanji->append(Gtk::Label->new("$helper: $result"));
     }
-    $grid->attach( $box_kanji, 0, 0, 12, 4 );
+    $grid->attach( $box_kanji, 0, 0, 12, 1 );
     $self->_app->window_set_child($grid);
     my $back_button = $self->lesson->create_exit_lesson_back_button(
         sub {
@@ -160,8 +160,8 @@ sub _create_challenge($self, $char, $guess) {
     $scroll->set_policy($const->GTK_POLICY_AUTOMATIC, $const->GTK_POLICY_NEVER);
     $self->_buttons_box($box);
     $scroll->set_child($box);
-    $grid->attach( $scroll,             0, 2, 12, 1 );
-    $grid->attach( $continue_button, 6, 3, 5,  1 );
+    $grid->attach( $scroll,             0, 1, 12, 1 );
+    $grid->attach( $continue_button, 6, 2, 5,  1 );
 }
 
 sub _create_grid_challenge($self) {
@@ -173,10 +173,9 @@ sub _create_grid_challenge($self) {
 
 sub _get_label_featured_character( $self, $text ) {
     my $label     = Gtk::Label->new($text);
+    $label->add_css_class('featured-char');
     my $attr_list = Pango::AttrList->new;
-    my $size      = Pango::AttrSize->new( 72 * PANGO_SCALE );
 
-    $attr_list->insert($size);
     my $fore_attr = $self->_app->characters->get_color_attr($text);
 
     $label->set_attributes($attr_list);
@@ -224,18 +223,18 @@ sub _on_click_continue_button( $self, $grid, $char, $guess ) {
         $label_feedback->add_css_class('error');
         $char->fail;
         $continue_button->set_sensitive(0);
-        Glib::Timeout->add_seconds(1, sub {
+        $self->_app->app->timeout_add(1_000, sub {
             $continue_button->set_sensitive(1);
             return 0;
         });
     }
 
     my $attr_list = Pango::AttrList->new;
-    my $size      = Pango::AttrSize->new( 15 * $self->_app->get_width );
-    $attr_list->insert($size);
     my $const = AlgaGTK::Constants->new;
     $label_feedback->set_halign($const->GTK_ALIGN_CENTER);
     $label_feedback->set_attributes($attr_list);
-    $grid->attach( $label_feedback, 0, 3, 7, 1 );
+    $label_feedback->set_margin_end(5);
+    $label_feedback->set_wrap(1);
+    $grid->attach( $label_feedback, 0, 2, 7, 1 );
 }
 1;

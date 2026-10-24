@@ -99,7 +99,7 @@ sub _create_challenge( $self, $word, $guess ) {
     $box_word->append( $self->_new_exercise_number_label );
     $box_word->append($word_label);
     $box_word->append($exercise_label);
-    $grid->attach( $box_word, 0, 0, 12, 4 );
+    $grid->attach( $box_word, 0, 0, 12, 1 );
     $self->_app->window_set_child($scroll);
     my $back_button = $self->lesson->create_exit_lesson_back_button(
         sub {
@@ -127,10 +127,20 @@ sub _create_challenge( $self, $word, $guess ) {
             $on_answer->(1);
         }
     );
+    {
+        my $label = bless $correct_answer_button->get_child, 'Gtk::Label';
+        $label->inc_ref;
+        $label->set_wrap(1);
+    }
     push @buttons, $correct_answer_button;
     $self->_buttons( \@buttons );
     for my $bad_answer (@$incorrect_answers) {
         my $incorrect_button = Gtk::ToggleButton->new($bad_answer);
+        {
+            my $label = bless $incorrect_button->get_child, 'Gtk::Label';
+            $label->inc_ref;
+            $label->set_wrap(1);
+        }
         $incorrect_button->set_group($correct_answer_button);
         $incorrect_button->connect(
             'clicked',
@@ -159,8 +169,8 @@ sub _create_challenge( $self, $word, $guess ) {
     $scroll_buttons->set_policy( $const->GTK_POLICY_AUTOMATIC, $const->GTK_POLICY_NEVER );
     $self->_buttons_box($box);
     $scroll_buttons->set_child($box);
-    $grid->attach( $scroll_buttons,          0, 2, 12, 1 );
-    $grid->attach( $continue_button, 6, 3, 5,  1 );
+    $grid->attach( $scroll_buttons,          0, 1, 12, 1 );
+    $grid->attach( $continue_button, 6, 2, 5,  1 );
 }
 
 sub _create_grid_challenge($self) {
@@ -172,10 +182,9 @@ sub _create_grid_challenge($self) {
 
 sub _get_label_featured_word( $self, $text ) {
     my $label     = Gtk::Label->new($text);
+    $label->add_css_class('featured-word');
     my $attr_list = Pango::AttrList->new;
-    my $size      = Pango::AttrSize->new( 20 * PANGO_SCALE );
 
-    $attr_list->insert($size);
     my $fore_attr = $self->_app->characters->get_color_attr($text);
 
     $label->set_attributes($attr_list);
@@ -213,6 +222,7 @@ sub _on_click_continue_button( $self, $grid, $word, $guess ) {
     {
         if ( $self->_final_answer eq $self->guess_to_string($guess) ) {
             $label_feedback = Gtk::Label->new('You are doing it great.');
+            $label_feedback->set_wrap(1);
             $label_feedback->add_css_class('success');
             $self->lesson->add_one_success;
             $word->success;
@@ -220,6 +230,7 @@ sub _on_click_continue_button( $self, $grid, $word, $guess ) {
         }
         $label_feedback = Gtk::Label->new(
             'Meck!! The correct answer is ' . $self->guess_to_string($guess) );
+        $label_feedback->set_wrap(1);
         $label_feedback->add_css_class('error');
         $word->fail;
         $continue_button->set_sensitive(0);
@@ -233,11 +244,9 @@ sub _on_click_continue_button( $self, $grid, $word, $guess ) {
     }
 
     my $attr_list = Pango::AttrList->new;
-    my $size      = Pango::AttrSize->new( 15 * $self->_app->get_width );
-    $attr_list->insert($size);
     my $const = AlgaGTK::Constants->new;
     $label_feedback->set_halign($const->GTK_ALIGN_CENTER);
     $label_feedback->set_attributes($attr_list);
-    $grid->attach( $label_feedback, 0, 3, 7, 1 );
+    $grid->attach( $label_feedback, 0, 2, 7, 1 );
 }
 1;

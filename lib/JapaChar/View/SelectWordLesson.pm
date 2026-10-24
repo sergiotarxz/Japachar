@@ -156,6 +156,11 @@ sub _select_words($self) {
     my $box    = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 10 );
 
     my $xmpp = Gtk::Button->new('Report bugs and share feedback in XMPP');
+    {
+        my $label = bless $xmpp->get_child, 'Gtk::Label';
+        $label->inc_ref;
+        $label->set_wrap(1);
+    }
 
     $xmpp->connect(
         clicked => sub {
@@ -167,7 +172,11 @@ sub _select_words($self) {
     $xmpp->set_halign($const->GTK_ALIGN_CENTER);
 
     my $discord = Gtk::Button->new('Report bugs and share feedback in Discord');
-
+    {
+        my $label = bless $discord->get_child, 'Gtk::Label';
+        $label->inc_ref;
+        $label->set_wrap(1);
+    }
     $discord->connect(
         clicked => sub {
             $self->app->launch_discord;
@@ -187,6 +196,11 @@ sub _select_words($self) {
 
     my $button =
       Gtk::Button->new("Study everything ordered by classification");
+    {
+        my $label = bless $button->get_child, 'Gtk::Label';
+        $label->inc_ref;
+        $label->set_wrap(1);
+    }
     $button->connect(
         clicked => sub {
             JapaChar::View::WordLesson->new( app => $self->app )->run;
@@ -198,6 +212,11 @@ sub _select_words($self) {
     $box->append($button);
     for my $classification (@$classifications) {
         my $button = Gtk::Button->new("Study words classification $classification");
+        {
+            my $label = bless $button->get_child, 'Gtk::Label';
+            $label->inc_ref;
+            $label->set_wrap(1);
+        }
         $button->connect(
             clicked => sub {
                 JapaChar::View::WordLesson->new(

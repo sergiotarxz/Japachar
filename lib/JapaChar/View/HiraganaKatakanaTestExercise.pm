@@ -25,9 +25,7 @@ has _buttons                   => ( is => 'rw' );
 has _buttons_box               => ( is => 'rw' );
 has _first_press_continue      => ( is => 'rw', default => sub { 1 } );
 has _continue_button           => ( is => 'rw' );
-has _on_resize_continue_button => ( is => 'lazy' );
 has _final_answer              => ( is => 'rw' );
-has _on_resize_buttons         => ( is => 'lazy' );
 
 sub _counter($self) {
     return $self->lesson->counter;
@@ -90,17 +88,15 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
     my $box_kana = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 10 );
     $box_kana->append( $self->_new_exercise_number_label );
     $box_kana->append($kana_label);
-    $grid->attach( $box_kana, 0, 0, 12, 4 );
+    $grid->attach( $box_kana, 0, 0, 12, 1 );
     $self->_app->window_set_child($grid);
     my $back_button = $self->lesson->create_exit_lesson_back_button(
         sub {
-            $self->_app->delete_on_resize( $self->_on_resize_continue_button );
         }
     );
     $self->_app->headerbar->pack_start($back_button);
     my $incorrect_chars =
       JapaChar::Characters->new->get_4_incorrect_answers($char, $self->_mark);
-    $self->_app->on_resize( $self->_on_resize_continue_button );
     my @buttons;
     my $continue_button = $self->lesson->create_continue_lesson_button(
         sub {
@@ -108,7 +104,6 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
         }
     );
     $self->_continue_button($continue_button);
-    $self->_on_resize_continue_button->();
     my $on_answer = sub ($correct) {
         $continue_button->set_sensitive(1);
     };
@@ -145,38 +140,9 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
         $box->append($button);
     }
     $self->_buttons_box($box);
-    $self->_on_resize_buttons->();
-    $self->_app->on_resize($self->_on_resize_buttons);
-    $grid->attach( $box,             0, 4, 12, 1 );
+    $grid->attach( $box,             0, 1, 12, 1 );
     $continue_button->set_margin_top(40);
-    $grid->attach( $continue_button, 6, 5, 5,  1 );
-}
-
-sub _build__on_resize_buttons($self) {
-    return sub {
-        return if !defined $self->_buttons_box;
-        my @buttons     = $self->_buttons->@*;
-        my $window_size = $self->_app->get_width;
-        for my $button (@buttons) {
-            my $attr_list         = Pango::AttrList->new;
-            my $size_number       = 40 * $window_size;
-            my $size_pango_number = PANGO_SCALE * 60;
-            my $size              = Pango::AttrSize->new($size_number);
-            if ( $size_pango_number < $size_number ) {
-                $size = Pango::AttrSize->new($size_pango_number);
-            }
-            if ($self->_app->accessibility->is_dyslexia) {
-                my $fore_attr = $self->_app->characters->get_color_attr($button->get_child->get_text);
-                $attr_list->insert($fore_attr);
-            }
-            $attr_list->insert($size);
-            {
-                my $label = bless $button->get_child, 'Gtk::Label';
-                $label->inc_ref;
-                $label->set_attributes($attr_list);
-            }
-        }
-    };
+    $grid->attach( $continue_button, 6, 2, 5,  1 );
 }
 
 sub _create_grid_challenge($self) {
@@ -187,10 +153,8 @@ sub _create_grid_challenge($self) {
 
 sub _get_label_featured_character( $self, $text ) {
     my $label     = Gtk::Label->new($text);
+    $label->add_css_class('featured-char');
     my $attr_list = Pango::AttrList->new;
-    my $size      = Pango::AttrSize->new( 72 * PANGO_SCALE );
-
-    $attr_list->insert($size);
     my $fore_attr = $self->_app->characters->get_color_attr($text);
 
     if ( $self->_app->accessibility->is_dyslexia ) {
@@ -212,7 +176,7 @@ sub _new_typing_romanji_challenge( $self, $char ) {
     $box_kana->set_size_request(40, 300);
     $box_kana->append( $self->_new_exercise_number_label );
     $box_kana->append($kana_label);
-    $grid->attach( $box_kana, 0, 0, 12, 4 );
+    $grid->attach( $box_kana, 0, 0, 12, 1 );
     $self->_app->window_set_child($grid);
     my $back_button = $self->lesson->create_exit_lesson_back_button(
         sub {
@@ -224,22 +188,15 @@ sub _new_typing_romanji_challenge( $self, $char ) {
     my $attr_list         = Pango::AttrList->new;
     my $size_number       = 60 * $self->_app->get_width;
     my $size_pango_number = PANGO_SCALE * 60;
-    my $size              = Pango::AttrSize->new($size_number);
 
-    if ( $size_pango_number < $size_number ) {
-        $size = Pango::AttrSize->new($size_pango_number);
-    }
-    $attr_list->insert($size);
     $romanji_entry->set_attributes($attr_list);
     my $buffer = $romanji_entry->get_buffer;
-    $self->_app->on_resize( $self->_on_resize_continue_button );
     my $continue_button = $self->lesson->create_continue_lesson_button(
         sub {
             $self->_on_click_continue_button( $grid, $char, 'romanji' );
         }
     );
     $self->_continue_button($continue_button);
-    $self->_on_resize_continue_button->();
     my $on_change_buffer = sub {
         my $text = $buffer->get_text;
         if ( !$text ) {
@@ -264,9 +221,9 @@ sub _new_typing_romanji_challenge( $self, $char ) {
 
     $romanji_entry->set_valign($const->GTK_ALIGN_CENTER);
     $romanji_entry->set_halign($const->GTK_ALIGN_CENTER);
-    $grid->attach( $romanji_entry, 2, 4, 8, 1 );
+    $grid->attach( $romanji_entry, 2, 1, 8, 1 );
     $continue_button->set_margin_top(40);
-    $grid->attach( $continue_button, 6, 5, 5, 1 );
+    $grid->attach( $continue_button, 6, 2, 5, 1 );
 }
 
 sub _new_exercise_number_label($self) {
@@ -277,24 +234,7 @@ sub _new_exercise_number_label($self) {
     return $return;
 }
 
-sub _build__on_resize_continue_button($self) {
-    return sub {
-        my $continue_button = $self->_continue_button;
-        my $attr_list       = Pango::AttrList->new;
-        my $size = Pango::AttrSize->new( 40 * $self->_app->get_width );
-
-        $attr_list->insert($size);
-        {
-            my $label = bless $continue_button->get_child, 'Gtk::Label';
-            $label->inc_ref;
-            $label->set_attributes($attr_list);
-        }
-    };
-}
-
 sub _on_exit($self) {
-#    $self->_app->delete_on_resize( $self->_on_resize_buttons );
-    $self->_app->delete_on_resize( $self->_on_resize_continue_button );
 }
 
 sub _on_click_continue_button( $self, $grid, $char, $guess ) {
@@ -337,12 +277,11 @@ sub _on_click_continue_button( $self, $grid, $char, $guess ) {
         $self->success;
     }
     my $attr_list = Pango::AttrList->new;
-    my $size      = Pango::AttrSize->new( 20000 );
-    $attr_list->insert($size);
     my $const = AlgaGTK::Constants->new;
     $label_feedback->set_halign($const->GTK_ALIGN_CENTER);
     $label_feedback->set_wrap(1);
+    $label_feedback->set_margin_top(10);
     $label_feedback->set_attributes($attr_list);
-    $grid->attach( $label_feedback, 0, 5, 7, 1 );
+    $grid->attach( $label_feedback, 0, 2, 7, 1 );
 }
 1;

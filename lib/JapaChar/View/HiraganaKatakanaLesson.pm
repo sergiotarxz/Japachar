@@ -47,12 +47,9 @@ sub _show_start_lesson($self) {
         my $attr_list         = Pango::AttrList->new;
         my $size_number       = 30 * $self->app->get_width;
         my $size_pango_number = PANGO_SCALE * 60;
-        my $size              = Pango::AttrSize->new($size_number);
 
         if ( $size_pango_number < $size_number ) {
-            $size = Pango::AttrSize->new($size_pango_number);
         }
-        $attr_list->insert($size);
         $intro->set_attributes($attr_list);
         $intro2->set_attributes($attr_list);
         $intro3->set_attributes($attr_list);
@@ -64,11 +61,9 @@ sub _show_start_lesson($self) {
         }
     };
     $resize->();
-    $self->app->on_resize($resize);
     $continue_button->connect(
         'clicked',
         sub {
-            $self->app->delete_on_resize($resize);
             $continue_button->set_sensitive(0);
             $self->_successes(0);
             require JapaChar::View::HiraganaKatakanaTestExercise;
@@ -83,7 +78,6 @@ sub _show_start_lesson($self) {
     $back_button->connect(
         'clicked',
         sub {
-            $self->app->delete_on_resize($resize);
             require JapaChar::View::MainMenu;
             JapaChar::View::MainMenu->new( app => $self->app )->run;
         }
@@ -155,10 +149,12 @@ sub finish_lesson_screen($self) {
     if ($notable_lesson) {
         $feedback_label =
           Gtk::Label->new('You did it great, here you have your 20 points.');
+        $feedback_label->set_wrap(1);
     }
     else {
         $feedback_label = Gtk::Label->new(
             'You need to continue improving, we have 10 points for you');
+        $feedback_label->set_wrap(1);
     }
 
     my $continue_button = Gtk::Button->new('Continue');
@@ -173,12 +169,7 @@ sub finish_lesson_screen($self) {
         my $attr_list         = Pango::AttrList->new;
         my $size_number       = 20 * $self->app->get_width;
         my $size_pango_number = PANGO_SCALE * 35;
-        my $size              = Pango::AttrSize->new($size_number);
 
-        if ( $size_pango_number < $size_number ) {
-            $size = Pango::AttrSize->new($size_pango_number);
-        }
-        $attr_list->insert($size);
         $feedback_label->set_attributes($attr_list);
         {
             my $label = bless $continue_button->get_child, 'Gtk::Label';
@@ -186,7 +177,6 @@ sub finish_lesson_screen($self) {
             $label->set_attributes($attr_list);
         }
     };
-    $self->app->on_resize($resize);
     $continue_button->set_margin_end(50);
     $continue_button->set_margin_bottom(50);
     $resize->();
@@ -195,7 +185,6 @@ sub finish_lesson_screen($self) {
     $continue_button->connect(
         'clicked',
         sub {
-            $self->app->delete_on_resize($resize);
             JapaChar::Score->sum( $notable_lesson ? 20 : 10 );
             $continue_button->set_sensitive(0);
             require JapaChar::View::MainMenu;
