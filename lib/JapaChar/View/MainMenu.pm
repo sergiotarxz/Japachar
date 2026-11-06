@@ -76,12 +76,18 @@ sub run($self) {
     }
     $button_start_kanji_lesson->connect(
         clicked => sub {
+            if ($self->app->config->{android_gratis}) {
+                return $self->paywall;
+            }
             JapaChar::View::SelectKanjiLesson->new( app => $self->app, )->run;
         }
     );
     $button_start_words_lesson->connect(
         clicked => sub {
             say 'Starting words lesson';
+            if ($self->app->config->{android_gratis}) {
+                return $self->paywall;
+            }
             JapaChar::View::SelectWordLesson->new( app => $self->app, )->run;
         }
     );
@@ -366,5 +372,14 @@ sub _create_option( $self, $grid, $label, $onchange, $onget ) {
         }
     );
     $grid->attach( $entry, 1, $row, 1, 1 );
+}
+
+sub paywall($self) {
+    my $dialog = Adw::AlertDialog->new( 'Feature available for paid users',
+        'You can only study Hiragana and Katakana in the free version.
+
+Developing this app takes effort, this feature is available only for paid users, Linux users and F-droid users' );
+    $dialog->add_response( 'close', 'Continue' );
+    $self->app->present_dialog($dialog);
 }
 1;

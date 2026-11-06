@@ -53,6 +53,9 @@ sub _select_mark($self) {
         my $button = Gtk::Button->new($mark);
         $button->connect(
             clicked => sub {
+                if (!defined $translate{$mark} || $translate{$mark} ne 'none') {
+                    return $self->paywall;
+                }
                 JapaChar::View::HiraganaKatakanaLesson->new(
                     app  => $self->app,
                     type => $self->type,
@@ -66,5 +69,14 @@ sub _select_mark($self) {
     $scroll->set_child($box);
     $self->app->window_set_child($scroll);
     $self->app->headerbar->pack_start($back_button);
+}
+
+sub paywall($self) {
+    my $dialog = Adw::AlertDialog->new( 'Feature available for paid users',
+        'You can only study \'none\' in the free version.
+
+Developing this app takes effort, this feature is available only for paid users, Linux users and F-droid users' );
+    $dialog->add_response( 'close', 'Continue' );
+    $self->app->present_dialog($dialog);
 }
 1;
