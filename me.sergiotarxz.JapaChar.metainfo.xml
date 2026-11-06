@@ -27,7 +27,7 @@
   <developer_name>sergiotarxz</developer_name>
   <releases>
     <release date="2026-11-06"
-             version="v2.02">
+             version="v2.03">
       <description>
         <p>Migrating out of introspection, Android app published, allowing to better granularity in Hiragana/Katakana learning.</p>
       </description>
