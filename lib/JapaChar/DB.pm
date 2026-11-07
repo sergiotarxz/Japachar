@@ -28,7 +28,7 @@ sub connect {
     require JapaChar;
     my $app      = JapaChar->new;
     my $config   = $app->config;
-    my $db_path = $class->_db_path;
+    my $db_path = $class->_db_path($app);
     $dbh = DBI->connect(
         'dbi:SQLite:dbname='.$db_path,
         undef, undef,
@@ -39,12 +39,13 @@ sub connect {
     $class->_migrate($dbh);
     return $dbh;
 }
+
 sub is_android {
     return  -d '/data' && -d '/system';
 }
 
-sub _db_path($class) {
-    my $home = $class->is_android ? '/storage/emulated/0/Android/data/me.sergiotarxz.japachar/files/' : $ENV{HOME};
+sub _db_path($class, $app) {
+    my $home = $class->is_android ? '/storage/emulated/0/Android/data/'.$app->android_package.'/files/' : $ENV{HOME};
     if ($^O eq 'MSWin32') {
         $home = $ENV{userprofile};
     }

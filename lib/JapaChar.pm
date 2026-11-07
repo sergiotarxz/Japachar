@@ -57,6 +57,10 @@ sub is_android {
     return  -d '/data' && -d '/system';
 }
 
+sub android_package($self) {
+    return $self->config->{android_package};
+}
+
 sub root($self) {
     return path(__FILE__)->parent if $self->is_android;
     return path(__FILE__)->parent->parent->parent;
