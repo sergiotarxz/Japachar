@@ -19,7 +19,9 @@ sub Schema ($class) {
     return $schema if defined $schema;
     require JapaChar::DB;
     JapaChar::DB->connect;
-    my $db_path = JapaChar::DB->_db_path;
+    require JapaChar;
+    my $app = JapaChar->new;
+    my $db_path = JapaChar::DB->_db_path($app);
     my $user = undef;
     my $password = undef;
     # Undef is perfectly fine for username and password.

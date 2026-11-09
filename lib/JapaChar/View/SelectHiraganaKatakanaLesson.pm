@@ -53,7 +53,7 @@ sub _select_mark($self) {
         my $button = Gtk::Button->new($mark);
         $button->connect(
             clicked => sub {
-                if (!defined $translate{$mark} || $translate{$mark} ne 'none') {
+                if ($self->app->config->{android_gratis} && (!defined $translate{$mark} || $translate{$mark} ne 'none')) {
                     return $self->paywall;
                 }
                 JapaChar::View::HiraganaKatakanaLesson->new(
