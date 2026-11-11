@@ -22,17 +22,58 @@ use JapaChar::Schema::Result::WordRepresentationClassification;
 use JapaChar::Schema::Result::WordRepresentation;
 
 __PACKAGE__->register_class(
-    BasicCharacter => 'JapaChar::Schema::Result::BasicCharacter',
-    KanjiKunReadings => 'JapaChar::Schema::Result::KanjiKunReadings',
-    KanjiMeanings => 'JapaChar::Schema::Result::KanjiMeanings',
-    KanjiOnReadings => 'JapaChar::Schema::Result::KanjiOnReadings',
-    Kanji => 'JapaChar::Schema::Result::Kanji',
-    Option => 'JapaChar::Schema::Result::Option',
-    WordClassification => 'JapaChar::Schema::Result::WordClassification',
-    WordMeaning => 'JapaChar::Schema::Result::WordMeaning',
-    Word => 'JapaChar::Schema::Result::Word',
-    WordRepresentationClassification => 'JapaChar::Schema::Result::WordRepresentationClassification',
-    WordRepresentation => 'JapaChar::Schema::Result::WordRepresentation',
+    'BasicCharacter',
+    'JapaChar::Schema::Result::BasicCharacter',
+);
+
+__PACKAGE__->register_class(
+    'KanjiKunReadings',
+    'JapaChar::Schema::Result::KanjiKunReadings',
+);
+
+__PACKAGE__->register_class(
+    'KanjiMeanings',
+    'JapaChar::Schema::Result::KanjiMeanings',
+);
+
+__PACKAGE__->register_class(
+    'KanjiOnReadings',
+    'JapaChar::Schema::Result::KanjiOnReadings',
+);
+
+__PACKAGE__->register_class(
+    'Kanji',
+    'JapaChar::Schema::Result::Kanji',
+);
+
+__PACKAGE__->register_class(
+    'Option',
+    'JapaChar::Schema::Result::Option',
+);
+
+__PACKAGE__->register_class(
+    'WordClassification',
+    'JapaChar::Schema::Result::WordClassification',
+);
+
+__PACKAGE__->register_class(
+    'WordMeaning',
+    'JapaChar::Schema::Result::WordMeaning',
+);
+
+__PACKAGE__->register_class(
+    'Word',
+    'JapaChar::Schema::Result::Word',
+);
+
+__PACKAGE__->register_class(
+    'WordRepresentationClassification',
+    'JapaChar::Schema::Result::WordRepresentationClassification',
+);
+
+__PACKAGE__->register_class(
+    'WordRepresentation',
+    'JapaChar::Schema::Result::WordRepresentation',
 );
 
 my $schema;
