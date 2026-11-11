@@ -152,7 +152,7 @@ sub start($self) {
     my $app =
       Adw::Application->new( 'me.sergiotarxz.JapaChar', 0 | $const->G_APPLICATION_CAN_OVERRIDE_APP_ID | $const->G_APPLICATION_ALLOW_REPLACEMENT);
     $self->app($app);
-#    JapaChar::Fontconfig->new(app => $self)->set_current;
+    JapaChar::Fontconfig->new(app => $self)->set_current;
     $app->connect(
         'activate' => sub {
             $self->_application_start($app);
