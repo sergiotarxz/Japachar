@@ -9,6 +9,18 @@ use feature 'signatures';
 
 use parent 'DBIx::Class::Schema';
 
+use JapaChar::Schema::Result::BasicCharacter;
+use JapaChar::Schema::Result::KanjiKunReadings;
+use JapaChar::Schema::Result::KanjiMeanings;
+use JapaChar::Schema::Result::KanjiOnReadings;
+use JapaChar::Schema::Result::Kanji;
+use JapaChar::Schema::Result::Option;
+use JapaChar::Schema::Result::WordClassification;
+use JapaChar::Schema::Result::WordMeaning;
+use JapaChar::Schema::Result::Word;
+use JapaChar::Schema::Result::WordRepresentationClassification;
+use JapaChar::Schema::Result::WordRepresentation;
+
 __PACKAGE__->register_class(
     BasicCharacter => 'JapaChar::Schema::Result::BasicCharacter',
     KanjiKunReadings => 'JapaChar::Schema::Result::KanjiKunReadings',
