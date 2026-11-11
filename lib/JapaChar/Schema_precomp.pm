@@ -9,8 +9,18 @@ use feature 'signatures';
 
 use parent 'DBIx::Class::Schema';
 
-__PACKAGE__->load_namespaces(
-    result_namespace => '+JapaChar::Schema::Result',
+__PACKAGE__->register_class(
+    BasicCharacter => 'JapaChar::Schema::Result::BasicCharacter',
+    KanjiKunReadings => 'JapaChar::Schema::Result::KanjiKunReadings',
+    KanjiMeanings => 'JapaChar::Schema::Result::KanjiMeanings',
+    KanjiOnReadings => 'JapaChar::Schema::Result::KanjiOnReadings',
+    Kanji => 'JapaChar::Schema::Result::Kanji',
+    Option => 'JapaChar::Schema::Result::Option',
+    WordClassification => 'JapaChar::Schema::Result::WordClassification',
+    WordMeaning => 'JapaChar::Schema::Result::WordMeaning',
+    Word => 'JapaChar::Schema::Result::Word',
+    WordRepresentationClassification => 'JapaChar::Schema::Result::WordRepresentationClassification',
+    WordRepresentation => 'JapaChar::Schema::Result::WordRepresentation',
 );
 
 my $schema;
