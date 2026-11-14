@@ -26,6 +26,12 @@
   </branding>
   <developer_name>sergiotarxz</developer_name>
   <releases>
+    <release date="2026-11-14"
+             version="v2.04">
+      <description>
+        <p>Making the interface more libadwaita.</p>
+      </description>
+    </release>
     <release date="2026-11-06"
              version="v2.03">
       <description>

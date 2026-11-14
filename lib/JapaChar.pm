@@ -388,4 +388,13 @@ sub start($self) {
     $app->load_resource( $self->_gresources_path );
     $app->run(@ARGV);
 }
+
+sub paywall($self) {
+    my $dialog = Adw::AlertDialog->new( 'Feature available for paid users',
+        'You can only study Hiragana and Katakana in the free version.
+
+Developing this app takes effort, this feature is available only for paid users, Linux users and F-droid users' );
+    $dialog->add_response( 'close', 'Continue' );
+    $self->present_dialog($dialog);
+}
 1;
