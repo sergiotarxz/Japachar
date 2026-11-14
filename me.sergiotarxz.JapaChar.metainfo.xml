@@ -27,6 +27,12 @@
   <developer_name>sergiotarxz</developer_name>
   <releases>
     <release date="2026-11-14"
+             version="v2.05">
+      <description>
+        <p>Fixing error in word population.</p>
+      </description>
+    </release>
+    <release date="2026-11-14"
              version="v2.04">
       <description>
         <p>Making the interface more libadwaita.</p>
