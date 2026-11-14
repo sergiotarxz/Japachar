@@ -53,15 +53,8 @@ sub _show_start_lesson($self) {
     $continue_button->set_halign($const->GTK_ALIGN_END);
     $continue_button->set_valign($const->GTK_ALIGN_END);
     $continue_button->set_vexpand(1);
-    $back_button->connect(
-        'clicked',
-        sub {
-            require JapaChar::View::MainMenu;
-            JapaChar::View::MainMenu->new( app => $self->app )->run;
-        }
-    );
     $continue_button->set_margin_bottom(50);
-    $self->app->window_set_child($box);
+    $self->app->window_set_child($box, 1, 'Start Word lesson', 'start-word-lesson');
     $self->app->headerbar->pack_start($back_button);
 }
 
@@ -113,8 +106,7 @@ sub _create_dialog_exit_lesson( $self, $on_exit ) {
 sub _on_dialog_exit_lesson_response( $self, $response, $on_exit ) {
     if ( $response eq $exit_the_lesson_id ) {
         $on_exit->();
-        require JapaChar::View::MainMenu;
-        JapaChar::View::MainMenu->new( app => $self->app )->run;
+        $self->app->build_welcome;
     }
 }
 
@@ -151,11 +143,10 @@ sub finish_lesson_screen($self) {
         sub {
             JapaChar::Score->sum( $notable_lesson ? 60 : 30 );
             $continue_button->set_sensitive(0);
-            require JapaChar::View::MainMenu;
-            JapaChar::View::MainMenu->new( app => $self->app )->run;
+            $self->app->build_welcome;
         }
     );
-    $self->app->window_set_child($box);
+    $self->app->window_set_child($box, 1, 'Congrats finishing word lesson', 'finish-word-lesson');
 }
 
 1;

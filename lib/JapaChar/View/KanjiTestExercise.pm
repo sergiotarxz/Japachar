@@ -105,7 +105,7 @@ sub _create_challenge($self, $char, $guess) {
         $box_kanji->append(Gtk::Label->new("$helper: $result"));
     }
     $grid->attach( $box_kanji, 0, 0, 12, 1 );
-    $self->_app->window_set_child($grid);
+    $self->_app->window_set_child($grid, 1, 'Complete the Kanji exercise', 'kanji-test-exercise');
     my $back_button = $self->lesson->create_exit_lesson_back_button(
         sub {
         }

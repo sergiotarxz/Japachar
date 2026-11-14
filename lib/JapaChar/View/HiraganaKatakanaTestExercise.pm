@@ -89,7 +89,7 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
     $box_kana->append( $self->_new_exercise_number_label );
     $box_kana->append($kana_label);
     $grid->attach( $box_kana, 0, 0, 12, 1 );
-    $self->_app->window_set_child($grid);
+    $self->_app->window_set_child($grid, 1, 'Complete the Kana exercise', 'complete-kana-exercise');
     my $back_button = $self->lesson->create_exit_lesson_back_button(
         sub {
         }
@@ -177,7 +177,7 @@ sub _new_typing_romanji_challenge( $self, $char ) {
     $box_kana->append( $self->_new_exercise_number_label );
     $box_kana->append($kana_label);
     $grid->attach( $box_kana, 0, 0, 12, 1 );
-    $self->_app->window_set_child($grid);
+    $self->_app->window_set_child($grid, 1, 'Write the correct sound', 'write-the-sound-kana');
     my $back_button = $self->lesson->create_exit_lesson_back_button(
         sub {
             $self->_on_exit;

@@ -100,7 +100,7 @@ sub _create_challenge( $self, $word, $guess ) {
     $box_word->append($word_label);
     $box_word->append($exercise_label);
     $grid->attach( $box_word, 0, 0, 12, 1 );
-    $self->_app->window_set_child($scroll);
+    $self->_app->window_set_child($scroll, 1, 'Word exercise', 'word-exercise');
     my $back_button = $self->lesson->create_exit_lesson_back_button(
         sub {
         }

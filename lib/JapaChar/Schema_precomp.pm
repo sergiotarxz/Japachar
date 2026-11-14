@@ -84,7 +84,7 @@ sub Schema ($class) {
         JapaChar::DB_precomp->connect;
         require JapaChar;
         my $app = JapaChar->new;
-        my $db_path = JapaChar::DB->_db_path($app);
+        my $db_path = JapaChar::DB_precomp->_db_path($app);
         my $user = undef;
         my $password = undef;
         # Undef is perfectly fine for username and password.

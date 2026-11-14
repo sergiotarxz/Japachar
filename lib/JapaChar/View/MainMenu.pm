@@ -24,6 +24,7 @@ use constant PANGO_SCALE => 1024;
 has app => ( is => 'ro' );
 
 sub run($self) {
+    my $split_view = Adw::NavigationSplitView->new;
     my $scroll = Gtk::ScrolledWindow->new;
     my $const = AlgaGTK::Constants->new;
     $scroll->set_policy( $const->GTK_POLICY_NEVER, $const->GTK_POLICY_AUTOMATIC );
@@ -155,25 +156,6 @@ sub run($self) {
             $self->app->launch_discord;
         }
     );
-    my $button_xmpp_community =
-      Gtk::Button->new('Join the XMPP community');
-    $attr_list = Pango::AttrList->new;
-    {
-        my $label = bless $button_xmpp_community->get_child, 'Gtk::Label';
-        $label->inc_ref;
-        $label->set_attributes($attr_list);
-        $label->set_wrap(1);
-    }
-    $button_xmpp_community->set_vexpand(1);
-    $button_xmpp_community->set_valign($const->GTK_ALIGN_CENTER);
-    $button_xmpp_community->set_halign($const->GTK_ALIGN_FILL);
-    $button_xmpp_community->set_hexpand(1);
-    $button_xmpp_community->connect(
-        clicked => sub {
-            $self->app->launch_xmpp;
-        }
-    );
-    $buttons_social->append($button_xmpp_community);
     $buttons_social->append($button_discord_community);
     $buttons_social->set_halign($const->GTK_ALIGN_FILL);
     my $clamp_buttons_social = Adw::Clamp->new;

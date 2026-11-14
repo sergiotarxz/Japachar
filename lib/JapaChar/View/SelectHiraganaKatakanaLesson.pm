@@ -25,13 +25,6 @@ sub run($self) {
 
 sub _select_mark($self) {
     my $back_button = Gtk::Button->new_from_icon_name('go-previous-symbolic');
-    $back_button->connect(
-        'clicked',
-        sub {
-            require JapaChar::View::MainMenu;
-            JapaChar::View::MainMenu->new( app => $self->app )->run;
-        }
-    );
     my $scroll = Gtk::ScrolledWindow->new;
     my $const        = AlgaGTK::Constants->new;
     my $box    = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 10 );
@@ -67,7 +60,7 @@ sub _select_mark($self) {
         $box->append($button);
     }
     $scroll->set_child($box);
-    $self->app->window_set_child($scroll);
+    $self->app->window_set_child($scroll, 1, 'Select Hiragana/Katakana lesson', 'select-hirakana-lesson');
     $self->app->headerbar->pack_start($back_button);
 }
 

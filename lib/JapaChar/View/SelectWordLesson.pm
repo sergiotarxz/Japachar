@@ -44,7 +44,7 @@ sub _migrate_words($self) {
     $label->set_valign($const->GTK_ALIGN_CENTER);
     $box->append($label);
     $box->append($progress_bar);
-    $self->app->window_set_child($box);
+    $self->app->window_set_child($box, 1, 'Populating the Words', 'populating the words');
     my ( $read, $write );
     pipe $read, $write;
     my $parent_pid = $$;
@@ -143,13 +143,6 @@ sub _migrate_words($self) {
 
 sub _select_words($self) {
     my $back_button = Gtk::Button->new_from_icon_name('go-previous-symbolic');
-    $back_button->connect(
-        'clicked',
-        sub {
-            require JapaChar::View::MainMenu;
-            JapaChar::View::MainMenu->new( app => $self->app )->run;
-        }
-    );
     my $classifications = $self->_words->classifications;
     my $scroll = Gtk::ScrolledWindow->new;
     my $const = AlgaGTK::Constants->new;
@@ -242,7 +235,7 @@ sub _select_words($self) {
     $box->append($xmpp);
     $box->append($discord);
     $scroll->set_child($box);
-    $self->app->window_set_child($scroll);
+    $self->app->window_set_child($scroll, 1, 'Select Word lesson', 'select-word-lesson');
     $self->app->headerbar->pack_start($back_button);
 }
 1;

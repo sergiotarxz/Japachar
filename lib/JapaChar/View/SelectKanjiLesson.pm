@@ -41,7 +41,7 @@ sub _migrate_kanji($self) {
     $label->set_valign($const->GTK_ALIGN_CENTER);
     $box->append($label);
     $box->append($progress_bar);
-    $self->app->window_set_child($box);
+    $self->app->window_set_child($box, 1, 'Wait while the Kanjies are populated', 'populate-kanji');
     my ( $read, $write );
     pipe $read, $write;
     my $parent_pid = $$;
@@ -132,13 +132,6 @@ sub _migrate_kanji($self) {
 
 sub _select_kanji($self) {
     my $back_button = Gtk::Button->new_from_icon_name('go-previous-symbolic');
-    $back_button->connect(
-        'clicked',
-        sub {
-            require JapaChar::View::MainMenu;
-            JapaChar::View::MainMenu->new( app => $self->app )->run;
-        }
-    );
     my $grades = $self->_kanji->grades;
     my $scroll = Gtk::ScrolledWindow->new;
     my $const        = AlgaGTK::Constants->new;
@@ -227,7 +220,7 @@ sub _select_kanji($self) {
     $box->append($xmpp);
     $box->append($discord);
     $scroll->set_child($box);
-    $self->app->window_set_child($scroll);
+    $self->app->window_set_child($scroll, 1, 'Select Kanji lesson', 'select-kanji' );
     $self->app->headerbar->pack_start($back_button);
 }
 1;
