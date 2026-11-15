@@ -27,6 +27,12 @@
   <developer_name>sergiotarxz</developer_name>
   <releases>
     <release date="2026-11-15"
+             version="v2.07">
+      <description>
+        <p>Making save load compatible with android and releasing just to avoid forgetting because AlgaGTK changed its compat.</p>
+      </description>
+    </release>
+    <release date="2026-11-15"
              version="v2.06">
       <description>
         <p>Adding save load and restore so you can transfer your saves between Android, Linux or any future platform.</p>
