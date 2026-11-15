@@ -355,8 +355,7 @@ be lost)');
             my $dialog = Gtk::FileDialog->new;
             $dialog->set_title('Save as');
             $dialog->set_initial_name(basename($save));
-            $dialog->open($self->_window, sub($path) {
-                my $file = Gio::File->new_for_uri($path);
+            $dialog->open($self->_window, sub($file) {
 
                 my $contents = $file->load_contents;
 
