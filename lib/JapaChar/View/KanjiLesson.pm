@@ -56,7 +56,7 @@ sub _show_start_lesson($self) {
     $continue_button->set_valign($const->GTK_ALIGN_END);
     $continue_button->set_vexpand(1);
     $continue_button->set_margin_bottom(50);
-    $self->app->window_set_child($box, 1, 'Start Kanji lesson');
+    $self->app->window_set_child($box, 1, 'Start Kanji lesson', 'finish-lesson-kanji');
     $self->app->headerbar->pack_start($back_button);
 }
 
@@ -148,7 +148,7 @@ sub finish_lesson_screen($self) {
             $self->app->build_welcome;
         }
     );
-    $self->app->window_set_child($box, 1, 'Congrats finishing your Kanji lesson');
+    $self->app->window_set_child($box, 1, 'Congrats finishing your Kanji lesson', 'finish-lesson-kanji');
 }
 
 1;

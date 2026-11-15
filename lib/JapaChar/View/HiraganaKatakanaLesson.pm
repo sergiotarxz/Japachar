@@ -182,7 +182,7 @@ sub finish_lesson_screen($self) {
             $self->app->build_welcome;
         }
     );
-    $self->app->window_set_child($box, 1, 'Congrats finishing your lesson');
+    $self->app->window_set_child($box, 1, 'Congrats finishing your lesson', 'finish-lesson-kana');
 }
 
 1;

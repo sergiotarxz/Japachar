@@ -351,11 +351,16 @@ be lost)');
             my $db = JapaChar::DB->_db_path($self);
             my $save = dirname($db).'/save.japasave';
             system 'cp', '-f', $db, $save;
+
             my $dialog = Gtk::FileDialog->new;
             $dialog->set_title('Save as');
             $dialog->set_initial_name(basename($save));
             $dialog->open($self->_window, sub($path) {
-                path($db)->spew_raw(path($path)->slurp_raw);
+                my $file = Gio::File->new_for_uri($path);
+
+                my $contents = $file->load_contents;
+
+                path($db)->spew_raw($contents);
                 exit(0);
             });
         }
