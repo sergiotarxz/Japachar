@@ -26,6 +26,12 @@
   </branding>
   <developer_name>sergiotarxz</developer_name>
   <releases>
+    <release date="2026-11-15"
+             version="v2.06">
+      <description>
+        <p>Adding save load and restore so you can transfer your saves between Android, Linux or any future platform.</p>
+      </description>
+    </release>
     <release date="2026-11-14"
              version="v2.05">
       <description>
