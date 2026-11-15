@@ -241,7 +241,8 @@ sub build_welcome($self) {
         'Welcome to Japachar',
         '© Sergiotarxz & Algaos Project',
         'Special thanks to Lucidraws for the logo',
-'The algorithm is gradual, you are expected to fail in the first exercises, only memorize the correct answer and keep trying'
+'The algorithm is gradual, you are expected to fail in the first exercises, only memorize the correct answer and keep trying',
+'We have Android (Play Store & F-Droid) and Linux (Flathub) apps, check out other platforms we support in our website in the sidebar',
     );
     for my $text (@texts) {
         my $label = Gtk::Label->new($text);
