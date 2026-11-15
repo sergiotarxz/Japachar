@@ -318,6 +318,17 @@ sub build_sidebar($self) {
             $self->launch_website;
         }
     );
+    $self->append_to_sidebar_list_box(
+        $list_box,
+        Gtk::Label->new('Backup save'),
+        sub {
+            use File::Basename qw/dirname/;
+            my $db = JapaChar::DB->db_path;
+            my $save = dirname($db).'/save.japasave';
+            system 'cp', $db, $save;
+            Android->share_file($self->_window, $save, 'application/vnd.japa.save');
+        }
+    );
     $list_box->connect(
         'row-activated' => sub( $list_box, $row ) {
             bless $row, 'Gtk::ListBoxRow';
