@@ -323,7 +323,7 @@ sub build_sidebar($self) {
         Gtk::Label->new('Backup save'),
         sub {
             use File::Basename qw/dirname/;
-            my $db = JapaChar::DB->_db_path;
+            my $db = JapaChar::DB->_db_path($self);
             my $save = dirname($db).'/save.japasave';
             system 'cp', $db, $save;
             Android->share_file($self->_window, $save, 'application/vnd.japa.save');
