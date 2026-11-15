@@ -11,6 +11,7 @@ use feature 'signatures';
 use Moo;
 use Path::Tiny;
 use YAML::PP;
+use File::Basename qw/dirname basename/;
 use JapaChar::DB;
 use JapaChar::Characters;
 use JapaChar::Random;
@@ -322,11 +323,41 @@ sub build_sidebar($self) {
         $list_box,
         Gtk::Label->new('Backup save'),
         sub {
-            use File::Basename qw/dirname/;
             my $db = JapaChar::DB->_db_path($self);
             my $save = dirname($db).'/save.japasave';
             system 'cp', $db, $save;
-            Android->share_file($self->_window, $save, 'application/vnd.japa.save');
+            if ($self->is_android) {
+                Android->share_file($self->_window, $save, 'application/vnd.japa.save');
+            } else {
+                my $dialog = Gtk::FileDialog->new;
+                $dialog->set_title('Save as');
+                $dialog->set_initial_name(basename($save));
+                $dialog->save($self->_window, sub($path) {
+                    path($path)->spew_raw(path($save)->slurp_raw);
+                });
+            }
+        }
+    );
+    my $label_open = Gtk::Label->new('Load a save
+(The app will
+close, your
+progress will
+be lost)');
+    $label_open->set_wrap(1);
+    $self->append_to_sidebar_list_box(
+        $list_box,
+        $label_open,
+        sub {
+            my $db = JapaChar::DB->_db_path($self);
+            my $save = dirname($db).'/save.japasave';
+            system 'cp', '-f', $db, $save;
+            my $dialog = Gtk::FileDialog->new;
+            $dialog->set_title('Save as');
+            $dialog->set_initial_name(basename($save));
+            $dialog->open($self->_window, sub($path) {
+                path($db)->spew_raw(path($path)->slurp_raw);
+                exit(0);
+            });
         }
     );
     $list_box->connect(
