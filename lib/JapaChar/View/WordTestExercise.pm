@@ -41,6 +41,13 @@ sub _build__app($self) {
 }
 
 sub run($self) {
+    my $dbh = JapaChar::DB->connect;
+
+    my ($journal_mode) = $dbh->selectrow_array(
+        'PRAGMA journal_mode'
+    );
+
+    warn "SQLite journal mode: $journal_mode";
     $self->lesson->counter( $self->_counter - 1 );
     if ( $self->_counter < 1 ) {
         $self->lesson->finish_lesson_screen();
