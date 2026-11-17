@@ -29,12 +29,16 @@ label {
     font-size: 1rem;
 }
 
-button label {
-    font-size: 1rem;
+button.kanji-button label {
+    font-size: 1.5rem;
 }
 
-button.kanji-button label {
-    font-size: 1.0rem;
+button.solution-button label {
+    font-size: 2rem;
+}
+
+button label {
+    font-size: 1rem;
 }
 
 label.featured-char {

@@ -137,6 +137,7 @@ sub _new_challenge_generic_code( $self, $show, $guess, $can_be_typed = 0 ) {
     $box->set_halign($const->GTK_ALIGN_CENTER);
 
     for my $button (@buttons) {
+        $button->add_css_class('solution-button');
         $box->append($button);
     }
     $self->_buttons_box($box);
