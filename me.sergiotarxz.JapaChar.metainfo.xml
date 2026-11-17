@@ -26,6 +26,12 @@
   </branding>
   <developer_name>sergiotarxz</developer_name>
   <releases>
+    <release date="2026-11-17"
+             version="v2.09">
+      <description>
+        <p>Recovering the score.</p>
+      </description>
+    </release>
     <release date="2026-11-16"
              version="v2.08">
       <description>
