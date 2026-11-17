@@ -43,29 +43,6 @@ sub _build__app($self) {
 sub run($self) {
     my $dbh = JapaChar::DB->connect;
 
-    my ($journal_mode) = $dbh->selectrow_array(
-        'PRAGMA journal_mode'
-    );
-
-    warn "SQLite journal mode: $journal_mode";
-    for my $sql (
-    'SELECT 1',
-    'PRAGMA quick_check',
-    'SELECT COUNT(*) FROM words',
-    'SELECT COUNT(*) FROM word_representations',
-    'SELECT COUNT(*) FROM word_classifications',
-    'SELECT COUNT(*) FROM word_representation_classifications',
-    ) {
-        my $result = eval {
-            $dbh->selectall_arrayref($sql);
-        };
-
-        if ($@) {
-            warn "SQLite test failed [$sql]: $@";
-        } else {
-            warn "SQLite test succeeded [$sql]";
-        }
-    }
     $self->lesson->counter( $self->_counter - 1 );
     if ( $self->_counter < 1 ) {
         $self->lesson->finish_lesson_screen();
@@ -191,7 +168,7 @@ sub _create_challenge( $self, $word, $guess ) {
         $box->append($button);
     }
     my $scroll_buttons = Gtk::ScrolledWindow->new;
-    $scroll_buttons->set_policy( $const->GTK_POLICY_AUTOMATIC, $const->GTK_POLICY_NEVER );
+    $scroll_buttons->set_policy( $const->GTK_POLICY_AUTOMATIC, $const->GTK_POLICY_AUTOMATIC );
     $self->_buttons_box($box);
     $scroll_buttons->set_child($box);
     $grid->attach( $scroll_buttons,          0, 1, 12, 1 );
