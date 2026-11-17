@@ -22,6 +22,7 @@ use Data::Dumper;
 use Mojo::Util qw/url_unescape/;
 use JSON       qw/from_json/;
 use AlgaGTK;
+use JapaChar::Score;
 
 use constant PANGO_SCALE => 1024;
 
@@ -237,6 +238,9 @@ sub build_content($self) {
 sub build_welcome($self) {
     my $const = AlgaGTK::Constants->new;
     my $child = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 10 );
+    my $score_label= Gtk::Label->new("Total Score: @{[JapaChar::Score->new->get]}");
+    $score_label->set_halign($const->GTK_ALIGN_START);
+    $child->append($score_label);
     my @texts = (
         'Welcome to Japachar',
         '© Sergiotarxz & Algaos Project',
@@ -247,6 +251,8 @@ sub build_welcome($self) {
     for my $text (@texts) {
         my $label = Gtk::Label->new($text);
         $label->set_wrap(1);
+        $label->set_margin_start(10);
+        $label->set_margin_end(10);
         $child->append($label);
     }
     $self->window_set_child( $child, 0, 'Japachar', 'japachar' );
