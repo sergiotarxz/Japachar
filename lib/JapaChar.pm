@@ -251,6 +251,7 @@ sub build_welcome($self) {
     for my $text (@texts) {
         my $label = Gtk::Label->new($text);
         $label->set_wrap(1);
+        $label->set_halign($const->GTK_ALIGN_START);
         $label->set_margin_start(10);
         $label->set_margin_end(10);
         $child->append($label);

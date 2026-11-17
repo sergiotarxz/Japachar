@@ -48,6 +48,24 @@ sub run($self) {
     );
 
     warn "SQLite journal mode: $journal_mode";
+    for my $sql (
+    'SELECT 1',
+    'PRAGMA quick_check',
+    'SELECT COUNT(*) FROM words',
+    'SELECT COUNT(*) FROM word_representations',
+    'SELECT COUNT(*) FROM word_classifications',
+    'SELECT COUNT(*) FROM word_representation_classifications',
+    ) {
+        my $result = eval {
+            $dbh->selectall_arrayref($sql);
+        };
+
+        if ($@) {
+            warn "SQLite test failed [$sql]: $@";
+        } else {
+            warn "SQLite test succeeded [$sql]";
+        }
+    }
     $self->lesson->counter( $self->_counter - 1 );
     if ( $self->_counter < 1 ) {
         $self->lesson->finish_lesson_screen();
