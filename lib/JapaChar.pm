@@ -428,6 +428,12 @@ sub parse_params( $self, $params ) {
 }
 
 sub start($self) {
+    my $tmpdir = '/data/data/me.sergiotarxz.japachar/cache';
+
+    mkdir $tmpdir unless -d $tmpdir;
+
+    $ENV{SQLITE_TMPDIR} = $tmpdir;
+    $ENV{TMPDIR} = $tmpdir;
     my $const = AlgaGTK::Constants->new;
     my $app   = Adw::Application->new( 'me.sergiotarxz.JapaChar',
         0 | $const->G_APPLICATION_CAN_OVERRIDE_APP_ID |
