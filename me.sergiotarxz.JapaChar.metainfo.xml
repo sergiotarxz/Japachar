@@ -27,6 +27,12 @@
   <developer_name>sergiotarxz</developer_name>
   <releases>
     <release date="2026-11-17"
+             version="v2.11">
+      <description>
+        <p>Increasing solution sizes to please phone users.</p>
+      </description>
+    </release>
+    <release date="2026-11-17"
              version="v2.10">
       <description>
         <p>Fixing bug that prevented scroll in some word exercises.</p>
