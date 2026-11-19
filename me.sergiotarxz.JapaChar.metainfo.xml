@@ -26,6 +26,12 @@
   </branding>
   <developer_name>sergiotarxz</developer_name>
   <releases>
+    <release date="2026-11-20"
+             version="v2.12">
+      <description>
+        <p>Allowing to open .japasave files directly from your files as long as you do not have the app open.</p>
+      </description>
+    </release>
     <release date="2026-11-17"
              version="v2.11">
       <description>
