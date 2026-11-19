@@ -2,7 +2,7 @@
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
     <mime-type type="application/x-japasave">
         <comment>JapaChar save file</comment>
-        <icon name="application-x-japasave"/>
+        <icon name="me.sergiotarxz.JapaChar-application-x-japasave"/>
         <glob pattern="*.japasave" weight="100"/>
     </mime-type>
 </mime-info>
