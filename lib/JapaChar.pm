@@ -433,6 +433,7 @@ sub start($self) {
 
         mkdir $tmpdir unless -d $tmpdir;
 
+        $ENV{GSK_DEBUG} = 'full-redraw';
         $ENV{SQLITE_TMPDIR} = $tmpdir;
         $ENV{TMPDIR} = $tmpdir;
     }
