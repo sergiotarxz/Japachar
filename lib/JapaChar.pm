@@ -40,6 +40,7 @@ has split_view       => ( is => 'rw' );
 has callbacks_menu   => ( is => 'rw' );
 has destructive      => ( is => 'rw' );
 has breakpoint       => ( is => 'rw' );
+has opened_file       => ( is => 'rw' );
 
 sub _build_words($self) {
     return JapaChar::Words->new( app => $self );
@@ -220,6 +221,37 @@ sub _application_start( $self, $app ) {
 
     #    JapaChar::View::MainMenu->new( app => $self )->run;
     $main_window->present;
+    if ( $self->opened_file ) {
+        {
+            if ( $self->opened_file->get_display_name =~ /\.japasave$/ ) {
+                my $db   = JapaChar::DB->_db_path($self);
+                my $save = dirname($db) . '/save.japasave';
+                system 'cp', '-f', $db, $save;
+
+                my $dialog = Adw::AlertDialog->new(
+                    'Sure you want to load a new save?',
+'All your progress will be lost, the app will be closed, you will LOSE YOUR CURRENT SAVE'
+                );
+                $dialog->add_response( 'previous', 'Go back' );
+                $dialog->add_response( 'continue', 'Continue' );
+                $dialog->set_response_appearance( 'continue',
+                    $const->ADW_RESPONSE_DESTRUCTIVE,
+                );
+                $dialog->connect(
+                    'response' => sub {
+                        my ( $dialog, $response ) = @_;
+                        if ( $response eq 'continue' ) {
+                            my $contents = $self->opened_file->load_contents;
+
+                            path($db)->spew_raw($contents);
+                            exit(0);
+                        }
+                    }
+                );
+                $dialog->present( $self->_window );
+            }
+        }
+    }
     $main_window->add_breakpoint($break);
     $main_window->set_content($split_view);
     $self->split_view->set_show_content(1);
@@ -439,10 +471,19 @@ sub start($self) {
     }
     my $const = AlgaGTK::Constants->new;
     my $app   = Adw::Application->new( 'me.sergiotarxz.JapaChar',
-        0 | $const->G_APPLICATION_CAN_OVERRIDE_APP_ID |
-          $const->G_APPLICATION_ALLOW_REPLACEMENT );
+        0 | $const->G_APPLICATION_CAN_OVERRIDE_APP_ID 
+            | $const->G_APPLICATION_ALLOW_REPLACEMENT 
+            | $const->G_APPLICATION_HANDLES_OPEN );
     $self->app($app);
     JapaChar::Fontconfig->new( app => $self )->set_current;
+    $app->connect(
+        'open' => sub($files, $hint) {
+            if (@$files) {
+                $self->opened_file($files->[0]);
+            }
+            $self->_application_start($app);
+        }
+    );
     $app->connect(
         'activate' => sub {
             $self->_application_start($app);

@@ -4,4 +4,4 @@ Exec=japachar %U
 Type=Application
 Icon=me.sergiotarxz.JapaChar
 Categories=Education;Game
-MimeType=x-scheme-handler/japachar
+MimeType=x-scheme-handler/japachar;application/x-japasave;
