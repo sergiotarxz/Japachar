@@ -18,6 +18,7 @@ my $build = Module::Build->new(
         'DBIx::Class'                 => 0,
         'Crypt::URandom'              => 0,
         'Mojolicious'                 => 0,
+        'Text::CSV'                   => 0,
         'AlgaGTK'                     => 0,
     },
     test_requires      => {

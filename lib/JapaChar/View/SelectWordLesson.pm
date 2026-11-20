@@ -22,11 +22,12 @@ has _words => ( is => 'lazy' );
 sub _build__words($self) {
     return JapaChar::Words->new( app => JapaChar->new );
 }
+
 sub _build__word_classifications($self) {
 }
 
 sub run($self) {
-    if ( !$self->_words->migrated ) {
+    if ( !$self->_words->migrated(JapaChar::Schema->Schema) ) {
         $self->_migrate_words;
         return;
     }
@@ -34,20 +35,25 @@ sub run($self) {
 }
 
 sub _migrate_words($self) {
-    my $const = AlgaGTK::Constants->new;
+    my $const        = AlgaGTK::Constants->new;
     my $box          = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 10 );
     my $label        = Gtk::Label->new('Populating Words database...');
     my $progress_bar = Gtk::ProgressBar->new;
-    $progress_bar->set_halign($const->GTK_ALIGN_CENTER);
+    $progress_bar->set_halign( $const->GTK_ALIGN_CENTER );
     $box->set_vexpand(1);
-    $box->set_valign($const->GTK_ALIGN_CENTER);
-    $label->set_valign($const->GTK_ALIGN_CENTER);
+    $box->set_valign( $const->GTK_ALIGN_CENTER );
+    $label->set_valign( $const->GTK_ALIGN_CENTER );
     $box->append($label);
     $box->append($progress_bar);
-    $self->app->window_set_child($box, 1, 'Populating the Words', 'populating the words');
+    $self->app->window_set_child(
+        $box, 1,
+        'Populating the Words',
+        'populating the words'
+    );
     my ( $read, $write );
     pipe $read, $write;
     my $parent_pid = $$;
+
     if ( $^O eq 'MSWin32' ) {
         if ( -e 'ipc' ) {
             system 'del', 'ipc' and die 'Unable to remove ipc';
@@ -56,15 +62,42 @@ sub _migrate_words($self) {
         open $read,  '<', 'ipc';
         close $write;
     }
-    my $db = JapaChar::DB_precomp->_db_path;
-    if (-e $db) {
+    my $db             = JapaChar::DB_precomp->_db_path;
+    my $install_schema = JapaChar::Schema_precomp->Schema;
+        say  $self->_words->is_first_migration( JapaChar::Schema->Schema );
+    if (
+        $self->_words->migrated($install_schema)
+        && $self->_words->is_first_migration( JapaChar::Schema->Schema ) 
+      )
+    {
         $self->_words->direct_copy_precomp_words_db;
         return $self->_select_words;
     }
-    my $pid        = fork;
+    if ( -e $db && $self->_words->migrated( JapaChar::Schema_precomp->Schema ) )
+    {
+        $install_schema = JapaChar::Schema->Schema;
+    }
+    if (
+        $self->_words->migrated(
+             JapaChar::Schema->Schema 
+        )
+        && $self->_words->migrated( JapaChar::Schema_precomp->Schema )
+      )
+    {
+        return;
+    }
+    my $words = JapaChar::Words->new(
+        app            => JapaChar->new,
+        install_schema => $install_schema
+    );
+    my $pid = fork;
     if ( !$pid ) {
         open $write, '>', 'ipc' if $^O eq 'MSWin32';
-        $self->_words->populate_words( $parent_pid, $write );
+        eval { $words->populate_words( $parent_pid, $write ); };
+        if ($@) {
+            warn $@;
+            exit 1;
+        }
         exit;
     }
     my $n_words;
@@ -79,6 +112,9 @@ sub _migrate_words($self) {
                 if ( $^O eq 'MSWin32' ) {
                     seek $read, 0, 1;
                     return !$read->eof;
+                }
+                if ( !kill 0, $pid ) {
+                    return undef;
                 }
                 return $select->can_read(0.01);
             };
@@ -124,12 +160,11 @@ sub _migrate_words($self) {
                     say $last_number;
                     $progress_bar->set_fraction( $last_number / $n_words );
                     $read_line = undef;
-                    if ( $last_number < $n_words && 0 == waitpid $pid,
-                        WNOHANG )
+                    if ( $last_number < $n_words && 0 == waitpid $pid, WNOHANG )
                     {
                         return 1;
                     }
-                    if (-e $db) {
+                    if ( -e $db ) {
                         $self->_words->direct_copy_precomp_words_db;
                         $self->_select_words;
                     }
@@ -144,9 +179,9 @@ sub _migrate_words($self) {
 sub _select_words($self) {
     my $back_button = Gtk::Button->new_from_icon_name('go-previous-symbolic');
     my $classifications = $self->_words->classifications;
-    my $scroll = Gtk::ScrolledWindow->new;
-    my $const = AlgaGTK::Constants->new;
-    my $box    = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 10 );
+    my $scroll          = Gtk::ScrolledWindow->new;
+    my $const           = AlgaGTK::Constants->new;
+    my $box             = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 10 );
 
     my $xmpp = Gtk::Button->new('Report bugs and share feedback in XMPP');
     {
@@ -162,7 +197,7 @@ sub _select_words($self) {
     );
 
     $xmpp->add_css_class('destructive-action');
-    $xmpp->set_halign($const->GTK_ALIGN_CENTER);
+    $xmpp->set_halign( $const->GTK_ALIGN_CENTER );
 
     my $discord = Gtk::Button->new('Report bugs and share feedback in Discord');
     {
@@ -177,7 +212,7 @@ sub _select_words($self) {
     );
 
     $discord->add_css_class('destructive-action');
-    $discord->set_halign($const->GTK_ALIGN_CENTER);
+    $discord->set_halign( $const->GTK_ALIGN_CENTER );
 
     my $label = Gtk::Label->new(
 'This feature is BETA and incomplete will remain free for a long time, we cannot ensure that time is forever though.'
@@ -187,8 +222,7 @@ sub _select_words($self) {
     $label->set_margin_top(20);
     $box->append($label);
 
-    my $button =
-      Gtk::Button->new("Study everything ordered by classification");
+    my $button = Gtk::Button->new("Study everything ordered by classification");
     {
         my $label = bless $button->get_child, 'Gtk::Label';
         $label->inc_ref;
@@ -201,10 +235,11 @@ sub _select_words($self) {
     );
     $button->set_margin_top(20);
     $button->add_css_class('accent');
-    $button->set_halign($const->GTK_ALIGN_CENTER);
+    $button->set_halign( $const->GTK_ALIGN_CENTER );
     $box->append($button);
     for my $classification (@$classifications) {
-        my $button = Gtk::Button->new("Study words classification $classification");
+        my $button =
+          Gtk::Button->new("Study words classification $classification");
         {
             my $label = bless $button->get_child, 'Gtk::Label';
             $label->inc_ref;
@@ -218,7 +253,7 @@ sub _select_words($self) {
                 )->run;
             }
         );
-        $button->set_halign($const->GTK_ALIGN_CENTER);
+        $button->set_halign( $const->GTK_ALIGN_CENTER );
         $box->append($button);
     }
     $button = Gtk::Button->new("Study unclassified words");
@@ -230,12 +265,13 @@ sub _select_words($self) {
             )->run;
         }
     );
-    $button->set_halign($const->GTK_ALIGN_CENTER);
+    $button->set_halign( $const->GTK_ALIGN_CENTER );
     $box->append($button);
     $box->append($xmpp);
     $box->append($discord);
     $scroll->set_child($box);
-    $self->app->window_set_child($scroll, 1, 'Select Word lesson', 'select-word-lesson');
+    $self->app->window_set_child( $scroll, 1, 'Select Word lesson',
+        'select-word-lesson' );
     $self->app->headerbar->pack_start($back_button);
 }
 1;

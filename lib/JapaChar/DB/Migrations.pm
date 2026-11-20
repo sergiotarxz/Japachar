@@ -97,8 +97,9 @@ sub MIGRATIONS {
             FOREIGN KEY (id_representation) REFERENCES word_representations(id),
             FOREIGN KEY (id_classification) REFERENCES word_classifications(id)
         );',
-        q/INSERT INTO options (name, value) VALUES ('words_version', '0');'/,
+        q/INSERT INTO options (name, value) VALUES ('words_version', '0');/,
         q/INSERT INTO options (name, value) VALUES ('want_words_version', '1');/,
+        q/UPDATE options SET value=2 WHERE name='want_words_version';/,
     );
 }
 1;

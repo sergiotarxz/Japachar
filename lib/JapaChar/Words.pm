@@ -19,10 +19,11 @@ use Moo;
 use Encode qw/decode/;
 
 has app             => ( is => 'ro', required => 1 );
+has install_schema => ( is => 'ro' );
 has _words_schema   => ( is => 'lazy' );
 has _options_schema => ( is => 'lazy' );
 has _schema         => ( is => 'lazy' );
-has _schema_precomp         => ( is => 'lazy' );
+has _schema_precomp => ( is => 'lazy' );
 
 sub _build__schema($self) {
     return JapaChar::Schema->Schema;
@@ -37,7 +38,7 @@ sub _build__words_schema($self) {
 }
 
 sub _build__options_schema($self) {
-    return $self->_schema->resultset('Option');
+    return $self->_schema_precomp->resultset('Option');
 }
 
 sub grades($self) {
@@ -90,15 +91,31 @@ sub get_4_incorrect_answers( $self, $word, $guess ) {
     }
 }
 
-sub migrated($self) {
+sub is_first_migration( $self, $schema ) {
+    return !$self->current_migration_version($schema);
+}
+
+sub migrated($self, $schema) {
+    my $option = $self->install_schema ? $self->install_schema->resultset('Option') : $self->_schema->resultset('Option');
+    if ($schema) {
+        $option = $schema->resultset('Option');
+    }
     my ($option_want_words_version) =
-      $self->_options_schema->search( { name => 'want_words_version' } );
-    my ($option_words_version) =
-      $self->_options_schema->search( { name => 'words_version' } );
-    if ( $option_words_version->value >= $option_want_words_version->value ) {
+      $option->search( { name => 'want_words_version' } );
+    if ( $self->current_migration_version($schema) >= $option_want_words_version->value ) {
         return 1;
     }
     return 0;
+}
+
+# We corrupted the chance to get the correct word_version
+# using the option because of the schema_precomp migration
+# now we have to do heuristics
+sub current_migration_version($self, $schema) {
+    my $dbh = $schema->storage->dbh;
+    return 0 if !scalar @{$dbh->selectall_arrayref('select * from word_classifications')};
+    return 1 if !scalar @{$dbh->selectall_arrayref('select * from word_classifications where value = \'jplt-n5\'')};
+    return 2;
 }
 
 {
@@ -149,7 +166,7 @@ sub migrated($self) {
 
 sub direct_copy_precomp_words_db($self) {
     my $dbh = JapaChar::DB->connect;
-    my ($word) = @{$dbh->selectall_arrayref('select * from words limit 1')};
+    my ($word) = @{ $dbh->selectall_arrayref('select * from words limit 1') };
     if ($word) {
         return;
     }
@@ -177,147 +194,212 @@ sub direct_copy_precomp_words_db($self) {
 
 sub populate_words( $self, $parent_pid, $write ) {
     require JapaChar::DB_precomp;
-    $self->_schema->txn_do(
+    $self->install_schema->txn_do(
         sub {
+            my $option = $self->install_schema->resultset('Option');
             my ($option_want_words_version) =
-              $self->_options_schema->search(
+              $option->search(
                 { name => 'want_words_version' } );
             my ($option_words_version) =
-              $self->_options_schema->search( { name => 'words_version' } );
-            if ( $self->migrated ) {
+              $option->search( { name => 'words_version' } );
+            if ( $self->migrated(JapaChar::Schema->Schema) ) {
                 say 'You already have the words database';
                 return;
             }
-            say 'Populating Words database, please wait...';
-            my $schema = $self->_schema_precomp->resultset('Word');
-            my $root   = $self->app->root;
-            open my $fh, '<', $root->child('JMdict_e.xml');
-            my @words;
-            my $word_index                          = 0;
-            my $representation_index                = 0;
-            my $meaning_index                       = 0;
-            my $classification_index                = 0;
-            my $representation_classification_index = 0;
-            my %classifications;
+            if ( $option_words_version < 2 ) {
+                say 'Populating Words database, please wait...';
+                my $schema = $self->install_schema->resultset('Word');
+                my $root   = $self->app->root;
+                open my $fh, '<', $root->child('JMdict_e.xml');
+                my @words;
+                my $word_index                          = 0;
+                my $representation_index                = 0;
+                my $meaning_index                       = 0;
+                my $classification_index                = 0;
+                my $representation_classification_index = 0;
+                my %classifications;
 
-            $write->print( 213000 . "\n" );
-            $write->flush;
-            my $tries      = 5;
-            my $chunk_size = 1;
-            my @times;
-            my $time_1 = time;
-            my $last_time;
-            my $decided_optimal = 0;
-            use List::Util qw/sum/;
+                $write->print( 213000 . "\n" );
+                $write->flush;
+                my $tries      = 5;
+                my $chunk_size = 1;
+                my @times;
+                my $time_1 = time;
+                my $last_time;
+                my $decided_optimal = 0;
+                use List::Util qw/sum/;
 
-            while ( my $entry_dom = $self->_try_to_find_entry($fh) ) {
-                if ( !kill 0, $parent_pid ) {
-                    warn 'Parent died';
-                    exit 1;
-                }
-                my @representations;
-                for my $representation ( $entry_dom->find('k_ele,r_ele')->each )
-                {
-                    if ( my $kanji = $representation->at('keb') ) {
-                        my @classifications =
-                          $representation->find('ke_pri')->each;
-                        @classifications = map { $_->text } @classifications;
-                        $kanji           = $kanji->text;
-                        push @representations,
-                          {
-                            id              => $representation_index++,
-                            type            => 'kanji',
-                            value           => $kanji,
-                            classifications => \@classifications,
-                          };
+                while ( my $entry_dom = $self->_try_to_find_entry($fh) ) {
+                    if ( !kill 0, $parent_pid ) {
+                        warn 'Parent died';
+                        exit 1;
                     }
-                    if ( my $pronunciation = $representation->at('reb') ) {
-                        my @classifications =
-                          $representation->find('re_pri')->each;
-                        @classifications = map { $_->text } @classifications;
-                        $pronunciation   = $pronunciation->text;
-                        push @representations,
-                          {
-                            id              => $representation_index++,
-                            type            => 'hirakana',
-                            value           => $pronunciation,
-                            classifications => \@classifications,
-                          };
-                    }
-                }
-                my @meanings;
-                for my $meaning ( $entry_dom->find('gloss')->each ) {
-                    push @meanings,
-                      {
-                        id      => $meaning_index++,
-                        meaning => $meaning->text
-                      };
-                }
-                my $classifications_resultset =
-                  JapaChar::Schema_precomp->Schema->resultset('WordClassification');
-
-                for my $representation (@representations) {
-                    my $classifications =
-                      delete $representation->{classifications};
-                    for my $classification (@$classifications) {
-                        if ( defined $classifications{$classification} ) {
-                            next;
+                    my @representations;
+                    for my $representation (
+                        $entry_dom->find('k_ele,r_ele')->each )
+                    {
+                        if ( my $kanji = $representation->at('keb') ) {
+                            my @classifications =
+                              $representation->find('ke_pri')->each;
+                            @classifications =
+                              map { $_->text } @classifications;
+                            $kanji = $kanji->text;
+                            push @representations,
+                              {
+                                id              => $representation_index++,
+                                type            => 'kanji',
+                                value           => $kanji,
+                                classifications => \@classifications,
+                              };
                         }
-                        $classifications{$classification} =
-                          $classification_index;
-                        $classifications_resultset->create(
-                            {
-                                id    => $classification_index++,
-                                value => $classification,
-                            },
-                        );
+                        if ( my $pronunciation = $representation->at('reb') ) {
+                            my @classifications =
+                              $representation->find('re_pri')->each;
+                            @classifications =
+                              map { $_->text } @classifications;
+                            $pronunciation = $pronunciation->text;
+                            push @representations,
+                              {
+                                id              => $representation_index++,
+                                type            => 'hirakana',
+                                value           => $pronunciation,
+                                classifications => \@classifications,
+                              };
+                        }
                     }
-                    if ( scalar @$classifications ) {
-                        $representation->{representation_classifications} = [
-                            map {
-                                {
-                                    id =>
-                                      $representation_classification_index++,
-                                    id_classification => $_,
-                                    id_representation => $representation->{id},
-                                }
-                            } @classifications{@$classifications}
-                        ];
+                    my @meanings;
+                    for my $meaning ( $entry_dom->find('gloss')->each ) {
+                        push @meanings,
+                          {
+                            id      => $meaning_index++,
+                            meaning => $meaning->text
+                          };
                     }
-                }
-                push @words,
-                  {
-                    id              => $word_index++,
-                    representations => \@representations,
-                    meanings        => \@meanings,
-                  };
-                if ( $word_index % ($word_index > 500 ? $chunk_size : 25) == 0 ) {
-                    $self->_schema_precomp->resultset('Word')->populate( \@words );
-                    $write->syswrite( $word_index . "\n" );
-                    $write->flush;
-                    @words = ();
-                    if ($word_index > 500 && !$decided_optimal ) {
-                        next if $tries-- == 5;
-                        push @times, ( scalar time ) - $time_1;
-                        if ( $tries == 0 ) {
-                            my $median_time = (sum(@times) / 5) / $chunk_size;
-                            if ( defined $last_time && $last_time < $median_time ) {
-                                $chunk_size--;
-                                warn "Optimal chunk size: $chunk_size";
-                                $decided_optimal = 1;
+                    my $classifications_resultset =
+                      $self->install_schema->resultset(
+                        'WordClassification');
+
+                    for my $representation (@representations) {
+                        my $classifications =
+                          delete $representation->{classifications};
+                        for my $classification (@$classifications) {
+                            if ( defined $classifications{$classification} ) {
                                 next;
                             }
-                            $tries = 5;
-                            $last_time = $median_time;
-                            $chunk_size++;
+                            $classifications{$classification} =
+                              $classification_index;
+                            $classifications_resultset->create(
+                                {
+                                    id    => $classification_index++,
+                                    value => $classification,
+                                },
+                            );
                         }
-                        $time_1 = time;
+                        if ( scalar @$classifications ) {
+                            $representation->{representation_classifications} =
+                              [
+                                map {
+                                    {
+                                        id =>
+                                          $representation_classification_index++,
+                                        id_classification => $_,
+                                        id_representation =>
+                                          $representation->{id},
+                                    }
+                                } @classifications{@$classifications}
+                              ];
+                        }
+                    }
+                    push @words,
+                      {
+                        id              => $word_index++,
+                        representations => \@representations,
+                        meanings        => \@meanings,
+                      };
+                    if ( $word_index % ( $word_index > 500 ? $chunk_size : 25 )
+                        == 0 )
+                    {
+                        $self->install_schema->resultset('Word')
+                          ->populate( \@words );
+                        $write->syswrite( $word_index . "\n" );
+                        $write->flush;
+                        @words = ();
+                        if ( $word_index > 500 && !$decided_optimal ) {
+                            next if $tries-- == 5;
+                            push @times, ( scalar time ) - $time_1;
+                            if ( $tries == 0 ) {
+                                my $median_time =
+                                  ( sum(@times) / 5 ) / $chunk_size;
+                                if ( defined $last_time
+                                    && $last_time < $median_time )
+                                {
+                                    $chunk_size--;
+                                    warn "Optimal chunk size: $chunk_size";
+                                    $decided_optimal = 1;
+                                    next;
+                                }
+                                $tries     = 5;
+                                $last_time = $median_time;
+                                $chunk_size++;
+                            }
+                            $time_1 = time;
+                        }
+                    }
+                }
+                $self->install_schema->resultset('Word')->populate( \@words );
+                $option_words_version->update( { value => 1 } );
+            }
+            use Text::CSV qw/csv/;
+            my $word_representation =
+              $self->install_schema->resultset('WordRepresentation');
+            my $word_classification =
+              $self->install_schema->resultset('WordClassification');
+            my $create_class = sub ($name) {
+                $word_classification->create(
+                    {
+                        value => $name,
+                    }
+                );
+                my ($result) = $word_classification->search({value => $name});
+                return $result;
+            };
+            my %hash = (
+                N5 => $create_class->('jplt-n5'),
+                N4 => $create_class->('jplt-n4'),
+                N3 => $create_class->('jplt-n3'),
+                N2 => $create_class->('jplt-n2'),
+                N1 => $create_class->('jplt-n1'),
+            );
+            my $word_representation_classification =
+              $self->install_schema->resultset(
+                'WordRepresentationClassification');
+            $write->print( 212999 . "\n" );
+            $write->flush;
+            for my $file ( reverse glob 'openjlpt-0.1.0/data/csv/vocab-n*.csv' )
+            {
+                my $csv = csv( in => $file, headers => 'auto' );
+
+                for my $row (@$csv) {
+                    my $word  = $row->{word};
+                    my $level = $row->{level};
+                    my ($word_rep) =
+                      $word_representation->search( { value => $word } );
+                    if ($word_rep) {
+                        my $id_classification = $hash{$level}->id;
+                        my $id_representation = $word_rep->id;
+                        $word_representation_classification->create(
+                            {
+                                id_classification => $id_classification,
+                                id_representation => $id_representation
+                            }
+                        );
                     }
                 }
             }
-            $self->_schema_precomp->resultset('Word')->populate( \@words );
+
             $option_words_version->update(
-                { value => $option_want_words_version->value } );
+                { value => 2 }
+            );
             say 'Populated Words database';
         }
     );
@@ -375,7 +457,6 @@ sub _next_learning_word( $self, $type = undef ) {
     my $words_resultset = JapaChar::Schema->Schema->resultset('Word');
     my @candidate_words = $self->_retrieve_started_words_not_finished($type);
     my $grade           = $type;
-    say $grade;
     if ( !defined $type ) {
         $grade = { is => undef };
     }
