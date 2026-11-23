@@ -273,6 +273,7 @@ sub build_welcome($self) {
     my $score_label= Gtk::Label->new("Total Score: @{[JapaChar::Score->new->get]}");
     $score_label->set_halign($const->GTK_ALIGN_START);
     $child->append($score_label);
+    my $box_text    = Gtk::Box->new( $const->GTK_ORIENTATION_VERTICAL, 0 );
     my @texts = (
         'Welcome to Japachar',
         '© Sergiotarxz & Algaos Project',
@@ -284,10 +285,25 @@ sub build_welcome($self) {
         my $label = Gtk::Label->new($text);
         $label->set_wrap(1);
         $label->set_halign($const->GTK_ALIGN_START);
-        $label->set_margin_start(10);
+        $label->set_margin_start(50);
+        $self->breakpoint->add_setter( $label, 'margin_start', 10 );
         $label->set_margin_end(10);
-        $child->append($label);
+        $box_text->append($label);
     }
+    $box_text->set_margin_top(50);
+    $child->append($box_text);
+    my $go_to_main_menu = Gtk::Button->new('Go to Main Menu');
+    $go_to_main_menu->connect(
+        'clicked' => sub {
+            $self->request_sidebar;
+        }
+    );
+    $go_to_main_menu->set_property('visible', 0);
+    $self->breakpoint->add_setter( $go_to_main_menu, 'visible', !!1 );
+    $go_to_main_menu->set_halign($const->GTK_ALIGN_CENTER);
+    $go_to_main_menu->set_hexpand(0);
+    $go_to_main_menu->set_margin_top(30);
+    $child->append($go_to_main_menu);
     $self->window_set_child( $child, 0, 'Japachar', 'japachar' );
 }
 
