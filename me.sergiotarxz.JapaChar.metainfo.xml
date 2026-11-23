@@ -26,6 +26,12 @@
   </branding>
   <developer_name>sergiotarxz</developer_name>
   <releases>
+    <release date="2026-11-23"
+             version="v2.14">
+      <description>
+        <p>Now the welcome screen has a button to go to the main menu and also the margins adapt better for desktop, the go to main menu button vanishes on large configurations</p>
+      </description>
+    </release>
     <release date="2026-11-20"
              version="v2.13">
       <description>
