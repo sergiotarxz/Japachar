@@ -200,6 +200,12 @@ sub _application_start( $self, $app ) {
     return if $self->started;
     $self->started(1);
     my $main_window = Adw::ApplicationWindow->new($app);
+    if ($self->is_android) {
+        $main_window->connect('close-request' => sub {
+            $self->request_sidebar;
+            return 1;
+        });
+    }
     $main_window->set_default_size( 320, 640 );
     my $split_view = Adw::NavigationSplitView->new;
     $self->split_view($split_view);
@@ -477,7 +483,7 @@ sub parse_params( $self, $params ) {
 
 sub start($self) {
     if ($self->is_android) {
-        my $tmpdir = '/data/data/me.sergiotarxz.japachar/cache';
+        my $tmpdir = '/data/data/'.$self->android_package.'/cache';
 
         mkdir $tmpdir unless -d $tmpdir;
 
